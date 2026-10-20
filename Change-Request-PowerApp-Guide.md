@@ -111,18 +111,21 @@ Refresh('Change Requests')
 ```
 
 ### Header controls
-| Control | Property | Value |
-|---|---|---|
-| `txtSearch` (Text input) | HintText | `"Search by title…"` |
-| `tglMine` (Toggle) | — | label it “My requests only” |
-| `btnNew` (Button) | Text | `"+ Request a New Change"` |
-| | OnSelect | `Launch(FormUrl, {}, LaunchTarget.New)` |
-| | Fill / Height | `ColorValue("#1E3A6B")` / `44` *(make this the most prominent control on the screen)* |
-| `btnTemplate` (Button, secondary style) | Text | `"Download Rollback Plan template"` |
-| | OnSelect | `Launch(RollbackTemplateUrl, {}, LaunchTarget.New)` |
-| `icoRefresh` (Reload icon) | OnSelect | `Refresh('Change Requests')` |
-| `tmrRefresh` (Timer, Visible = false) | Duration / Repeat / AutoStart | `60000` / `true` / `true` |
-| | OnTimerEnd | `Refresh('Change Requests')` |
+Select **BoardScreen** in the Tree view before inserting each control. The positions assume the default Tablet size (1366 × 768). Keep every header control above **Y = 80**, because that's where `galStages` starts.
+
+> Use the **classic** controls. If your Insert panel shows *Text label*, *Pen input* and *List box*, you're already on classic. The formulas use classic property names such as `txtSearch.Text` and `tglMine.Value`.
+
+| # | Insert | Rename to | Properties |
+|---|---|---|---|
+| 1 | Text label *(optional title)* | `lblAppTitle` | Text: `"Change Request Portal"` · Size: `20` · FontWeight: `FontWeight.Bold` · X `20` · Y `15` · Width `300` · Height `40` |
+| 2 | Text input | `txtSearch` | Default: `""` · HintText: `"Search by title…"` *(grey placeholder shown while empty)* · X `340` · Y `15` · Width `260` · Height `40` |
+| 3 | Toggle | `tglMine` | Default: `false` · TrueText: `"My requests"` · FalseText: `"All requests"` · X `620` · Y `15` · Width `200` · Height `40` |
+| 4 | Icons › Reload | `icoRefresh` | OnSelect: `Refresh('Change Requests')` · X `840` · Y `20` · Width `30` · Height `30` |
+| 5 | Button | `btnTemplate` | Text: `"Download Rollback Plan template"` · OnSelect: `Launch(RollbackTemplateUrl, {}, LaunchTarget.New)` · Fill: `Color.White` · Color: `ColorValue("#1E3A6B")` · BorderColor: `ColorValue("#1E3A6B")` · X `890` · Y `15` · Width `230` · Height `40` |
+| 6 | Button | `btnNew` | Text: `"+ Request a New Change"` · OnSelect: `Launch(FormUrl, {}, LaunchTarget.New)` · Fill: `ColorValue("#1E3A6B")` · X `1130` · Y `13` · Width `216` · Height `44` |
+| 7 | Timer | `tmrRefresh` | Duration: `60000` · Repeat: `true` · AutoStart: `true` · Visible: `false` · OnTimerEnd: `Refresh('Change Requests')` |
+
+To check the buttons, hold **Alt** and click **btnNew**, which should open the form, then **btnTemplate**, which should open the PDF. The search box and toggle start working once `galCards` (below) is built.
 
 > New requests now come in through the Microsoft Form, and a Power Automate flow creates the list item (see [Change-Request-Form-Setup.md](Change-Request-Form-Setup.md)). It takes a few seconds for a new request to show up. The timer refreshes the board every minute, and users can click the refresh icon to update it immediately.
 
@@ -134,6 +137,7 @@ Insert a **Blank horizontal gallery** under the header.
 | Items | `Stages` |
 | TemplateSize | `300` |
 | TemplatePadding | `8` |
+| X / Y | `0` / `80` |
 | Height | `Parent.Height - Self.Y` |
 
 Add these controls inside its template:
