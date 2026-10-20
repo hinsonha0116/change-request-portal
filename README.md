@@ -18,6 +18,7 @@ A Microsoft 365 change-request portal. Requests are submitted through a Microsof
 | [Provision-ChangeRequestLists.ps1](Provision-ChangeRequestLists.ps1) | Creates the SharePoint lists and uploads the rollback template (PnP.PowerShell) |
 | [Rollback-Plan-Template.pdf](Rollback-Plan-Template.pdf) | Fillable Rollback Plan form that requesters attach to every change |
 | [Build-RollbackPdf.ps1](Build-RollbackPdf.ps1) | Regenerates the Rollback Plan PDF: `./Build-RollbackPdf.ps1 -OutFile .\Rollback-Plan-Template.pdf` |
+| [docs/](docs/) | Screen layout diagrams used in the guide, and `Build-Mockups.ps1`, which regenerates them |
 
 ## Setup order
 

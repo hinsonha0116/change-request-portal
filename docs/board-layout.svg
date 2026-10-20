@@ -1,0 +1,90 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1366 768' font-family='Segoe UI, Arial, sans-serif'>
+<rect x='0' y='0' width='1366' height='768' fill='#FFFFFF' stroke='#9CA3AF' />
+<text x='20' y='46' font-size='22' fill='#111827' font-weight='bold' text-anchor='start'>Change Request Portal</text>
+<rect x='340' y='15' width='260' height='40' fill='#fff' stroke='#9CA3AF' />
+<text x='352' y='40' font-size='14' fill='#9CA3AF' font-weight='normal' text-anchor='start'>Search by title…</text>
+<rect x='630' y='25' width='44' height='20' fill='#D1D5DB' stroke='none' rx='10'/>
+<circle cx='640' cy='35' r='8' fill='#fff'/>
+<text x='684' y='40' font-size='14' fill='#374151' font-weight='normal' text-anchor='start'>All requests</text>
+<circle cx='855' cy='35' r='10' fill='none' stroke='#374151' stroke-width='2.5' stroke-dasharray='48 15'/>
+<rect x='890' y='15' width='230' height='40' fill='#fff' stroke='#1E3A6B' stroke-width='1.5' rx='4'/>
+<text x='1005' y='40' font-size='13' fill='#1E3A6B' font-weight='normal' text-anchor='middle'>Download Rollback Plan template</text>
+<rect x='1130' y='13' width='216' height='44' fill='#1E3A6B' stroke='none' rx='4'/>
+<text x='1238' y='40' font-size='14' fill='#fff' font-weight='bold' text-anchor='middle'>+ Request a New Change</text>
+<line x1='0' y1='80' x2='1366' y2='80' stroke='#C026D3' stroke-dasharray='4 4'/>
+<rect x='4' y='84' width='219' height='680' fill='#F3F4F6' stroke='none' />
+<rect x='4' y='84' width='219' height='44' fill='#6B7280' stroke='none' />
+<text x='12' y='111' font-size='13' fill='#fff' font-weight='bold' text-anchor='start'>1. Requested  (2)</text>
+<rect x='8' y='136' width='211' height='116' fill='#fff' stroke='#D1D5DB' />
+<rect x='8' y='136' width='5' height='116' fill='#EA580C' stroke='none' />
+<text x='20' y='154' font-size='11' fill='#6B7280' font-weight='bold' text-anchor='start'>CR-00014</text>
+<text x='20' y='176' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>Replace core router PSU</text>
+<text x='20' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>P2 · Hardware · Normal</text>
+<text x='20' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk 2 · Impact 3</text>
+<text x='20' y='244' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>SSgt Lee · 3 CS</text>
+<rect x='8' y='260' width='211' height='116' fill='#fff' stroke='#D1D5DB' />
+<rect x='8' y='260' width='5' height='116' fill='#DC2626' stroke='none' />
+<text x='20' y='278' font-size='11' fill='#6B7280' font-weight='bold' text-anchor='start'>CR-00013</text>
+<text x='20' y='300' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>Patch VPN concentrator</text>
+<text x='20' y='332' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>P1 · Network · Emergency</text>
+<text x='20' y='350' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk 1 · Impact 2</text>
+<text x='20' y='368' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>TSgt Diaz · 3 CS</text>
+<rect x='232' y='84' width='219' height='680' fill='#F3F4F6' stroke='none' />
+<rect x='232' y='84' width='219' height='44' fill='#2563EB' stroke='none' />
+<text x='240' y='111' font-size='13' fill='#fff' font-weight='bold' text-anchor='start'>2. Change Advisory Board  (1)</text>
+<rect x='236' y='136' width='211' height='116' fill='#fff' stroke='#D1D5DB' />
+<rect x='236' y='136' width='5' height='116' fill='#CA8A04' stroke='none' />
+<text x='248' y='154' font-size='11' fill='#6B7280' font-weight='bold' text-anchor='start'>CR-00011</text>
+<text x='248' y='176' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>Upgrade switch firmware</text>
+<text x='248' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>P3 · Network · Normal</text>
+<text x='248' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk 3 · Impact 3</text>
+<text x='248' y='244' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>A1C Park · 5 CS</text>
+<rect x='459' y='84' width='219' height='680' fill='#F3F4F6' stroke='none' />
+<rect x='459' y='84' width='219' height='44' fill='#7C3AED' stroke='none' />
+<text x='467' y='111' font-size='13' fill='#fff' font-weight='bold' text-anchor='start'>3. Change Authority  (1)</text>
+<rect x='463' y='136' width='211' height='116' fill='#fff' stroke='#D1D5DB' />
+<rect x='463' y='136' width='5' height='116' fill='#6B7280' stroke='none' />
+<text x='475' y='154' font-size='11' fill='#6B7280' font-weight='bold' text-anchor='start'>CR-00009</text>
+<text x='475' y='176' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>New SharePoint site</text>
+<text x='475' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>P4 · Software · Standard</text>
+<text x='475' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk 3 · Impact 3</text>
+<text x='475' y='244' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>Mr. Cole · A6X</text>
+<rect x='687' y='84' width='219' height='680' fill='#F3F4F6' stroke='none' />
+<rect x='687' y='84' width='219' height='44' fill='#D97706' stroke='none' />
+<text x='695' y='111' font-size='13' fill='#fff' font-weight='bold' text-anchor='start'>4. Implementation  (1)</text>
+<rect x='691' y='136' width='211' height='116' fill='#fff' stroke='#D1D5DB' />
+<rect x='691' y='136' width='5' height='116' fill='#EA580C' stroke='none' />
+<text x='703' y='154' font-size='11' fill='#6B7280' font-weight='bold' text-anchor='start'>CR-00007</text>
+<text x='703' y='176' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>Firewall rule update</text>
+<text x='703' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>P2 · Network · Normal</text>
+<text x='703' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk 2 · Impact 2</text>
+<text x='703' y='244' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>SrA Kim · 3 CS</text>
+<rect x='915' y='84' width='219' height='680' fill='#F3F4F6' stroke='none' />
+<rect x='915' y='84' width='219' height='44' fill='#0891B2' stroke='none' />
+<text x='923' y='111' font-size='13' fill='#fff' font-weight='bold' text-anchor='start'>5. Review  (0)</text>
+<rect x='1142' y='84' width='219' height='680' fill='#F3F4F6' stroke='none' />
+<rect x='1142' y='84' width='219' height='44' fill='#16A34A' stroke='none' />
+<text x='1150' y='111' font-size='13' fill='#fff' font-weight='bold' text-anchor='start'>6. Close  (1)</text>
+<rect x='1146' y='136' width='211' height='116' fill='#fff' stroke='#D1D5DB' />
+<rect x='1146' y='136' width='5' height='116' fill='#6B7280' stroke='none' />
+<text x='1158' y='154' font-size='11' fill='#6B7280' font-weight='bold' text-anchor='start'>CR-00003</text>
+<text x='1158' y='176' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>Printer driver rollout</text>
+<text x='1158' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>P4 · Software · Standard</text>
+<text x='1158' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk 3 · Impact 3</text>
+<text x='1158' y='244' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>Ms. Ford · A6O</text>
+<rect x='20' y='60' width='91.2' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='26' y='74' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>lblAppTitle</text>
+<rect x='340' y='58' width='76.8' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='346' y='72' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>txtSearch</text>
+<rect x='620' y='58' width='62.4' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='626' y='72' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>tglMine</text>
+<rect x='818' y='58' width='84' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='824' y='72' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>icoRefresh</text>
+<rect x='960' y='58' width='91.2' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='966' y='72' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnTemplate</text>
+<rect x='1240' y='58' width='55.2' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1246' y='72' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnNew</text>
+<rect x='2' y='82' width='1362' height='684' fill='none' stroke='#C026D3' stroke-width='2' stroke-dasharray='6 4'/>
+<rect x='1180' y='740' width='170.4' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1186' y='754' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>galStages (whole area)</text>
+<rect x='915' y='84' width='219' height='44' fill='none' stroke='#C026D3' stroke-width='2' stroke-dasharray='6 4'/>
+<rect x='919' y='136' width='170.4' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='925' y='150' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>rectHeader + lblHeader</text>
+<rect x='8' y='134' width='211' height='626' fill='none' stroke='#C026D3' stroke-width='2' stroke-dasharray='6 4'/>
+<rect x='20' y='500' width='69.6' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='26' y='514' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>galCards</text>
+<rect x='236' y='136' width='211' height='116' fill='none' stroke='#C026D3' stroke-width='2' stroke-dasharray='6 4'/>
+<rect x='236' y='258' width='199.2' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='242' y='272' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>galCards template = 1 card</text>
+<rect x='1080' y='640' width='278.4' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1086' y='654' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>tmrRefresh: invisible, place anywhere</text>
+</svg>
