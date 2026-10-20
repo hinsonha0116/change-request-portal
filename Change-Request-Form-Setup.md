@@ -41,13 +41,13 @@ If you put the PDF in the same folder as the provisioning script, the script upl
    - **Who can fill out this form:** *Only people in my organization*. This is required, because Forms only allows file uploads on organization-only forms.
    - **Record name:** On. This also records each responder's e-mail, which is a useful audit backup.
    - **Accept responses:** On.
-3. Add the questions below **in this order**.
+3. Add the questions below. This is the suggested order, but you can rearrange them: the flow finds each answer by its question name, not its position.
 
 | # | Question | Type | Required | Options / settings |
 |---|---|---|---|---|
 | 1 | A6 Program | Text | ✔ | |
-| 2 | DSN | Text | ✔ | Subtitle: *e.g., 312-555-1234* |
-| 3 | Requested By | Text | ✔ | Subtitle: *Rank and full name* |
+| 2 | Requested By | Text | ✔ | Subtitle: *Rank and full name* |
+| 3 | DSN | Text | ✔ | Subtitle: *e.g., 312-555-1234* |
 | 4 | E-mail | Text | ✔ | |
 | 5 | Category | Choice | ✔ | Hardware · Software · Network |
 | 6 | Change Type | Choice | ✔ | Standard · Normal · Emergency · Informational |

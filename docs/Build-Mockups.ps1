@@ -108,8 +108,8 @@ for ($i = 0; $i -lt 6; $i++) {
 }
 # form
 $rows = @(
-    @('A6 Program', 'A6X Cyber', 'DSN', '312-555-0142'),
-    @('Requested By', 'A1C Jordan Park', 'Requester Email', 'jordan.park@us.af.mil'),
+    @('A6 Program', 'A6X Cyber', 'Requested By', 'A1C Jordan Park'),
+    @('DSN', '312-555-0142', 'Requester Email', 'jordan.park@us.af.mil'),
     @('Title', 'Upgrade switch firmware', 'Category', 'Network'),
     @('Change Type', 'Normal', 'Priority', '3 - Moderate'),
     @('Risk', '3 - Moderate', 'Impact', '3 - Moderate'),

@@ -391,7 +391,7 @@ With({cur: LookUp(Stages, Name = varCR.Stage.Value).Order},
 3. Click **+ Add field**, tick the missing ones, and click **Add**.
 4. Drag the fields into this order:
 
-> A6Program · DSN · RequestedBy · RequesterEmail · Title · Category · ChangeType · Priority · Risk · Impact · Description · PlannedStart · PlannedEnd · **Attachments** · CABDecision · CABNotes · AuthorityDecision · AuthorityNotes · Assignee · ActualStart · ActualEnd · ImplementationNotes · ReviewOutcome · ReviewNotes
+> A6Program · RequestedBy · DSN · RequesterEmail · Title · Category · ChangeType · Priority · Risk · Impact · Description · PlannedStart · PlannedEnd · **Attachments** · CABDecision · CABNotes · AuthorityDecision · AuthorityNotes · Assignee · ActualStart · ActualEnd · ImplementationNotes · ReviewOutcome · ReviewNotes
 
 **Unlock the cards so you can change them.** Each field is a *card*, and cards are locked by default.
 1. In the Tree view, expand `frmDetail` and click a card (e.g. `CABDecision_DataCard1`).
@@ -406,7 +406,7 @@ Do this for every card in the table below.
 
 | Cards | Visible | DisplayMode |
 |---|---|---|
-| A6Program, DSN, RequestedBy, RequesterEmail, Title, Category, ChangeType, Priority, Risk, Impact, Description, PlannedStart, PlannedEnd | `true` | `If(varCR.Stage.Value = "Requested", DisplayMode.Edit, DisplayMode.View)` |
+| A6Program, RequestedBy, DSN, RequesterEmail, Title, Category, ChangeType, Priority, Risk, Impact, Description, PlannedStart, PlannedEnd | `true` | `If(varCR.Stage.Value = "Requested", DisplayMode.Edit, DisplayMode.View)` |
 | Attachments | `true` | `If(varCR.Stage.Value = "Close", DisplayMode.View, DisplayMode.Edit)` |
 | CABDecision, CABNotes | `LookUp(Stages, Name = varCR.Stage.Value).Order >= 2` | `If(varCR.Stage.Value = "Change Advisory Board" && IsCAB, DisplayMode.Edit, DisplayMode.View)` |
 | AuthorityDecision, AuthorityNotes | `LookUp(Stages, Name = varCR.Stage.Value).Order >= 3` | `If(varCR.Stage.Value = "Change Authority" && IsAuthority, DisplayMode.Edit, DisplayMode.View)` |
