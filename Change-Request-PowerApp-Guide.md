@@ -27,13 +27,16 @@ Run [Provision-ChangeRequestLists.ps1](Provision-ChangeRequestLists.ps1) in Powe
 > PnP PowerShell needs its own Entra ID app registration. You can create one with `Register-PnPEntraIDAppForInteractiveLogin`.
 
 ### Option B: by hand
-Create a list named **Change Requests** with these columns. *Internal names must match exactly* or the formulas below won't work.
+Create a list named **Change Requests** with these columns, **one column per row**. *Internal names must match exactly* or the formulas below won't work.
 
 | Column | Type | Values / default |
 |---|---|---|
 | Title *(built-in)* | Single line | change title |
 | Stage | Choice (required) | Requested, Change Advisory Board, Change Authority, Implementation, Review, Close — default **Requested** |
-| A6Program, DSN, RequestedBy, RequesterEmail | Single line | |
+| A6Program | Single line | |
+| DSN | Single line | |
+| RequestedBy | Single line | |
+| RequesterEmail | Single line | |
 | Category | Choice | Hardware, Software, Network |
 | ChangeType | Choice | Standard, Normal, Emergency, Informational |
 | Description | Multiple lines (plain) | |
@@ -41,14 +44,16 @@ Create a list named **Change Requests** with these columns. *Internal names must
 | Risk | Choice | 3 - Moderate, 2 - High, 1 - Critical |
 | Impact | Choice | 3 - Moderate, 2 - High, 1 - Critical |
 | FormResponseId | Number | links the item back to its Forms response |
-| PlannedStart, PlannedEnd | Date and time | |
+| PlannedStart | Date and time | |
+| PlannedEnd | Date and time | |
 | Assignee | Person | |
 | CABDecision | Choice | Pending, Approved, Rejected — default Pending |
 | CABNotes | Multiple lines (plain) | |
 | AuthorityDecision | Choice | Pending, Approved, Rejected — default Pending |
 | AuthorityNotes | Multiple lines (plain) | |
 | ImplementationNotes | Multiple lines (plain) | |
-| ActualStart, ActualEnd | Date and time | |
+| ActualStart | Date and time | |
+| ActualEnd | Date and time | |
 | ReviewOutcome | Choice | Successful, Successful with issues, Failed, Rolled back, Rejected |
 | ReviewNotes | Multiple lines (plain) | |
 | ClosedDate | Date and time | |
