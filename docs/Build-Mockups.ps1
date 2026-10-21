@@ -41,16 +41,16 @@ $b += Txt 1238 40 '+ Request a New Change' 14 '#fff' 'bold' 'middle'
 $b += "<line x1='0' y1='80' x2='1366' y2='80' stroke='$tag' stroke-dasharray='4 4'/>"
 
 $cards = @(
-    @(@('CR-00014', 'Replace core router PSU', 'P2 · Hardware · Normal', 'Risk 2 · Impact 3', 'SSgt Lee · 3 CS'),
-      @('CR-00013', 'Patch VPN concentrator', 'P1 · Network · Emergency', 'Risk 1 · Impact 2', 'TSgt Diaz · 3 CS')),
-    @(, @('CR-00011', 'Upgrade switch firmware', 'P3 · Network · Normal', 'Risk 3 · Impact 3', 'A1C Park · 5 CS')),
-    @(, @('CR-00009', 'New SharePoint site', 'P4 · Software · Standard', 'Risk 3 · Impact 3', 'Mr. Cole · A6X')),
-    @(, @('CR-00007', 'Firewall rule update', 'P2 · Network · Normal', 'Risk 2 · Impact 2', 'SrA Kim · 3 CS')),
+    @(@('CR-00014', 'Replace core router PSU', 'High · Hardware · Normal', 'Risk High · Impact Moderate', 'SSgt Lee · 3 CS'),
+      @('CR-00013', 'Patch VPN concentrator', 'Critical · Network · Emergency', 'Risk Critical · Impact High', 'TSgt Diaz · 3 CS')),
+    @(, @('CR-00011', 'Upgrade switch firmware', 'Moderate · Network · Normal', 'Risk Moderate · Impact Moderate', 'A1C Park · 5 CS')),
+    @(, @('CR-00009', 'New SharePoint site', 'Low · Software · Standard', 'Risk Moderate · Impact Moderate', 'Mr. Cole · A6X')),
+    @(, @('CR-00007', 'Firewall rule update', 'High · Network · Normal', 'Risk High · Impact High', 'SrA Kim · 3 CS')),
     @(),
-    @(, @('CR-00003', 'Printer driver rollout', 'P4 · Software · Standard', 'Risk 3 · Impact 3', 'Ms. Ford · A6O'))
+    @(, @('CR-00003', 'Printer driver rollout', 'Low · Software · Standard', 'Risk Moderate · Impact Moderate', 'Ms. Ford · A6O'))
 )
 $names = 'Requested', 'Change Advisory Board', 'Change Authority', 'Implementation', 'Review', 'Close'
-$pcol = @{ '1' = '#DC2626'; '2' = '#EA580C'; '3' = '#CA8A04'; '4' = '#6B7280' }
+$pcol = @{ 'Critical' = '#DC2626'; 'High' = '#EA580C'; 'Moderate' = '#CA8A04'; 'Low' = '#6B7280' }
 $colW = 1366 / 6
 for ($i = 0; $i -lt 6; $i++) {
     $x = [math]::Round(4 + $i * $colW); $w = [math]::Round($colW - 9)
@@ -62,7 +62,7 @@ for ($i = 0; $i -lt 6; $i++) {
     foreach ($c in $cards[$i]) {
         $y = 136 + $j * 124; $cx = $x + 4; $cw = $w - 8
         $b += Rect $cx $y $cw 116 '#fff' '#D1D5DB'
-        $b += Rect $cx $y 5 116 $pcol[$c[2].Substring(1, 1)]
+        $b += Rect $cx $y 5 116 $pcol[$c[2].Split(' ')[0]]
         $b += Txt ($cx + 12) ($y + 18) $c[0] 11 '#6B7280' 'bold'
         $b += Txt ($cx + 12) ($y + 40) $c[1] 13 '#111827' 'bold'
         $b += Txt ($cx + 12) ($y + 72) $c[2] 11 '#374151'

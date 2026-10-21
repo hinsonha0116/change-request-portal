@@ -299,8 +299,8 @@ For every **Text label** in the card, set **PaddingTop** `0`, **PaddingBottom** 
 | 2 | Rectangle | `rectPriority` | X `0` · Y `0` · Width `5` · Height `Parent.TemplateHeight - 4` · Fill: `PriorityColor(ThisItem.Priority.Value)` |
 | 3 | Text label | `lblId` | X `12` · Y `4` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · FontWeight: `FontWeight.Semibold` · Color: `RGBA(0,0,0,0.55)` · Text: `"CR-" & Text(ThisItem.ID, "00000")` |
 | 4 | Text label | `lblTitle` | X `12` · Y `22` · Width `Parent.TemplateWidth - 16` · Height `36` · Size `11` · FontWeight: `FontWeight.Semibold` · VerticalAlign: `VerticalAlign.Top` · Text: `ThisItem.Title` |
-| 5 | Text label | `lblMeta` | X `12` · Y `58` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · Text: `"P" & Left(ThisItem.Priority.Value, 1) & " · " & ThisItem.Category.Value & " · " & ThisItem.ChangeType.Value` |
-| 6 | Text label | `lblRisk` | X `12` · Y `76` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · Text: `"Risk " & Left(ThisItem.Risk.Value, 1) & " · Impact " & Left(ThisItem.Impact.Value, 1)` |
+| 5 | Text label | `lblMeta` | X `12` · Y `58` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · Text: `Mid(ThisItem.Priority.Value, 5) & " · " & ThisItem.Category.Value & " · " & ThisItem.ChangeType.Value` |
+| 6 | Text label | `lblRisk` | X `12` · Y `76` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · Text: `"Risk " & Mid(ThisItem.Risk.Value, 5) & " · Impact " & Mid(ThisItem.Impact.Value, 5)` |
 | 7 | Text label | `lblOwner` | X `12` · Y `94` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · Color: `RGBA(0,0,0,0.55)` · Text: `ThisItem.RequestedBy & " · " & ThisItem.A6Program & " · " & Text(ThisItem.Created, "dd mmm yyyy")` |
 
 If `PriorityColor` isn't available in your environment, use this as `rectPriority` **Fill** instead:

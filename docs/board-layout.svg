@@ -19,15 +19,15 @@
 <rect x='8' y='136' width='5' height='116' fill='#EA580C' stroke='none' />
 <text x='20' y='154' font-size='11' fill='#6B7280' font-weight='bold' text-anchor='start'>CR-00014</text>
 <text x='20' y='176' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>Replace core router PSU</text>
-<text x='20' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>P2 · Hardware · Normal</text>
-<text x='20' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk 2 · Impact 3</text>
+<text x='20' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>High · Hardware · Normal</text>
+<text x='20' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk High · Impact Moderate</text>
 <text x='20' y='244' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>SSgt Lee · 3 CS</text>
 <rect x='8' y='260' width='211' height='116' fill='#fff' stroke='#D1D5DB' />
 <rect x='8' y='260' width='5' height='116' fill='#DC2626' stroke='none' />
 <text x='20' y='278' font-size='11' fill='#6B7280' font-weight='bold' text-anchor='start'>CR-00013</text>
 <text x='20' y='300' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>Patch VPN concentrator</text>
-<text x='20' y='332' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>P1 · Network · Emergency</text>
-<text x='20' y='350' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk 1 · Impact 2</text>
+<text x='20' y='332' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Critical · Network · Emergency</text>
+<text x='20' y='350' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk Critical · Impact High</text>
 <text x='20' y='368' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>TSgt Diaz · 3 CS</text>
 <rect x='232' y='84' width='219' height='680' fill='#F3F4F6' stroke='none' />
 <rect x='232' y='84' width='219' height='44' fill='#2563EB' stroke='none' />
@@ -36,8 +36,8 @@
 <rect x='236' y='136' width='5' height='116' fill='#CA8A04' stroke='none' />
 <text x='248' y='154' font-size='11' fill='#6B7280' font-weight='bold' text-anchor='start'>CR-00011</text>
 <text x='248' y='176' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>Upgrade switch firmware</text>
-<text x='248' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>P3 · Network · Normal</text>
-<text x='248' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk 3 · Impact 3</text>
+<text x='248' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Moderate · Network · Normal</text>
+<text x='248' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk Moderate · Impact Moderate</text>
 <text x='248' y='244' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>A1C Park · 5 CS</text>
 <rect x='459' y='84' width='219' height='680' fill='#F3F4F6' stroke='none' />
 <rect x='459' y='84' width='219' height='44' fill='#7C3AED' stroke='none' />
@@ -46,8 +46,8 @@
 <rect x='463' y='136' width='5' height='116' fill='#6B7280' stroke='none' />
 <text x='475' y='154' font-size='11' fill='#6B7280' font-weight='bold' text-anchor='start'>CR-00009</text>
 <text x='475' y='176' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>New SharePoint site</text>
-<text x='475' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>P4 · Software · Standard</text>
-<text x='475' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk 3 · Impact 3</text>
+<text x='475' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Low · Software · Standard</text>
+<text x='475' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk Moderate · Impact Moderate</text>
 <text x='475' y='244' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>Mr. Cole · A6X</text>
 <rect x='687' y='84' width='219' height='680' fill='#F3F4F6' stroke='none' />
 <rect x='687' y='84' width='219' height='44' fill='#D97706' stroke='none' />
@@ -56,8 +56,8 @@
 <rect x='691' y='136' width='5' height='116' fill='#EA580C' stroke='none' />
 <text x='703' y='154' font-size='11' fill='#6B7280' font-weight='bold' text-anchor='start'>CR-00007</text>
 <text x='703' y='176' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>Firewall rule update</text>
-<text x='703' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>P2 · Network · Normal</text>
-<text x='703' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk 2 · Impact 2</text>
+<text x='703' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>High · Network · Normal</text>
+<text x='703' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk High · Impact High</text>
 <text x='703' y='244' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>SrA Kim · 3 CS</text>
 <rect x='915' y='84' width='219' height='680' fill='#F3F4F6' stroke='none' />
 <rect x='915' y='84' width='219' height='44' fill='#0891B2' stroke='none' />
@@ -69,8 +69,8 @@
 <rect x='1146' y='136' width='5' height='116' fill='#6B7280' stroke='none' />
 <text x='1158' y='154' font-size='11' fill='#6B7280' font-weight='bold' text-anchor='start'>CR-00003</text>
 <text x='1158' y='176' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>Printer driver rollout</text>
-<text x='1158' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>P4 · Software · Standard</text>
-<text x='1158' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk 3 · Impact 3</text>
+<text x='1158' y='208' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Low · Software · Standard</text>
+<text x='1158' y='226' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Risk Moderate · Impact Moderate</text>
 <text x='1158' y='244' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>Ms. Ford · A6O</text>
 <rect x='20' y='60' width='91.2' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='26' y='74' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>lblAppTitle</text>
 <rect x='340' y='58' width='76.8' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='346' y='72' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>txtSearch</text>
