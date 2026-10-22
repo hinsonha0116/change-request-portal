@@ -48,7 +48,7 @@ Both scroll when the text is longer than the box.
 2. Set **Visible** to `false`.
 3. Set **Update** to:
    ```powerfx
-   If(varCR.Stage.Value = "Requested", txtDescription.Text, Parent.Default)
+   If(varCR.Stage.Value = "Requested", txtDescription.Text, ThisItem.Description)
    ```
    This line shows a red error until you add `txtDescription` in 2c. That's expected.
 
