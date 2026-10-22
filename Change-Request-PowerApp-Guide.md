@@ -83,7 +83,8 @@ PnP PowerShell needs its own Entra ID app registration, which usually needs an a
 | A6Program | Single line | |
 | DSN | Single line | |
 | RequestedBy | Single line | |
-| RequesterEmail | Single line | |
+| RequesterEmail | Single line | the E-mail typed in the form |
+| SubmittedBy | Single line | the submitter's sign-in email, filled by the flow |
 | Category | Choice | Hardware, Software, Network · default *none* |
 | ChangeType | Choice | Standard, Normal, Emergency, Informational · default *none* |
 | Description | Multiple lines (plain) | |
@@ -164,6 +165,13 @@ ChangeAuthorities = ["change.manager@contoso.com"];
 IsCAB       = Lower(User().Email) in CABMembers;
 IsAuthority = Lower(User().Email) in ChangeAuthorities;
 
+// Change Management team: can move and send back requests.
+CMTeam = ["cm.lead@contoso.com", "cm.analyst@contoso.com"];
+IsCM   = Lower(User().Email) in CMTeam;
+
+// Who sees every request on the board. Everyone else sees only their own.
+CanSeeAll = IsCM || IsCAB || IsAuthority;
+
 // Links used by the board buttons. See Change-Request-Form-Setup.md.
 FormUrl             = "https://forms.office.com/r/REPLACE_ME";
 RollbackTemplateUrl = "https://<tenant>.sharepoint.com/sites/<site>/Shared%20Documents/Change%20Templates/Rollback-Plan-Template.pdf";
@@ -201,7 +209,7 @@ Select **BoardScreen** in the Tree view before inserting each control. The posit
 |---|---|---|---|
 | 1 | Text label *(optional title)* | `lblAppTitle` | Text: `"Change Request Portal"` · Size: `20` · FontWeight: `FontWeight.Bold` · X `20` · Y `15` · Width `300` · Height `40` |
 | 2 | Text input | `txtSearch` | Default: `""` · HintText: `"Search by title…"` *(grey placeholder shown while empty)* · X `340` · Y `15` · Width `260` · Height `40` |
-| 3 | Toggle | `tglMine` | Default: `false` · TrueText: `"My requests"` · FalseText: `"All requests"` · X `620` · Y `15` · Width `200` · Height `40` |
+| 3 | Toggle | `tglMine` | Default: `false` · TrueText: `"My requests"` · FalseText: `"All requests"` · Visible: `CanSeeAll` *(regular users only ever see their own, so they don't need it)* · X `620` · Y `15` · Width `200` · Height `40` |
 | 4 | Icons › Reload | `icoRefresh` | OnSelect: `Refresh('Change Requests')` · X `840` · Y `20` · Width `30` · Height `30` |
 | 5 | Button | `btnTemplate` | Text: `"Download Rollback Plan template"` · OnSelect: `Launch(RollbackTemplateUrl, {}, LaunchTarget.New)` · Fill: `Color.White` · Color: `ColorValue("#1E3A6B")` · BorderColor: `ColorValue("#1E3A6B")` · X `890` · Y `15` · Width `230` · Height `40` |
 | 6 | Button | `btnNew` | Text: `"+ Request a New Change"` · OnSelect: `Launch(FormUrl, {}, LaunchTarget.New)` · Fill: `ColorValue("#1E3A6B")` · X `1130` · Y `13` · Width `216` · Height `44` |
@@ -279,13 +287,20 @@ Sort(
     Filter(
         'Change Requests',
         Stage.Value = ThisItem.Name,
-        !tglMine.Value || RequesterEmail = User().Email,
+        (CanSeeAll && !tglMine.Value) || SubmittedBy = User().Email || RequesterEmail = User().Email,
         IsBlank(txtSearch.Text) || StartsWith(Title, txtSearch.Text)
     ),
     Modified,
     SortOrder.Descending
 )
 ```
+
+**Who sees which cards:**
+- **CM, CAB and Change Authority members** (`CanSeeAll`) see every request. Turning on the toggle shows only their own.
+- **Everyone else** sees only requests they submitted (`SubmittedBy`, their sign-in account) or where their address was typed in the form's E-mail box (`RequesterEmail`).
+- **Capitalisation:** SharePoint ignores upper and lower case when comparing the emails.
+
+> This hides requests in the app. It doesn't secure them. Anyone with access to the SharePoint site can still open the list directly. See *Optional extras* for locking it down.
 
 **Add the card controls.**
 1. Click inside `galCards` so *its* template is selected (pencil icon ✎ at its top-left).
@@ -333,12 +348,20 @@ Full setup is in **[Change-Request-Form-Setup.md](Change-Request-Form-Setup.md)*
 
 ![DetailScreen layout](docs/detail-layout.svg)
 
-**Tip: load a real request while you build.** The DetailScreen shows whatever request is in `varCR`. While you're building it, `varCR` is empty, so the form looks blank. To fill it:
+*The magenta tags name each control. The form is on the left, Description and History are stacked on the right, and the actions run along the bottom.*
+
+**Tip: load a real request while you build.** The DetailScreen shows whatever request is in `varCR`. While you're building it, `varCR` is empty, so the screen looks blank. To fill it:
 1. Make sure at least one request exists (see the 3.4 check).
 2. Go to **BoardScreen** and press **F5**.
 3. Click a card, then close the preview with **Esc** or the **X**.
 
 `varCR` now holds that request, and the DetailScreen shows real data as you build it.
+
+**How the buttons work.** Every action button (**Save changes**, **Move**, **Send back**, **Reject**) does two things:
+1. It records which action was clicked in `varAction` and **saves the form**.
+2. When the save succeeds, `frmDetail.OnSuccess` carries out the action.
+
+So the buttons are never greyed out, unsaved edits are never lost, and a CAB member can choose *Approved* and click **Move** in one step.
 
 ### 5.1 Screen property
 Select **DetailScreen** and set **OnVisible**. This reloads the latest copy of the request:
@@ -353,8 +376,11 @@ Select **DetailScreen** in the Tree view, then insert:
 |---|---|---|---|
 | 1 | Rectangle | `rectDetailHeader` | X `0` · Y `0` · Width `Parent.Width` · Height `60` · Fill: `ColorValue("#1E3A6B")` |
 | 2 | Button | `btnHome` | Text: `"← Board"` · OnSelect: `Navigate(BoardScreen, ScreenTransition.UnCover)` · Fill: `Color.White` · Color: `ColorValue("#1E3A6B")` · X `16` · Y `12` · Width `110` · Height `36` |
-| 3 | Text label | `lblCRTitle` | Text: `"CR-" & Text(varCR.ID, "00000") & " — " & varCR.Title` · Color: `Color.White` · Size `18` · FontWeight: `FontWeight.Bold` · X `140` · Y `10` · Width `Parent.Width - 160` · Height `40` |
-| 4 | Blank horizontal gallery | `galProgress` | Items: `Stages` · X `20` · Y `66` · Width `Parent.Width - 40` · Height `70` · TemplateSize: `Self.Width / 6 - 1` · TemplatePadding `0` · ShowScrollbar `false` · ShowNavigation `false` |
+| 3 | Text label | `lblCRTitle` | Text: `"CR-" & Text(varCR.ID, "00000") & " — " & varCR.Title` · Color: `Color.White` · Size `18` · FontWeight: `FontWeight.Bold` · X `140` · Y `10` · Width `Parent.Width - 320` · Height `40` |
+| 4 | Button | `btnSave` | Text: `"Save changes"` · OnSelect: `Set(varAction, "save"); SubmitForm(frmDetail)` · Fill: `Color.White` · Color: `ColorValue("#1E3A6B")` · X `Parent.Width - 160` · Y `12` · Width `140` · Height `36` |
+| 5 | Blank horizontal gallery | `galProgress` | Items: `Stages` · X `20` · Y `66` · Width `Parent.Width - 40` · Height `70` · TemplateSize: `Self.Width / 6 - 1` · TemplatePadding `0` · ShowScrollbar `false` · ShowNavigation `false` |
+
+If `btnSave` disappears behind the blue banner, right-click it and choose **Reorder › Bring to front**.
 
 Now click the first item of **galProgress** so its template is selected (pencil icon ✎), and insert:
 
@@ -372,6 +398,8 @@ With({cur: LookUp(Stages, Name = varCR.Stage.Value).Order},
        RGBA(0,0,0,0.12)))
 ```
 
+> If you get *ThisItem isn't recognized* on any of these three, the control is on the screen instead of inside the gallery. In the Tree view it must be indented under `galProgress`. To fix it, select the control and press **Ctrl+X**. Click the first item of `galProgress` until the pencil ✎ shows, then press **Ctrl+V**.
+
 ### 5.3 The request form: `frmDetail`
 1. Select **DetailScreen**, go to **+ Insert**, and choose **Edit form**. Rename it to `frmDetail`.
 2. Set these properties:
@@ -387,18 +415,20 @@ With({cur: LookUp(Stages, Name = varCR.Stage.Value).Order},
 
 **Choose the fields.**
 1. With `frmDetail` selected, go to the **Properties** pane on the right and click **Edit fields**.
-2. Remove any field that isn't in the list below: hover it, click **⋯**, then **Remove**. In particular, remove **Stage**, **ClosedDate**, **FormResponseId**, **Created** and **Modified**. The buttons control the stage, so a save can never overwrite it.
+2. Remove any field that isn't in the list below: hover it, click **⋯**, then **Remove**. In particular, remove **Stage**, **ClosedDate**, **FormResponseId**, **SubmittedBy**, **Created** and **Modified**. The buttons control the stage, so a save can never overwrite it.
 3. Click **+ Add field**, tick the missing ones, and click **Add**.
 4. Drag the fields into this order:
 
 > A6Program · RequestedBy · DSN · RequesterEmail · Title · Category · ChangeType · Priority · Risk · Impact · Description · PlannedStart · PlannedEnd · **Attachments** · CABDecision · CABNotes · AuthorityDecision · AuthorityNotes · Assignee · ActualStart · ActualEnd · ImplementationNotes · ReviewOutcome · ReviewNotes
+
+**Description** stays in the form so Save writes it, but its card is hidden. Section 5.4 shows it on the right of the screen instead.
 
 **Unlock the cards so you can change them.** Each field is a *card*, and cards are locked by default.
 1. In the Tree view, expand `frmDetail` and click a card (e.g. `CABDecision_DataCard1`).
 2. In the **Properties** pane, open the **Advanced** tab.
 3. Click **🔒 Unlock to change properties**.
 
-Do this for every card in the table below.
+Do this for every card in the table below, plus the Description card and the four date cards.
 
 > **Shortcut:** once the cards in a row of the table are unlocked, you can set them together. **Ctrl+click** them in the Tree view, then set Visible and DisplayMode once for all of them.
 
@@ -406,33 +436,117 @@ Do this for every card in the table below.
 
 | Cards | Visible | DisplayMode |
 |---|---|---|
-| A6Program, RequestedBy, DSN, RequesterEmail, Title, Category, ChangeType, Priority, Risk, Impact, Description, PlannedStart, PlannedEnd | `true` | `If(varCR.Stage.Value = "Requested", DisplayMode.Edit, DisplayMode.View)` |
+| A6Program, RequestedBy, DSN, RequesterEmail, Title, Category, ChangeType, Priority, Risk, Impact, PlannedStart, PlannedEnd | `true` | `If(varCR.Stage.Value = "Requested", DisplayMode.Edit, DisplayMode.View)` |
+| Description | `false` | *(leave as is)* |
 | Attachments | `true` | `If(varCR.Stage.Value = "Close", DisplayMode.View, DisplayMode.Edit)` |
 | CABDecision, CABNotes | `LookUp(Stages, Name = varCR.Stage.Value).Order >= 2` | `If(varCR.Stage.Value = "Change Advisory Board" && IsCAB, DisplayMode.Edit, DisplayMode.View)` |
 | AuthorityDecision, AuthorityNotes | `LookUp(Stages, Name = varCR.Stage.Value).Order >= 3` | `If(varCR.Stage.Value = "Change Authority" && IsAuthority, DisplayMode.Edit, DisplayMode.View)` |
 | Assignee, ActualStart, ActualEnd, ImplementationNotes | `LookUp(Stages, Name = varCR.Stage.Value).Order >= 4` | `If(varCR.Stage.Value = "Implementation", DisplayMode.Edit, DisplayMode.View)` |
 | ReviewOutcome, ReviewNotes | `LookUp(Stages, Name = varCR.Stage.Value).Order >= 5` | `If(varCR.Stage.Value = "Review", DisplayMode.Edit, DisplayMode.View)` |
 
-**frmDetail.OnSuccess**
+**Description card › Update.** This takes the text from the box on the right while the request is in *Requested*, and keeps the saved text otherwise:
+```powerfx
+If(varCR.Stage.Value = "Requested", txtDescription.Text, ThisItem.Description)
+```
+This line shows a red error until you add `txtDescription` in 5.4. That's expected.
+
+**Date cards › Update** (PlannedStart, PlannedEnd, ActualStart, ActualEnd). Requests from the form arrive with these dates empty. Without this change, an empty date card still produces a time (midnight), and the form reports "unsaved changes" that aren't real.
+
+Each card's **Update** looks something like:
+```powerfx
+DateValue1.SelectedDate + Time(Value(HourValue1.Selected.Value), Value(MinuteValue1.Selected.Value), 0)
+```
+Wrap it so a blank date stays blank. Keep **your** control names, which may be `DateValue2`, `HourValue3` and so on:
+```powerfx
+If(IsBlank(DateValue1.SelectedDate), Blank(),
+   DateValue1.SelectedDate + Time(Value(HourValue1.Selected.Value), Value(MinuteValue1.Selected.Value), 0))
+```
+
+**frmDetail.OnSuccess.** This runs after every successful save and carries out whichever button was clicked:
 ```powerfx
 Set(varCR, Self.LastSubmit);
-Notify("Saved", NotificationType.Success)
+Switch(varAction,
+    "advance",
+        With({cur: LookUp(Stages, Name = varCR.Stage.Value)},
+        With({nxt: LookUp(Stages, Order = cur.Order + 1)},
+            If(
+                cur.Name = "Change Advisory Board" && varCR.CABDecision.Value <> "Approved",
+                    Notify("The CAB decision must be Approved before this change can move on.", NotificationType.Error),
+                cur.Name = "Change Authority" && varCR.AuthorityDecision.Value <> "Approved",
+                    Notify("The Change Authority decision must be Approved before this change can move on.", NotificationType.Error),
+                cur.Name = "Implementation" && IsBlank(varCR.ImplementationNotes),
+                    Notify("Add implementation notes before moving to Review.", NotificationType.Error),
+                cur.Name = "Review" && IsBlank(varCR.ReviewOutcome.Value),
+                    Notify("Choose a review outcome before closing.", NotificationType.Error),
+                Set(varCR, Patch('Change Requests', varCR, {
+                    Stage:      {Value: nxt.Name},
+                    ClosedDate: If(nxt.Name = "Close", Now())
+                }));
+                Patch('Change Request History', Defaults('Change Request History'), {
+                    Title: "CR-" & Text(varCR.ID, "00000"), RequestID: varCR.ID,
+                    FromStage: cur.Name, ToStage: nxt.Name, Comment: txtComment.Text
+                });
+                Reset(txtComment);
+                Notify("Moved to " & nxt.Name, NotificationType.Success)
+            )
+        )),
+    "back",
+        With({cur: LookUp(Stages, Name = varCR.Stage.Value)},
+        With({prv: LookUp(Stages, Order = cur.Order - 1)},
+            Set(varCR, Patch('Change Requests', varCR, {Stage: {Value: prv.Name}}));
+            Patch('Change Request History', Defaults('Change Request History'), {
+                Title: "CR-" & Text(varCR.ID, "00000"), RequestID: varCR.ID,
+                FromStage: cur.Name, ToStage: prv.Name, Comment: txtComment.Text
+            });
+            Reset(txtComment);
+            Notify("Sent back to " & prv.Name, NotificationType.Warning)
+        )),
+    "reject",
+        With({prevStage: varCR.Stage.Value},
+            If(prevStage = "Change Advisory Board",
+                Set(varCR, Patch('Change Requests', varCR, {
+                    Stage: {Value: "Close"}, ReviewOutcome: {Value: "Rejected"}, ClosedDate: Now(),
+                    CABDecision: {Value: "Rejected"}, CABNotes: txtComment.Text
+                })),
+                Set(varCR, Patch('Change Requests', varCR, {
+                    Stage: {Value: "Close"}, ReviewOutcome: {Value: "Rejected"}, ClosedDate: Now(),
+                    AuthorityDecision: {Value: "Rejected"}, AuthorityNotes: txtComment.Text
+                }))
+            );
+            Patch('Change Request History', Defaults('Change Request History'), {
+                Title: "CR-" & Text(varCR.ID, "00000"), RequestID: varCR.ID,
+                FromStage: prevStage, ToStage: "Close", Comment: "REJECTED: " & txtComment.Text
+            });
+            Reset(txtComment);
+            Notify("Change rejected and closed", NotificationType.Warning)
+        ),
+    Notify("Saved", NotificationType.Success)
+);
+Set(varAction, Blank())
 ```
 
 **frmDetail.OnFailure**
 ```powerfx
+Set(varAction, Blank());
 Notify("Couldn't save: " & Self.Error, NotificationType.Error)
 ```
 
-**Check:** with a request loaded (see the tip at the top of Step 5), a request in *Requested* should show only the request fields and Attachments, and they should be editable. Click the Rollback Plan attachment to open the PDF.
+**Check:** load a request in *Requested* (see the tip at the top of Step 5). It should show only the request fields and Attachments, and they should be editable. Click the Rollback Plan attachment to open the PDF.
 
-### 5.4 History panel
-Select **DetailScreen**, then insert:
+### 5.4 Description and History (right side)
+Select **DetailScreen**, then insert these controls. They stack down the right side of the screen.
 
 | # | Insert | Rename to | Properties |
 |---|---|---|---|
-| 1 | Text label | `lblHistoryTitle` | Text: `"History"` · Size `14` · FontWeight: `FontWeight.Bold` · X `920` · Y `146` · Width `426` · Height `32` |
-| 2 | Blank vertical gallery | `galHistory` | X `920` · Y `182` · Width `426` · Height `Parent.Height - 272` · TemplateSize `80` · TemplatePadding `0` · Items: see below |
+| 1 | Text label | `lblDescTitle` | Text: `"Description"` · Size `14` · FontWeight: `FontWeight.Bold` · X `920` · Y `146` · Width `426` · Height `28` |
+| 2 | Text input | `txtDescription` | Mode: `TextMode.MultiLine` · Default: `varCR.Description` · HintText: `"Describe the change"` · Visible: `varCR.Stage.Value = "Requested"` · X `920` · Y `176` · Width `426` · Height `200` |
+| 3 | Text label | `lblDescription` | Text: `varCR.Description` · Overflow: `Overflow.Scroll` · VerticalAlign: `VerticalAlign.Top` · Visible: `varCR.Stage.Value <> "Requested"` · Fill: `RGBA(0,0,0,0.02)` · BorderColor: `RGBA(0,0,0,0.15)` · BorderThickness `1` · PaddingTop/Bottom/Left/Right `8` · X `920` · Y `176` · Width `426` · Height `200` |
+| 4 | Text label | `lblHistoryTitle` | Text: `"History"` · Size `14` · FontWeight: `FontWeight.Bold` · X `920` · Y `388` · Width `426` · Height `28` |
+| 5 | Blank vertical gallery | `galHistory` | X `920` · Y `418` · Width `426` · Height `Parent.Height - 508` · TemplateSize `80` · TemplatePadding `0` · ShowScrollbar `true` · Items: see below |
+
+`txtDescription` and `lblDescription` sit in the same spot, and only one is visible at a time:
+- **`txtDescription`** is editable, while the request is in *Requested*. A multi-line text input scrolls on its own.
+- **`lblDescription`** is read-only, at every later stage. `Overflow.Scroll` makes it scroll.
 
 `galHistory` **Items**:
 ```powerfx
@@ -443,126 +557,84 @@ Click the first item of **galHistory** so its template is selected (pencil icon 
 
 | # | Insert | Rename to | Properties |
 |---|---|---|---|
-| 1 | Text label | `lblHistMove` | X `8` · Y `6` · Width `Parent.TemplateWidth - 16` · Height `22` · Size `10` · FontWeight: `FontWeight.Bold` · Text: `If(IsBlank(ThisItem.FromStage), "Created", ThisItem.FromStage & " → " & ThisItem.ToStage)` |
+| 1 | Text label | `lblHistMove` | X `8` · Y `6` · Width `Parent.TemplateWidth - 16` · Height `22` · Size `10` · FontWeight: `FontWeight.Bold` · Text: see below |
 | 2 | Text label | `lblHistWho` | X `8` · Y `28` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · Color: `RGBA(0,0,0,0.55)` · Text: `ThisItem.Author.DisplayName & " · " & Text(ThisItem.Created, "dd mmm yyyy hh:mm")` |
 | 3 | Text label | `lblHistComment` | X `8` · Y `48` · Width `Parent.TemplateWidth - 16` · Height `28` · Size `10` · Text: `ThisItem.Comment` |
 | 4 | Rectangle | `rectHistLine` | X `0` · Y `Parent.TemplateHeight - 1` · Width `Parent.TemplateWidth` · Height `1` · Fill: `RGBA(0,0,0,0.1)` |
 
+`lblHistMove` **Text**. Comments (same stage in From and To) read **Comment (stage)**, and moves show an arrow:
+```powerfx
+If(IsBlank(ThisItem.FromStage), "Created",
+   ThisItem.FromStage = ThisItem.ToStage, "Comment (" & ThisItem.ToStage & ")",
+   ThisItem.FromStage & " → " & ThisItem.ToStage)
+```
+
 ### 5.5 Action bar
-Select **DetailScreen**, then insert these controls. They all sit along the bottom of the screen.
+Select **DetailScreen**, then insert these controls along the bottom of the screen. Every control except the rectangle uses **Y** `Parent.Height - 62` and **Height** `44`.
 
 | # | Insert | Rename to | Properties |
 |---|---|---|---|
 | 1 | Rectangle | `rectActionBar` | X `0` · Y `Parent.Height - 80` · Width `Parent.Width` · Height `80` · Fill: `RGBA(0,0,0,0.05)` |
-| 2 | Text input | `txtComment` | Default: `""` · HintText: `"Comment for the history log"` · X `20` · Y `Parent.Height - 62` · Width `520` · Height `44` |
-| 3 | Button | `btnSave` | Text: `"Save changes"` · X `560` · Y `Parent.Height - 62` · Width `130` · Height `44` · OnSelect / DisplayMode below |
-| 4 | Button | `btnSendBack` | Text: `"← Send back"` · Fill: `Color.White` · Color: `ColorValue("#1E3A6B")` · BorderColor: `ColorValue("#1E3A6B")` · X `705` · Y `Parent.Height - 62` · Width `150` · Height `44` · Visible / DisplayMode / OnSelect below |
-| 5 | Button | `btnReject` | Text: `"Reject"` · Fill: `Color.Firebrick` · X `870` · Y `Parent.Height - 62` · Width `130` · Height `44` · Visible / DisplayMode / OnSelect below |
-| 6 | Button | `btnAdvance` | Fill: `ColorValue("#1E3A6B")` · X `1015` · Y `Parent.Height - 62` · Width `331` · Height `44` · Text / Visible / DisplayMode / OnSelect below |
+| 2 | Button | `btnSendBack` | Text: `"← Send back"` · Fill: `Color.White` · Color / BorderColor: `ColorValue("#1E3A6B")` · X `20` · Width `150` |
+| 3 | Button | `btnReject` | Text: `"Reject"` · Fill: `Color.Firebrick` · X `180` · Width `130` |
+| 4 | Button | `btnAddComment` | Text: `"Add comment"` · Fill: `Color.White` · Color / BorderColor: `ColorValue("#1E3A6B")` · X `320` · Width `120` |
+| 5 | Text input | `txtComment` | Default: `""` · HintText: `"Comment for the history log"` · X `450` · Width `555` |
+| 6 | Button | `btnAdvance` | Fill: `ColorValue("#1E3A6B")` · X `1015` · Width `331` |
 
 If `rectActionBar` covers the other controls, right-click it and choose **Reorder › Send to back**.
 
-**`btnSave`**
-- OnSelect: `SubmitForm(frmDetail)`
-- DisplayMode: `If(frmDetail.Unsaved, DisplayMode.Edit, DisplayMode.Disabled)`
+Set **DisplayMode** to `DisplayMode.Edit` on every button. That's the default, so you only need to change it if it shows something else.
 
-**`btnAdvance`**
-- Visible: `varCR.Stage.Value <> "Close"`
-- DisplayMode: `If(frmDetail.Unsaved, DisplayMode.Disabled, DisplayMode.Edit)`. This forces users to save before moving a request, so the checks below always look at saved data.
+**`btnAdvance`**: moves the request to the next stage. CM team only.
+- Visible: `varCR.Stage.Value <> "Close" && IsCM`
 - Text:
   ```powerfx
   "Move to " & LookUp(Stages, Order = LookUp(Stages, Name = varCR.Stage.Value).Order + 1).Name & " →"
   ```
+- OnSelect: `Set(varAction, "advance"); SubmitForm(frmDetail)`
+
+**`btnSendBack`**: returns the request to the previous stage. CM team only, and a comment is required.
+- Visible: `With({o: LookUp(Stages, Name = varCR.Stage.Value).Order}, o >= 2 && o <= 5) && IsCM`
 - OnSelect:
   ```powerfx
-  With({cur: LookUp(Stages, Name = varCR.Stage.Value)},
-  With({nxt: LookUp(Stages, Order = cur.Order + 1)},
-      If(
-          cur.Name = "Change Advisory Board" && varCR.CABDecision.Value <> "Approved",
-              Notify("The CAB decision must be Approved before this change can move on.", NotificationType.Error),
-          cur.Name = "Change Authority" && varCR.AuthorityDecision.Value <> "Approved",
-              Notify("The Change Authority decision must be Approved before this change can move on.", NotificationType.Error),
-          cur.Name = "Implementation" && IsBlank(varCR.ImplementationNotes),
-              Notify("Add implementation notes before moving to Review.", NotificationType.Error),
-          cur.Name = "Review" && IsBlank(varCR.ReviewOutcome.Value),
-              Notify("Choose a review outcome before closing.", NotificationType.Error),
-
-          // all checks passed
-          Set(varCR, Patch('Change Requests', varCR, {
-              Stage:      {Value: nxt.Name},
-              ClosedDate: If(nxt.Name = "Close", Now())
-          }));
-          Patch('Change Request History', Defaults('Change Request History'), {
-              Title:     "CR-" & Text(varCR.ID, "00000"),
-              RequestID: varCR.ID,
-              FromStage: cur.Name,
-              ToStage:   nxt.Name,
-              Comment:   txtComment.Text
-          });
-          Reset(txtComment);
-          Notify("Moved to " & nxt.Name, NotificationType.Success)
-      )
-  ))
-  ```
-
-**`btnSendBack`**: returns the request to the previous stage. A comment is required.
-- Visible: `With({o: LookUp(Stages, Name = varCR.Stage.Value).Order}, o >= 2 && o <= 5)`
-- DisplayMode: `If(frmDetail.Unsaved, DisplayMode.Disabled, DisplayMode.Edit)`
-- OnSelect:
-  ```powerfx
-  If(IsBlank(txtComment.Text),
+  If(IsBlank(Trim(txtComment.Text)),
       Notify("Add a comment explaining why it's being sent back.", NotificationType.Warning),
-      With({cur: LookUp(Stages, Name = varCR.Stage.Value)},
-      With({prv: LookUp(Stages, Order = cur.Order - 1)},
-          Set(varCR, Patch('Change Requests', varCR, {Stage: {Value: prv.Name}}));
-          Patch('Change Request History', Defaults('Change Request History'), {
-              Title:     "CR-" & Text(varCR.ID, "00000"),
-              RequestID: varCR.ID,
-              FromStage: cur.Name,
-              ToStage:   prv.Name,
-              Comment:   txtComment.Text
-          });
-          Reset(txtComment);
-          Notify("Sent back to " & prv.Name, NotificationType.Warning)
-      ))
-  )
+      Set(varAction, "back"); SubmitForm(frmDetail))
   ```
 
-**`btnReject`**: lets approvers reject the request, which moves it straight to Close.
+**`btnReject`**: lets approvers reject the request, which moves it straight to Close. A comment is required.
 - Visible: `(varCR.Stage.Value = "Change Advisory Board" && IsCAB) || (varCR.Stage.Value = "Change Authority" && IsAuthority)`
-- DisplayMode: `If(frmDetail.Unsaved, DisplayMode.Disabled, DisplayMode.Edit)`
 - OnSelect:
   ```powerfx
-  If(IsBlank(txtComment.Text),
+  If(IsBlank(Trim(txtComment.Text)),
       Notify("Add a comment explaining the rejection.", NotificationType.Warning),
-      With({prevStage: varCR.Stage.Value},
-          If(prevStage = "Change Advisory Board",
-              Set(varCR, Patch('Change Requests', varCR, {
-                  Stage: {Value: "Close"}, ReviewOutcome: {Value: "Rejected"}, ClosedDate: Now(),
-                  CABDecision: {Value: "Rejected"}, CABNotes: txtComment.Text
-              })),
-              Set(varCR, Patch('Change Requests', varCR, {
-                  Stage: {Value: "Close"}, ReviewOutcome: {Value: "Rejected"}, ClosedDate: Now(),
-                  AuthorityDecision: {Value: "Rejected"}, AuthorityNotes: txtComment.Text
-              }))
-          );
-          Patch('Change Request History', Defaults('Change Request History'), {
-              Title:     "CR-" & Text(varCR.ID, "00000"),
-              RequestID: varCR.ID,
-              FromStage: prevStage,
-              ToStage:   "Close",
-              Comment:   "REJECTED: " & txtComment.Text
-          });
-          Reset(txtComment);
-          Notify("Change rejected and closed", NotificationType.Warning)
-      )
+      Set(varAction, "reject"); SubmitForm(frmDetail))
+  ```
+
+**`btnAddComment`**: posts the comment to the History without changing the stage. Available to everyone. It doesn't touch the form, so it works at any stage, even with unsaved edits.
+- OnSelect:
+  ```powerfx
+  If(IsBlank(Trim(txtComment.Text)),
+      Notify("Type a comment first.", NotificationType.Warning),
+      Patch('Change Request History', Defaults('Change Request History'), {
+          Title:     "CR-" & Text(varCR.ID, "00000"),
+          RequestID: varCR.ID,
+          FromStage: varCR.Stage.Value,
+          ToStage:   varCR.Stage.Value,
+          Comment:   txtComment.Text
+      });
+      Reset(txtComment);
+      Notify("Comment added", NotificationType.Success)
   )
   ```
 
-**Check:** press **F5** on BoardScreen, click a card, and confirm that:
-- the progress tracker highlights stage 1,
-- the **Move to Change Advisory Board →** button shows,
-- *Save changes* is greyed out until you edit a field.
+When a button is hidden (Reject for non-approvers, for example), its space in the bar is simply left empty.
+
+**Check:** as a CM team member, press **F5** on BoardScreen and click a card. Confirm that:
+- the progress tracker highlights the current stage,
+- **Save changes** is in the top-right of the banner,
+- Description and History are on the right,
+- the **Move** button shows to the right of the comment box.
 
 ---
 
@@ -585,26 +657,30 @@ If `rectActionBar` covers the other controls, right-click it and choose **Reorde
 
 ## Step 7 — Test checklist
 
-Work through this list in the **published** app. Test with your own account and, for the last item, with someone who isn't an approver.
+Work through this list in the **published** app. You'll need your own account (on the CM team) plus, for the last rows, a colleague who **isn't** on the CM, CAB or Authority lists.
 
 | # | Do this | Expect |
 |---|---|---|
 | 1 | Click **+ Request a New Change**, fill the form, upload the Rollback Plan PDF, and submit | Form confirms submission |
-| 2 | Open the flow's **Run history** in Power Automate | Latest run is green on every step |
-| 3 | Open the **Change Requests** list in SharePoint | New item with Stage = Requested, CAB/Authority = Pending, attachment `RollbackPlan_CR-000NN.pdf` |
+| 2 | Open the flow's **Run history** in Power Automate | Latest run is green on every step; **Create CR** shows SubmittedBy filled with your sign-in email |
+| 3 | Open the **Change Requests** list in SharePoint | New item with Stage = Requested, CAB/Authority = Pending, SubmittedBy filled, attachment `RollbackPlan_CR-000NN.pdf` |
 | 4 | Back in the app, click the refresh icon | Card appears in **1. Requested**, header count is (1) |
-| 5 | Type part of the title in the search box, then turn on the toggle | Card stays (title match, your email) |
-| 6 | Click the card | Detail screen opens; stage 1 is highlighted; request fields are editable; the PDF opens from Attachments |
-| 7 | Edit a field, then try to click **Move** | Move is disabled until you click **Save changes** |
-| 8 | Save, type a comment, and click **Move to Change Advisory Board** | Moves to stage 2; a History row appears with your comment |
-| 9 | Click **Move** again without approving | Error: *CAB decision must be Approved* |
-| 10 | As a CAB member, set CAB Decision = Approved, Save, then Move | Moves to Change Authority |
-| 11 | Click **Send back** with no comment, then with a comment | First: warning. Second: returns to CAB with a History row |
-| 12 | Move forward again. As an Authority, set Approved, Save, then Move | Moves to Implementation |
-| 13 | Click **Move** with Implementation Notes empty, then fill them, Save and Move | First: error. Then it moves to Review |
-| 14 | Choose a Review Outcome, Save, then Move | Moves to Close; ClosedDate is set; every field is read-only; the Move button is hidden |
-| 15 | Submit a second request, move it to CAB, enter a comment, and click **Reject** | Goes straight to Close with outcome *Rejected* |
-| 16 | Ask someone who **isn't** in `CABMembers` to open a CAB-stage request | Decision fields are read-only and there's no Reject button |
+| 5 | Type part of the title in the search box, then turn on the toggle | Card stays (title match, your request) |
+| 6 | Click the card | Detail screen opens; stage 1 is highlighted; request fields and Description are editable; the PDF opens from Attachments |
+| 7 | Edit the Description and click **Save changes** (top right) | "Saved"; reopen the request and the new text is there; no History row is added |
+| 8 | Type a comment and click **Add comment** | History shows **Comment (Requested)** at the top; the stage doesn't change |
+| 9 | Type a comment and click **Move to Change Advisory Board** | Moves to stage 2; a History row appears with your comment |
+| 10 | Click **Move** again without approving | Error: *CAB decision must be Approved*; it stays in CAB |
+| 11 | As a CAB member, set CAB Decision = Approved and click **Move** *without saving first* | Saves and moves to Change Authority in one click |
+| 12 | Click **Send back** with no comment, then with a comment | First: warning. Second: returns to CAB with a History row |
+| 13 | Move forward again. As an Authority, set Approved, then Move | Moves to Implementation |
+| 14 | Click **Move** with Implementation Notes empty, then fill them and Move | First: error. Then it moves to Review |
+| 15 | Choose a Review Outcome, then Move | Moves to Close; ClosedDate is set; every field is read-only; Description is read-only and scrolls; the Move button is hidden |
+| 16 | Submit a second request, move it to CAB, enter a comment, and click **Reject** | Goes straight to Close with outcome *Rejected*; History shows **REJECTED:** and your comment |
+| 17 | Open a request with many History entries | History scrolls to show older entries |
+| 18 | Have the colleague (not CM/CAB/Authority) submit a request and open the board | They see **only their own** request; the toggle is hidden |
+| 19 | Have them open their request | **Move** and **Send back** are hidden; decision fields are read-only; there's no Reject button; **Add comment** works |
+| 20 | Submit a request with the colleague's address in the **E-mail** box | The colleague sees it on their board |
 
 ---
 
@@ -622,7 +698,11 @@ Work through this list in the **published** app. Test with your own account and,
 | Flow fails at **Parse JSON** | The Additional attachments answer was empty | Use the `if(empty(...), '[]', ...)` guard from the form setup document (Part C, step 6) |
 | Flow fails at **Get file content** | The flow isn't running as the form owner | Rebuild the flow signed in as the account that owns the form |
 | CAB member can't edit the decision | Email in `CABMembers` doesn't match the sign-in email exactly. Air Force accounts can differ, e.g. `@us.af.mil` vs `@af.mil` | Add a temporary label with Text `User().Email`, check what it shows for that person, and put that exact address (lower case) in App.Formulas |
-| Move, Send back and Reject are greyed out | There are unsaved edits on the form | Click **Save changes** first |
+| Move, Send back or Reject is greyed out | DisplayMode still uses `frmDetail.Unsaved` from an older version of this guide | Set DisplayMode to `DisplayMode.Edit` on every button and use the save-then-act OnSelect formulas in 5.5 |
+| Move or Send back is missing | The user isn't in `CMTeam`, or their email doesn't match exactly | Check the address with a temporary label showing `User().Email`, and add that exact address (lower case) to `CMTeam` |
+| A regular user sees no requests at all | SubmittedBy is empty (flow mapping missing) and the E-mail box didn't match them | Check the flow maps SubmittedBy to **Responders' Email**, and that the form is set to *Only people in my organization*. Fill SubmittedBy by hand on older items |
+| Description edits aren't saved | Description card Update doesn't read from `txtDescription` | Set the card's Update to the formula in 5.3. Use `ThisItem.Description`, not `Parent.Default` |
+| *ThisItem isn't recognized* | The control is on the screen instead of inside a gallery | Cut it (Ctrl+X), click the gallery's first item until the pencil ✎ shows, and paste (Ctrl+V) |
 | *"Title" field is required* when moving a request | The History list's Title is required and a Patch didn't set it | All formulas in this guide set Title. Check that you copied the full Patch, or make Title optional in the History list settings |
 | DetailScreen is blank while building | `varCR` is empty in Studio | Preview the board, click a card, and close the preview (see the tip in Step 5) |
 | Users get access errors | They have the app but not the SharePoint site | Give them **Edit** on the site (Step 6) |
@@ -634,5 +714,10 @@ Work through this list in the **published** app. Test with your own account and,
 
 - **Email or Teams notifications:** create a Power Automate flow with the trigger *When an item is created or modified* on Change Requests, plus a condition on `Stage`. For example, when Stage = *Change Advisory Board*, post an adaptive card to the CAB Teams channel.
 - **Stricter enforcement:** the stage rules are enforced only inside the app, and anyone with Edit permission could still change the list directly in SharePoint. If you need rules that can't be bypassed, move stage changes into a Power Automate flow that runs under a service account and make the list read-only for users, or move the data to Dataverse and use security roles.
+- **Manage roles without republishing:** the CM, CAB and Authority lists are typed into App.Formulas, so every team change means editing and republishing the app. Instead, create a SharePoint list named **App Roles** with columns `Email` (text, lower case) and `Role` (choice: CM, CAB, Authority), and add it as a data source. Then replace the role lines in App.Formulas with, for example, `IsCM = !IsBlank(LookUp('App Roles', Email = Lower(User().Email) && Role.Value = "CM"));`, and do the same for `IsCAB` and `IsAuthority`. Limit who can edit **App Roles**.
+- **Hide other people's requests in SharePoint too:** the board only hides requests in the app. To stop regular users opening the list directly:
+  - remove their direct access to **Change Requests**,
+  - have the flow grant each submitter access to their own item (SharePoint's *Grant access to an item or a folder* action),
+  - give CM, CAB and Authority members access to the whole list.
 - **Calendar view:** add a SharePoint calendar view on `PlannedStart`/`PlannedEnd` to get a forward schedule of changes.
 - **Layout diagrams:** the images in this guide are generated by [docs/Build-Mockups.ps1](docs/Build-Mockups.ps1). Re-run it if you change the layout.

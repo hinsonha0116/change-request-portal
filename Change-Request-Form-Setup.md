@@ -39,7 +39,7 @@ If you put the PDF in the same folder as the provisioning script, the script upl
    - Who should own it: the account that owns the form must also own the flow in Part C. A shared change-management account is best, so the process doesn't break if one person leaves.
 2. Open **⋯ › Settings** and set:
    - **Who can fill out this form:** *Only people in my organization*. This is required, because Forms only allows file uploads on organization-only forms.
-   - **Record name:** On. This also records each responder's e-mail, which is a useful audit backup.
+   - **Record name:** On. This records each responder's sign-in e-mail. The flow stores it in SubmittedBy, and the app uses that to show people their own requests.
    - **Accept responses:** On.
 3. Add the questions below. This is the suggested order, but you can rearrange them: the flow finds each answer by its question name, not its position.
 
@@ -91,6 +91,7 @@ Sign in to **make.powerautomate.com** with the **same account that owns the form
 | DSN | *DSN* |
 | RequestedBy | *Requested By* |
 | RequesterEmail | *E-mail* |
+| SubmittedBy | *Responders' Email*. The submitter's sign-in account, which the app uses to show people their own requests |
 | Category Value | *Category* |
 | ChangeType Value | *Change Type* |
 | Description | *Description* |

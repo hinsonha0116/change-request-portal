@@ -94,6 +94,7 @@ Add-FieldIfMissing $cr 'A6Program'          Text
 Add-FieldIfMissing $cr 'DSN'                Text
 Add-FieldIfMissing $cr 'RequestedBy'        Text
 Add-FieldIfMissing $cr 'RequesterEmail'     Text
+Add-FieldIfMissing $cr 'SubmittedBy'        Text   # submitter's sign-in email (Forms responder), set by the flow
 Add-FieldIfMissing $cr 'Category'           Choice   -Choices 'Hardware','Software','Network'
 Add-FieldIfMissing $cr 'ChangeType'         Choice   -Choices 'Standard','Normal','Emergency','Informational'
 Add-FieldIfMissing $cr 'Description'        Note

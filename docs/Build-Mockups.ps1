@@ -90,23 +90,9 @@ $b += Tag 1080 640 'tmrRefresh: invisible, place anywhere'
 Svg 'board-layout.svg' $b
 
 # ============================== DetailScreen ==============================
-$d = @()
-$d += Rect 0 0 1366 60 $navy
-$d += Rect 16 12 110 36 '#fff' 'none' "rx='4'"
-$d += Txt 71 36 '← Board' 14 $navy 'bold' 'middle'
-$d += Txt 140 38 'CR-00011 — Upgrade switch firmware' 20 '#fff' 'bold'
-# progress
+# Save in the banner, form on the left, Description + History on the right,
+# actions along the bottom with the comment box directly left of Move.
 $pw = 1326 / 6
-for ($i = 0; $i -lt 6; $i++) {
-    $cx = [math]::Round(20 + $pw * $i + $pw / 2)
-    $fill = if ($i -lt 2) { '#16A34A' } elseif ($i -eq 2) { $stageColors[2] } else { '#E5E7EB' }
-    $num = if ($i -lt 2) { '#fff' } elseif ($i -eq 2) { '#fff' } else { '#6B7280' }
-    $d += "<circle cx='$cx' cy='88' r='14' fill='$fill'/>"
-    $d += Txt $cx 93 "$($i + 1)" 12 $num 'bold' 'middle'
-    $wt = if ($i -eq 2) { 'bold' } else { 'normal' }
-    $d += Txt $cx 128 $names[$i] 12 '#111827' $wt 'middle'
-}
-# form
 $rows = @(
     @('A6 Program', 'A6X Cyber', 'Requested By', 'A1C Jordan Park'),
     @('DSN', '312-555-0142', 'Requester Email', 'jordan.park@us.af.mil'),
@@ -116,72 +102,12 @@ $rows = @(
     @('Attachments', 'RollbackPlan_CR-00011.pdf', 'Planned Start', '24 Oct 2026 18:00'),
     @('CAB Decision', 'Approved', 'Authority Decision', 'Pending ▾')
 )
-$y = 162
-foreach ($r in $rows) {
-    foreach ($k in 0, 1) {
-        $fx = 32 + $k * 440
-        $d += Txt $fx $y $r[$k * 2] 11 '#374151' 'bold'
-        $editable = $r[$k * 2] -eq 'Authority Decision'
-        $bg = if ($editable) { '#fff' } else { '#F9FAFB' }
-        $st = if ($editable) { $navy } else { '#E5E7EB' }
-        $d += Rect $fx ($y + 6) 420 32 $bg $st
-        $d += Txt ($fx + 8) ($y + 27) $r[$k * 2 + 1] 13 '#111827'
-    }
-    $y += 64
-}
-$d += Frame 20 146 880 532
-$d += Tag 700 146 'frmDetail (2 columns, scrolls)'
-# history
-$d += Txt 920 172 'History' 16 '#111827' 'bold'
 $hist = @(
     @('Change Advisory Board → Change Authority', 'Maj. Reyes · 21 Oct 2026 09:12', 'Approved at CAB'),
     @('Requested → Change Advisory Board', 'Mr. Cole · 20 Oct 2026 15:40', 'Ready for CAB review'),
     @('Comment (Requested)', 'Mr. Cole · 20 Oct 2026 15:10', 'Checked rollback plan, looks good'),
     @('Created', 'Flow · 20 Oct 2026 14:05', 'Submitted via Microsoft Forms by A1C Park')
 )
-$hy = 188
-foreach ($h in $hist) {
-    $d += Txt 928 ($hy + 18) $h[0] 12 '#111827' 'bold'
-    $d += Txt 928 ($hy + 38) $h[1] 11 '#6B7280'
-    $d += Txt 928 ($hy + 58) $h[2] 12 '#374151'
-    $d += "<line x1='920' y1='$($hy + 78)' x2='1346' y2='$($hy + 78)' stroke='#E5E7EB'/>"
-    $hy += 80
-}
-$d += Frame 916 182 434 496
-$d += Tag 1200 652 'galHistory'
-$d += Tag 1010 156 'lblHistoryTitle'
-# action bar
-$d += Rect 0 688 1366 80 '#F3F4F6'
-$d += Rect 20 706 400 44 '#fff' '#9CA3AF'
-$d += Rect 430 706 120 44 '#fff' $navy "rx='4'"
-$d += Txt 490 733 'Add comment' 13 $navy 'bold' 'middle'
-$d += Txt 32 733 'Comment for the history log' 14 '#9CA3AF'
-$d += Rect 560 706 130 44 '#E5E7EB' 'none' "rx='4'"
-$d += Txt 625 733 'Save changes' 13 '#9CA3AF' 'bold' 'middle'
-$d += Rect 705 706 150 44 '#fff' $navy "rx='4'"
-$d += Txt 780 733 '← Send back' 13 $navy 'bold' 'middle'
-$d += Rect 870 706 130 44 '#B22222' 'none' "rx='4'"
-$d += Txt 935 733 'Reject' 13 '#fff' 'bold' 'middle'
-$d += Rect 1015 706 331 44 $navy 'none' "rx='4'"
-$d += Txt 1180 733 'Move to Implementation →' 14 '#fff' 'bold' 'middle'
-# tags
-$d += Tag 1240 4 'rectDetailHeader'
-$d += Tag 16 50 'btnHome'
-$d += Tag 560 40 'lblCRTitle'
-$d += Frame 18 66 1330 70
-$d += Tag 1200 112 'galProgress'
-$d += Tag 150 686 'rectActionBar'
-$d += Tag 300 686 'txtComment'
-$d += Tag 420 686 'btnAddComment'
-$d += Tag 572 686 'btnSave'
-$d += Tag 718 686 'btnSendBack'
-$d += Tag 880 686 'btnReject'
-$d += Tag 1130 686 'btnAdvance'
-Svg 'detail-layout.svg' $d
-
-# ======================= DetailScreen (updated layout) =======================
-# Used by DetailScreen-Fixes.md: Save in the banner, Description + History on the right,
-# comment box directly left of the Move button.
 $u = @()
 $u += Rect 0 0 1366 60 $navy
 $u += Rect 16 12 110 36 '#fff' 'none' "rx='4'"
@@ -259,9 +185,9 @@ $u += Txt 1180 733 'Move to Implementation →' 14 '#fff' 'bold' 'middle'
 $u += Tag 1040 20 'btnSave (in banner)'
 $u += Tag 16 50 'btnHome'
 $u += Tag 560 40 'lblCRTitle'
-$u += Tag 30 686 'btnSendBack'
+$u += Tag 24 686 'btnSendBack (CM)'
 $u += Tag 190 686 'btnReject'
 $u += Tag 322 686 'btnAddComment'
 $u += Tag 640 686 'txtComment'
-$u += Tag 1130 686 'btnAdvance'
-Svg 'detail-layout-updated.svg' $u
+$u += Tag 1110 686 'btnAdvance (CM only)'
+Svg 'detail-layout.svg' $u

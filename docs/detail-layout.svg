@@ -4,6 +4,8 @@
 <rect x='16' y='12' width='110' height='36' fill='#fff' stroke='none' rx='4'/>
 <text x='71' y='36' font-size='14' fill='#1E3A6B' font-weight='bold' text-anchor='middle'>← Board</text>
 <text x='140' y='38' font-size='20' fill='#fff' font-weight='bold' text-anchor='start'>CR-00011 — Upgrade switch firmware</text>
+<rect x='1206' y='12' width='140' height='36' fill='#fff' stroke='none' rx='4'/>
+<text x='1276' y='36' font-size='14' fill='#1E3A6B' font-weight='bold' text-anchor='middle'>Save changes</text>
 <circle cx='130' cy='88' r='14' fill='#16A34A'/>
 <text x='130' y='93' font-size='12' fill='#fff' font-weight='bold' text-anchor='middle'>1</text>
 <text x='130' y='128' font-size='12' fill='#111827' font-weight='normal' text-anchor='middle'>Requested</text>
@@ -65,43 +67,54 @@
 <rect x='472' y='552' width='420' height='32' fill='#fff' stroke='#1E3A6B' />
 <text x='480' y='573' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>Pending ▾</text>
 <rect x='20' y='146' width='880' height='532' fill='none' stroke='#C026D3' stroke-width='2' stroke-dasharray='6 4'/>
-<rect x='700' y='146' width='228' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='706' y='160' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>frmDetail (2 columns, scrolls)</text>
-<text x='920' y='172' font-size='16' fill='#111827' font-weight='bold' text-anchor='start'>History</text>
-<text x='928' y='206' font-size='12' fill='#111827' font-weight='bold' text-anchor='start'>Change Advisory Board → Change Authority</text>
-<text x='928' y='226' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>Maj. Reyes · 21 Oct 2026 09:12</text>
-<text x='928' y='246' font-size='12' fill='#374151' font-weight='normal' text-anchor='start'>Approved at CAB</text>
-<line x1='920' y1='266' x2='1346' y2='266' stroke='#E5E7EB'/>
-<text x='928' y='286' font-size='12' fill='#111827' font-weight='bold' text-anchor='start'>Requested → Change Advisory Board</text>
-<text x='928' y='306' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>Mr. Cole · 20 Oct 2026 15:40</text>
-<text x='928' y='326' font-size='12' fill='#374151' font-weight='normal' text-anchor='start'>Ready for CAB review</text>
-<line x1='920' y1='346' x2='1346' y2='346' stroke='#E5E7EB'/>
-<text x='928' y='366' font-size='12' fill='#111827' font-weight='bold' text-anchor='start'>Created</text>
-<text x='928' y='386' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>Flow · 20 Oct 2026 14:05</text>
-<text x='928' y='406' font-size='12' fill='#374151' font-weight='normal' text-anchor='start'>Submitted via Microsoft Forms by A1C Park</text>
-<line x1='920' y1='426' x2='1346' y2='426' stroke='#E5E7EB'/>
-<rect x='916' y='182' width='434' height='496' fill='none' stroke='#C026D3' stroke-width='2' stroke-dasharray='6 4'/>
-<rect x='1200' y='652' width='84' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1206' y='666' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>galHistory</text>
-<rect x='1010' y='156' width='120' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1016' y='170' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>lblHistoryTitle</text>
+<rect x='640' y='146' width='264' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='646' y='160' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>frmDetail (Description card hidden)</text>
+<text x='920' y='166' font-size='16' fill='#111827' font-weight='bold' text-anchor='start'>Description</text>
+<rect x='920' y='176' width='426' height='200' fill='#F9FAFB' stroke='#E5E7EB' />
+<text x='930' y='198' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>Upgrade firmware on the two core switches in</text>
+<text x='930' y='220' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>Bldg 400 from 17.6.4 to 17.9.5 to address the</text>
+<text x='930' y='242' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>vendor security advisory. Work is done in the</text>
+<text x='930' y='264' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>Saturday maintenance window, one switch at a</text>
+<text x='930' y='286' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>time, so the stack stays up throughout. Each</text>
+<text x='930' y='308' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>switch reloads once (about 8 minutes). Config is</text>
+<text x='930' y='330' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>backed up to the NMS before the upgrade, and the</text>
+<text x='930' y='352' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>rollback is a reload to the previous image ...</text>
+<rect x='1336' y='182' width='5' height='80' fill='#9CA3AF' stroke='none' rx='2'/>
+<rect x='1030' y='150' width='98.4' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1036' y='164' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>lblDescTitle</text>
+<rect x='1106' y='352' width='235.2' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1112' y='366' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>txtDescription + lblDescription</text>
+<text x='920' y='408' font-size='16' fill='#111827' font-weight='bold' text-anchor='start'>History</text>
+<text x='928' y='436' font-size='12' fill='#111827' font-weight='bold' text-anchor='start'>Change Advisory Board → Change Authority</text>
+<text x='928' y='456' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>Maj. Reyes · 21 Oct 2026 09:12</text>
+<text x='928' y='476' font-size='12' fill='#374151' font-weight='normal' text-anchor='start'>Approved at CAB</text>
+<line x1='920' y1='496' x2='1330' y2='496' stroke='#E5E7EB'/>
+<text x='928' y='516' font-size='12' fill='#111827' font-weight='bold' text-anchor='start'>Requested → Change Advisory Board</text>
+<text x='928' y='536' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>Mr. Cole · 20 Oct 2026 15:40</text>
+<text x='928' y='556' font-size='12' fill='#374151' font-weight='normal' text-anchor='start'>Ready for CAB review</text>
+<line x1='920' y1='576' x2='1330' y2='576' stroke='#E5E7EB'/>
+<text x='928' y='596' font-size='12' fill='#111827' font-weight='bold' text-anchor='start'>Comment (Requested)</text>
+<text x='928' y='616' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>Mr. Cole · 20 Oct 2026 15:10</text>
+<text x='928' y='636' font-size='12' fill='#374151' font-weight='normal' text-anchor='start'>Checked rollback plan, looks good</text>
+<line x1='920' y1='656' x2='1330' y2='656' stroke='#E5E7EB'/>
+<rect x='1336' y='424' width='5' height='120' fill='#9CA3AF' stroke='none' rx='2'/>
+<rect x='916' y='414' width='434' height='264' fill='none' stroke='#C026D3' stroke-width='2' stroke-dasharray='6 4'/>
+<rect x='1010' y='392' width='120' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1016' y='406' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>lblHistoryTitle</text>
+<rect x='1180' y='652' width='156' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1186' y='666' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>galHistory (scrolls)</text>
 <rect x='0' y='688' width='1366' height='80' fill='#F3F4F6' stroke='none' />
-<rect x='20' y='706' width='520' height='44' fill='#fff' stroke='#9CA3AF' />
-<text x='32' y='733' font-size='14' fill='#9CA3AF' font-weight='normal' text-anchor='start'>Comment for the history log</text>
-<rect x='560' y='706' width='130' height='44' fill='#E5E7EB' stroke='none' rx='4'/>
-<text x='625' y='733' font-size='13' fill='#9CA3AF' font-weight='bold' text-anchor='middle'>Save changes</text>
-<rect x='705' y='706' width='150' height='44' fill='#fff' stroke='#1E3A6B' rx='4'/>
-<text x='780' y='733' font-size='13' fill='#1E3A6B' font-weight='bold' text-anchor='middle'>← Send back</text>
-<rect x='870' y='706' width='130' height='44' fill='#B22222' stroke='none' rx='4'/>
-<text x='935' y='733' font-size='13' fill='#fff' font-weight='bold' text-anchor='middle'>Reject</text>
+<rect x='20' y='706' width='150' height='44' fill='#fff' stroke='#1E3A6B' rx='4'/>
+<text x='95' y='733' font-size='13' fill='#1E3A6B' font-weight='bold' text-anchor='middle'>← Send back</text>
+<rect x='180' y='706' width='130' height='44' fill='#B22222' stroke='none' rx='4'/>
+<text x='245' y='733' font-size='13' fill='#fff' font-weight='bold' text-anchor='middle'>Reject</text>
+<rect x='320' y='706' width='120' height='44' fill='#fff' stroke='#1E3A6B' rx='4'/>
+<text x='380' y='733' font-size='13' fill='#1E3A6B' font-weight='bold' text-anchor='middle'>Add comment</text>
+<rect x='450' y='706' width='555' height='44' fill='#fff' stroke='#9CA3AF' />
+<text x='462' y='733' font-size='14' fill='#9CA3AF' font-weight='normal' text-anchor='start'>Comment for the history log</text>
 <rect x='1015' y='706' width='331' height='44' fill='#1E3A6B' stroke='none' rx='4'/>
 <text x='1180' y='733' font-size='14' fill='#fff' font-weight='bold' text-anchor='middle'>Move to Implementation →</text>
-<rect x='1240' y='4' width='127.2' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1246' y='18' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>rectDetailHeader</text>
+<rect x='1040' y='20' width='148.8' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1046' y='34' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnSave (in banner)</text>
 <rect x='16' y='50' width='62.4' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='22' y='64' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnHome</text>
 <rect x='560' y='40' width='84' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='566' y='54' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>lblCRTitle</text>
-<rect x='18' y='66' width='1330' height='70' fill='none' stroke='#C026D3' stroke-width='2' stroke-dasharray='6 4'/>
-<rect x='1200' y='112' width='91.2' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1206' y='126' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>galProgress</text>
-<rect x='210' y='686' width='105.6' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='216' y='700' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>rectActionBar</text>
-<rect x='380' y='686' width='84' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='386' y='700' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>txtComment</text>
-<rect x='572' y='686' width='62.4' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='578' y='700' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnSave</text>
-<rect x='718' y='686' width='91.2' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='724' y='700' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnSendBack</text>
-<rect x='880' y='686' width='76.8' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='886' y='700' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnReject</text>
-<rect x='1130' y='686' width='84' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1136' y='700' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnAdvance</text>
+<rect x='24' y='686' width='127.2' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='30' y='700' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnSendBack (CM)</text>
+<rect x='190' y='686' width='76.8' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='196' y='700' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnReject</text>
+<rect x='322' y='686' width='105.6' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='328' y='700' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnAddComment</text>
+<rect x='640' y='686' width='84' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='646' y='700' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>txtComment</text>
+<rect x='1110' y='686' width='156' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1116' y='700' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnAdvance (CM only)</text>
 </svg>
