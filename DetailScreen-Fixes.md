@@ -25,6 +25,13 @@ These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Re
 - **Opening a request** shows the current stage's tab first. After a move, the box switches to the new stage's tab.
 - The CAB, Authority, Implementation and Review notes **move out of the form** on the left, which leaves it shorter.
 
+![Notes tabs: three examples](docs/notes-tabs.svg)
+
+*Three examples:*
+1. *A request in Requested shows only the Description tab, and it's editable.*
+2. *At the CAB stage, a CAB member sees Description and CAB, with CAB editable.*
+3. *A closed request shows all five tabs, read-only, here with Implement selected.*
+
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar.
 
 ---

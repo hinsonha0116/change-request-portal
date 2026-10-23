@@ -191,3 +191,75 @@ $u += Tag 322 686 'btnAddComment'
 $u += Tag 640 686 'txtComment'
 $u += Tag 1110 686 'btnAdvance (CM only)'
 Svg 'detail-layout.svg' $u
+
+# ============================== Notes tabs ==============================
+# Used by DetailScreen-Fixes.md: three examples of the tabbed notes box.
+$labels = 'Description', 'CAB', 'Authority', 'Implement', 'Review'
+
+# One right-hand notes panel: $count tabs visible, $sel selected, $edit bold/editable index (-1 none)
+function Panel($x, $title, $sub, $count, $sel, $edit, $lines, $editable) {
+    $o = @()
+    $o += Txt $x 52 $title 16 '#111827' 'bold'
+    $o += Txt $x 74 $sub 12 '#6B7280'
+    $tw = 426 / 5
+    for ($i = 0; $i -lt $count; $i++) {
+        $tx = [math]::Round($x + $i * $tw)
+        $fill = if ($i -eq $sel) { $navy } else { '#EEF0F3' }
+        $col = if ($i -eq $sel) { '#FFFFFF' } else { '#111827' }
+        $wt = if ($i -eq $edit) { 'bold' } else { 'normal' }
+        $o += Rect ($tx + 1) 96 ([math]::Round($tw - 2)) 30 $fill
+        $o += Txt ([math]::Round($tx + $tw / 2)) 116 $labels[$i] 12 $col $wt 'middle'
+    }
+    if ($editable) { $o += Rect $x 130 426 200 '#FFFFFF' $navy "stroke-width='1.5'" }
+    else { $o += Rect $x 130 426 200 '#F7F8FA' '#D1D5DB' }
+    $ly = 154
+    foreach ($l in $lines) {
+        $c = if ($l.StartsWith('|')) { '#9CA3AF' } else { '#111827' }
+        $o += Txt ($x + 10) $ly $l.TrimStart('|') 13 $c
+        $ly += 21
+    }
+    if (-not $editable) { $o += Rect ($x + 416) 136 5 70 '#9CA3AF' 'none' "rx='2'" }
+    $tag = if ($editable) { 'editable (txtNote)' } else { 'read-only (lblNote), scrolls' }
+    $tagFill = if ($editable) { $navy } else { '#6B7280' }
+    $o += Rect $x 338 ([math]::Round(12 + 7 * $tag.Length)) 22 $tagFill 'none' "rx='3'"
+    $o += Txt ($x + 6) 353 $tag 12 '#FFFFFF' 'bold'
+    $o
+}
+
+$n = @()
+$n += Rect 0 0 1366 470 '#FFFFFF' '#9CA3AF'
+$n += Txt 20 24 'Notes tabs on the DetailScreen (right side, X 920 · Y 146) — three examples' 13 '#6B7280'
+$n += Panel 20 '1. Request in Requested' 'Anyone opening it · Description tab only' 1 0 0 @(
+    'Upgrade firmware on the two core switches in',
+    'Bldg 400 from 17.6.4 to 17.9.5 to address the',
+    'vendor security advisory. Work is done in the',
+    'Saturday maintenance window, one switch at a',
+    'time, so the stack stays up throughout.|') $true
+$n += Panel 470 '2. Request in CAB stage' 'CAB member · CAB tab opens and is editable' 2 1 1 @(
+    'Reviewed 21 Oct. Rollback plan is complete and',
+    'tested in the lab. Approve for Saturday window',
+    'provided NOC is notified 24 hours ahead.|') $true
+$n += Panel 920 '3. Closed request' 'Anyone · clicked the Implement tab' 5 3 -1 @(
+    'Started 18:02. Switch A upgraded and reloaded',
+    'in 7 min, verified uplinks and VLANs. Switch B',
+    'upgraded 18:21, reload 8 min. All monitoring',
+    'green at 18:40. Backups stored on NMS under',
+    'CR-00011. No user impact reported. Change',
+    'completed 18:45.') $false
+
+# legend
+$ly = 400
+$n += Rect 20 ($ly - 12) 26 16 $navy
+$n += Txt 54 $ly 'Selected tab' 13 '#374151'
+$n += Txt 180 $ly 'Bold' 13 '#111827' 'bold'
+$n += Txt 218 $ly '= the tab you can edit' 13 '#374151'
+$n += Rect 400 ($ly - 12) 26 16 '#FFFFFF' $navy "stroke-width='1.5'"
+$n += Txt 434 $ly 'White box with navy border = editable' 13 '#374151'
+$n += Rect 720 ($ly - 12) 26 16 '#F7F8FA' '#D1D5DB'
+$n += Txt 754 $ly 'Grey box = read-only' 13 '#374151'
+$n += Txt 20 436 'Tabs appear as the request reaches each stage: Description (1) · CAB (2) · Authority (3) · Implement (4) · Review (5).' 13 '#374151'
+$n += Txt 20 456 'Below the box, History stays where it is (Y 388).' 13 '#6B7280'
+
+$svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1366 470' font-family='Segoe UI, Arial, sans-serif'>`n" + ($n -join "`n") + "`n</svg>`n"
+[IO.File]::WriteAllText((Join-Path $out 'notes-tabs.svg'), $svg, (New-Object Text.UTF8Encoding($false)))
+Write-Host "Wrote notes-tabs.svg"

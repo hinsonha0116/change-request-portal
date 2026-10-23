@@ -1,0 +1,60 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1366 470' font-family='Segoe UI, Arial, sans-serif'>
+<rect x='0' y='0' width='1366' height='470' fill='#FFFFFF' stroke='#9CA3AF' />
+<text x='20' y='24' font-size='13' fill='#6B7280' font-weight='normal' text-anchor='start'>Notes tabs on the DetailScreen (right side, X 920 · Y 146) — three examples</text>
+<text x='20' y='52' font-size='16' fill='#111827' font-weight='bold' text-anchor='start'>1. Request in Requested</text>
+<text x='20' y='74' font-size='12' fill='#6B7280' font-weight='normal' text-anchor='start'>Anyone opening it · Description tab only</text>
+<rect x='21' y='96' width='83' height='30' fill='#1E3A6B' stroke='none' />
+<text x='63' y='116' font-size='12' fill='#FFFFFF' font-weight='bold' text-anchor='middle'>Description</text>
+<rect x='20' y='130' width='426' height='200' fill='#FFFFFF' stroke='#1E3A6B' stroke-width='1.5'/>
+<text x='30' y='154' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>Upgrade firmware on the two core switches in</text>
+<text x='30' y='175' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>Bldg 400 from 17.6.4 to 17.9.5 to address the</text>
+<text x='30' y='196' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>vendor security advisory. Work is done in the</text>
+<text x='30' y='217' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>Saturday maintenance window, one switch at a</text>
+<text x='30' y='238' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>time, so the stack stays up throughout.|</text>
+<rect x='20' y='338' width='138' height='22' fill='#1E3A6B' stroke='none' rx='3'/>
+<text x='26' y='353' font-size='12' fill='#FFFFFF' font-weight='bold' text-anchor='start'>editable (txtNote)</text>
+<text x='470' y='52' font-size='16' fill='#111827' font-weight='bold' text-anchor='start'>2. Request in CAB stage</text>
+<text x='470' y='74' font-size='12' fill='#6B7280' font-weight='normal' text-anchor='start'>CAB member · CAB tab opens and is editable</text>
+<rect x='471' y='96' width='83' height='30' fill='#EEF0F3' stroke='none' />
+<text x='513' y='116' font-size='12' fill='#111827' font-weight='normal' text-anchor='middle'>Description</text>
+<rect x='556' y='96' width='83' height='30' fill='#1E3A6B' stroke='none' />
+<text x='598' y='116' font-size='12' fill='#FFFFFF' font-weight='bold' text-anchor='middle'>CAB</text>
+<rect x='470' y='130' width='426' height='200' fill='#FFFFFF' stroke='#1E3A6B' stroke-width='1.5'/>
+<text x='480' y='154' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>Reviewed 21 Oct. Rollback plan is complete and</text>
+<text x='480' y='175' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>tested in the lab. Approve for Saturday window</text>
+<text x='480' y='196' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>provided NOC is notified 24 hours ahead.|</text>
+<rect x='470' y='338' width='138' height='22' fill='#1E3A6B' stroke='none' rx='3'/>
+<text x='476' y='353' font-size='12' fill='#FFFFFF' font-weight='bold' text-anchor='start'>editable (txtNote)</text>
+<text x='920' y='52' font-size='16' fill='#111827' font-weight='bold' text-anchor='start'>3. Closed request</text>
+<text x='920' y='74' font-size='12' fill='#6B7280' font-weight='normal' text-anchor='start'>Anyone · clicked the Implement tab</text>
+<rect x='921' y='96' width='83' height='30' fill='#EEF0F3' stroke='none' />
+<text x='963' y='116' font-size='12' fill='#111827' font-weight='normal' text-anchor='middle'>Description</text>
+<rect x='1006' y='96' width='83' height='30' fill='#EEF0F3' stroke='none' />
+<text x='1048' y='116' font-size='12' fill='#111827' font-weight='normal' text-anchor='middle'>CAB</text>
+<rect x='1091' y='96' width='83' height='30' fill='#EEF0F3' stroke='none' />
+<text x='1133' y='116' font-size='12' fill='#111827' font-weight='normal' text-anchor='middle'>Authority</text>
+<rect x='1177' y='96' width='83' height='30' fill='#1E3A6B' stroke='none' />
+<text x='1219' y='116' font-size='12' fill='#FFFFFF' font-weight='normal' text-anchor='middle'>Implement</text>
+<rect x='1262' y='96' width='83' height='30' fill='#EEF0F3' stroke='none' />
+<text x='1304' y='116' font-size='12' fill='#111827' font-weight='normal' text-anchor='middle'>Review</text>
+<rect x='920' y='130' width='426' height='200' fill='#F7F8FA' stroke='#D1D5DB' />
+<text x='930' y='154' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>Started 18:02. Switch A upgraded and reloaded</text>
+<text x='930' y='175' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>in 7 min, verified uplinks and VLANs. Switch B</text>
+<text x='930' y='196' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>upgraded 18:21, reload 8 min. All monitoring</text>
+<text x='930' y='217' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>green at 18:40. Backups stored on NMS under</text>
+<text x='930' y='238' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>CR-00011. No user impact reported. Change</text>
+<text x='930' y='259' font-size='13' fill='#111827' font-weight='normal' text-anchor='start'>completed 18:45.</text>
+<rect x='1336' y='136' width='5' height='70' fill='#9CA3AF' stroke='none' rx='2'/>
+<rect x='920' y='338' width='208' height='22' fill='#6B7280' stroke='none' rx='3'/>
+<text x='926' y='353' font-size='12' fill='#FFFFFF' font-weight='bold' text-anchor='start'>read-only (lblNote), scrolls</text>
+<rect x='20' y='388' width='26' height='16' fill='#1E3A6B' stroke='none' />
+<text x='54' y='400' font-size='13' fill='#374151' font-weight='normal' text-anchor='start'>Selected tab</text>
+<text x='180' y='400' font-size='13' fill='#111827' font-weight='bold' text-anchor='start'>Bold</text>
+<text x='218' y='400' font-size='13' fill='#374151' font-weight='normal' text-anchor='start'>= the tab you can edit</text>
+<rect x='400' y='388' width='26' height='16' fill='#FFFFFF' stroke='#1E3A6B' stroke-width='1.5'/>
+<text x='434' y='400' font-size='13' fill='#374151' font-weight='normal' text-anchor='start'>White box with navy border = editable</text>
+<rect x='720' y='388' width='26' height='16' fill='#F7F8FA' stroke='#D1D5DB' />
+<text x='754' y='400' font-size='13' fill='#374151' font-weight='normal' text-anchor='start'>Grey box = read-only</text>
+<text x='20' y='436' font-size='13' fill='#374151' font-weight='normal' text-anchor='start'>Tabs appear as the request reaches each stage: Description (1) · CAB (2) · Authority (3) · Implement (4) · Review (5).</text>
+<text x='20' y='456' font-size='13' fill='#6B7280' font-weight='normal' text-anchor='start'>Below the box, History stays where it is (Y 388).</text>
+</svg>
