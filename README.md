@@ -18,7 +18,7 @@ A Microsoft 365 change-request portal. Requests are submitted through a Microsof
 | [Provision-ChangeRequestLists.ps1](Provision-ChangeRequestLists.ps1) | Creates the SharePoint lists and uploads the rollback template (PnP.PowerShell) |
 | [Rollback-Plan-Template.pdf](Rollback-Plan-Template.pdf) | Fillable Rollback Plan form that requesters attach to every change |
 | [Build-RollbackPdf.ps1](Build-RollbackPdf.ps1) | Regenerates the Rollback Plan PDF: `./Build-RollbackPdf.ps1 -OutFile .\Rollback-Plan-Template.pdf` |
-| [DetailScreen-Fixes.md](DetailScreen-Fixes.md) | Role-based access changes (CM-only buttons, users see only their own requests) for apps built from an earlier version of the guide. Already included in the guide |
+| [DetailScreen-Fixes.md](DetailScreen-Fixes.md) | Latest app update, not yet in the guide: a tabbed notes box (Description, CAB, Authority, Implementation, Review) on the DetailScreen |
 | [docs/](docs/) | Screen layout diagrams used in the guide, and `Build-Mockups.ps1`, which regenerates them |
 
 ## Setup order

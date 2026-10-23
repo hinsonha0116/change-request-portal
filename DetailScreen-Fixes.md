@@ -1,142 +1,237 @@
-# App updates: role-based access
+# App updates: notes tabs
 
-These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Request-PowerApp-Guide.md) and the DetailScreen updates you've already applied: the save-then-act buttons, the new layout, and the Add comment button.
+These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Request-PowerApp-Guide.md), with all earlier updates already applied:
+- the save-then-act buttons,
+- Description and History on the right,
+- Add comment,
+- CM-only buttons,
+- users seeing only their own requests.
 
-What changes:
-1. The **Move** and **Send back** buttons are shown only to members of the **Change Management (CM) team**.
-2. On the board, regular users see **only their own requests**. CM, CAB and Change Authority members see all of them.
+**What changes:** the Description box on the right of the DetailScreen becomes a tabbed **notes** box.
+- **Tabs:** across the top, **Description · CAB · Authority · Implement · Review**.
+- **Tabs appear as the request reaches each stage.** A request in Change Authority shows Description, CAB and Authority.
+- **Clicking a tab** shows that note in the same box. Long notes scroll.
+- **Only the current stage's note is editable,** following the same rules as before:
+
+  | Note | Editable when |
+  |---|---|
+  | Description | the request is in *Requested* |
+  | CAB notes | the request is in the CAB stage, for CAB members |
+  | Authority notes | the request is in the Change Authority stage, for Change Authorities |
+  | Implementation notes | the request is in Implementation |
+  | Review notes | the request is in Review |
+
+  Every other tab is read-only. The editable tab is shown in **bold**.
+- **Opening a request** shows the current stage's tab first. After a move, the box switches to the new stage's tab.
+- The CAB, Authority, Implementation and Review notes **move out of the form** on the left, which leaves it shorter.
 
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar.
 
 ---
 
-## 1 — Limit Move and Send back to the CM team
+## 1 — App.Formulas: list the tabs
 
-This works the same way as the existing CAB and Change Authority checks. You list the CM team once, in **App.Formulas**, then add that check to each button's **Visible** property.
-
-### 1a. Define the CM team
-Select **App** in the Tree view, choose **Formulas**, and add these lines to the **end** of the existing block:
+Select **App**, choose **Formulas**, and add this to the **end**:
 
 ```powerfx
-// Change Management team: can move and send back requests. Use lower-case emails.
-CMTeam = ["cm.lead@us.af.mil", "cm.analyst@us.af.mil"];
-
-IsCM = Lower(User().Email) in CMTeam;
+NoteTabs = Table(
+    {Key: "Description",    Label: "Description", MinStage: 1},
+    {Key: "CAB",            Label: "CAB",         MinStage: 2},
+    {Key: "Authority",      Label: "Authority",   MinStage: 3},
+    {Key: "Implementation", Label: "Implement",   MinStage: 4},
+    {Key: "Review",         Label: "Review",      MinStage: 5}
+);
 ```
 
-Replace the example addresses with your CM team's. Each address must match the email the person signs in with, exactly. If you're unsure what someone's is:
-1. Add a temporary **Text label** with **Text** = `User().Email`.
-2. Have them open the app and tell you what it shows.
-3. Delete the label afterwards.
-
-### 1b. Limit the buttons
-Replace each button's **Visible** with:
-
-| Button | Visible |
-|---|---|
-| `btnAdvance` | `varCR.Stage.Value <> "Close" && IsCM` |
-| `btnSendBack` | `With({o: LookUp(Stages, Name = varCR.Stage.Value).Order}, o >= 2 && o <= 5) && IsCM` |
-
-Anyone not on the CM team won't see these two buttons. Everything else stays the same:
-- **Everyone** can still read requests, use **Add comment**, and save the fields they're allowed to edit.
-- **Reject** stays limited to CAB members and Change Authorities.
-
-> **Same pattern for other buttons:** to restrict any other button, add `&& IsCM` (or `&& IsCAB`, `&& IsAuthority`) to the end of its **Visible** formula. To grey a button out instead of hiding it, use **DisplayMode**: `If(IsCM, DisplayMode.Edit, DisplayMode.Disabled)`.
-
-### 1c. Later: manage the team without editing the app
-With the email list, you have to edit and republish the app every time the team changes. When that gets tedious, keep the team in a SharePoint list instead:
-
-1. Create a list named **App Roles** with two columns:
-   - `Email`: Single line of text. Store addresses in lower case.
-   - `Role`: Choice, with the options CM, CAB and Authority.
-2. Add one row per person per role.
-3. In the app, add **App Roles** as a data source: **Data › Add data › SharePoint**, then pick your site.
-4. In **App.Formulas**, replace the `CMTeam` and `IsCM` lines with:
-   ```powerfx
-   IsCM = !IsBlank(LookUp('App Roles', Email = Lower(User().Email) && Role.Value = "CM"));
-   ```
-   You can do the same for `IsCAB` and `IsAuthority` using `"CAB"` and `"Authority"`.
-
-After that, changing the team is just adding or removing rows in SharePoint. Restrict who can edit the **App Roles** list to the people who should manage roles.
-
-An **Entra security group**, checked through the Office 365 Groups connector, is another option if IT already maintains a CM group. Check that the connector is available in your government tenant first.
-
-> **This hides buttons. It doesn't secure the data.** Anyone with Edit permission on the SharePoint site could still change a request's Stage directly in the list. To enforce the rule, lock the list down so only a Power Automate flow can change stages. See *Optional extras* in the main guide.
+`MinStage` is the stage number at which the tab appears. "Implementation" is shortened to *Implement* so all five tabs fit in the 426-pixel width.
 
 ---
 
-## 2 — Users see only their own requests
+## 2 — Rename the Description boxes
 
-**Who sees what on the board:**
+In the Tree view, double-click each name and rename it:
 
-| User | Sees |
+| Old name | New name |
 |---|---|
-| CM team, CAB members, Change Authorities | **All** requests, with the toggle to switch to just their own |
-| Everyone else | Only requests they **submitted**, or where **their email was typed in the E-mail box** |
+| `txtDescription` | `txtNote` |
+| `lblDescription` | `lblNote` |
 
-A request counts as "theirs" if either:
-- **`SubmittedBy`** matches them: the account they were signed in with when they submitted the form. Forms records this automatically, so it's always accurate.
-- **`RequesterEmail`** matches them: the address typed into the form's E-mail question. This covers someone submitting on another person's behalf.
+Power Apps updates every formula that refers to them automatically.
 
-This section uses `IsCM` from section 1, so do section 1 first.
+Then **delete `lblDescTitle`** (the "Description" heading). The tabs take its place.
 
-### 2a. Add a SubmittedBy column in SharePoint
-1. Open the **Change Requests** list and click **+ Add column › Single line of text**.
-2. Name it `SubmittedBy` exactly, with no space, and click **Save**.
+---
 
-### 2b. Fill SubmittedBy from the flow
-1. Open the **Change Request – Form to SharePoint** flow in Power Automate and click **Edit**.
-2. Open the **Create CR** step. If `SubmittedBy` doesn't appear yet, refresh the browser page so the flow picks up the new column.
-3. Click in **SubmittedBy**, then in the dynamic content list, under *Get response details*, choose **Responders' Email**.
-4. **Save** the flow.
+## 3 — Hidden helper: which note is editable right now
 
-Requests already in the list have SubmittedBy blank. Their submitters can still see them through the E-mail box match. To be safe, you can type the submitter's address into SubmittedBy for those items in SharePoint, or delete old test requests.
+Select **DetailScreen**, insert a **Text label**, rename it `lblEditableNote`, and set:
 
-> **If Responders' Email is empty in the flow run:** the form must be set to **Only people in my organization** (Forms › ⋯ › Settings). That's what makes Forms record who submitted it.
+| Property | Value |
+|---|---|
+| Visible | `false` |
+| Text | see below |
 
-### 2c. Define who can see everything
-Select **App**, choose **Formulas**, and add this line to the **end**, after the `IsCM` line from section 1:
-
+**Text**:
 ```powerfx
-CanSeeAll = IsCM || IsCAB || IsAuthority;
+Switch(varCR.Stage.Value,
+    "Requested",             "Description",
+    "Change Advisory Board", If(IsCAB, "CAB", ""),
+    "Change Authority",      If(IsAuthority, "Authority", ""),
+    "Implementation",        "Implementation",
+    "Review",                "Review",
+    "")
 ```
 
-### 2d. Change the board filter
-Select **`galCards`** (inside `galStages` on BoardScreen) and replace its **Items** with:
+The label shows the key of the one note the current user can edit, or nothing if they can't edit any. The other controls read it from here, so the rule is written only once.
 
+---
+
+## 4 — Add the tabs
+
+### 4a. The tab gallery
+Select **DetailScreen**, insert a **Blank horizontal gallery**, rename it `galNoteTabs`, and set:
+
+| Property | Value |
+|---|---|
+| Items | `Filter(NoteTabs, MinStage <= LookUp(Stages, Name = varCR.Stage.Value).Order)` |
+| X / Y | `920` / `146` |
+| Width / Height | `426` / `30` |
+| TemplateSize | `Self.Width / 5` |
+| TemplatePadding | `0` |
+| ShowScrollbar | `false` |
+| ShowNavigation | `false` |
+| OnSelect | `Set(varNoteTab, ThisItem.Key)` |
+
+If a data-source panel pops up when you insert the gallery, close it.
+
+### 4b. What each tab looks like
+Click the first item of `galNoteTabs` until the pencil ✎ shows at its top-left, then insert these into its template. They should appear **indented under `galNoteTabs`** in the Tree view.
+
+| # | Insert | Rename to | Properties |
+|---|---|---|---|
+| 1 | Rectangle | `rectTab` | X `1` · Y `0` · Width `Parent.TemplateWidth - 2` · Height `30` · Fill: `If(ThisItem.Key = varNoteTab, ColorValue("#1E3A6B"), RGBA(0,0,0,0.06))` |
+| 2 | Text label | `lblTab` | X `0` · Y `0` · Width `Parent.TemplateWidth` · Height `30` · Text: `ThisItem.Label` · Align: `Align.Center` · Size `10` · PaddingLeft/Right `2` · PaddingTop/Bottom `0` · FontWeight: `If(ThisItem.Key = lblEditableNote.Text, FontWeight.Bold, FontWeight.Normal)` · Color: `If(ThisItem.Key = varNoteTab, Color.White, Color.Black)` |
+
+The selected tab is filled navy, and the tab you can edit is **bold**.
+
+---
+
+## 5 — Point the boxes at the selected note
+
+The two boxes stay where they are (X `920`, Y `176`, 426 × 200), and only one is visible at a time:
+- **`txtNote`** (editable) shows when you're on the tab you're allowed to edit.
+- **`lblNote`** (read-only) shows for every other tab.
+
+### 5a. `txtNote`
+
+| Property | Value |
+|---|---|
+| Default | see below |
+| Visible | `!IsBlank(lblEditableNote.Text) && varNoteTab = lblEditableNote.Text` |
+| HintText | `"Type " & LookUp(NoteTabs, Key = varNoteTab).Label & " notes"` |
+
+**Default**:
 ```powerfx
-Sort(
-    Filter(
-        'Change Requests',
-        Stage.Value = ThisItem.Name,
-        (CanSeeAll && !tglMine.Value) || SubmittedBy = User().Email || RequesterEmail = User().Email,
-        IsBlank(txtSearch.Text) || StartsWith(Title, txtSearch.Text)
-    ),
-    Modified,
-    SortOrder.Descending
-)
+Switch(lblEditableNote.Text,
+    "Description",    varCR.Description,
+    "CAB",            varCR.CABNotes,
+    "Authority",      varCR.AuthorityNotes,
+    "Implementation", varCR.ImplementationNotes,
+    "Review",         varCR.ReviewNotes)
 ```
 
-How the middle line works:
-- **CM, CAB or Authority with the toggle off:** every request shows.
-- **Everyone else, or anyone with the toggle on:** only requests where SubmittedBy *or* RequesterEmail is their own address.
+**Default** follows the *editable* note, not the selected tab, on purpose. That way, anything you've typed isn't wiped when you click another tab and come back.
 
-SharePoint ignores upper and lower case when comparing the emails.
+Leave **Mode** (`TextMode.MultiLine`), position and size as they are.
 
-The column counts in the headers (`lblHeader`) follow automatically, because they count what `galCards` shows.
+### 5b. `lblNote`
 
-### 2e. Show the toggle only to people who need it
-Regular users only ever see their own requests, so the **My requests / All requests** toggle does nothing for them. Select **`tglMine`** and set **Visible** to:
+| Property | Value |
+|---|---|
+| Text | see below |
+| Visible | `!txtNote.Visible` |
+
+**Text**:
 ```powerfx
-CanSeeAll
+Coalesce(
+    Switch(varNoteTab,
+        "Description",    varCR.Description,
+        "CAB",            varCR.CABNotes,
+        "Authority",      varCR.AuthorityNotes,
+        "Implementation", varCR.ImplementationNotes,
+        "Review",         varCR.ReviewNotes),
+    "No notes yet.")
 ```
 
-> **This hides requests in the app. It doesn't secure them.** Anyone with permission on the SharePoint site can still open the **Change Requests** list directly and see every request. If requesters mustn't be able to see each other's changes even outside the app, you also need SharePoint item-level permissions:
-> - give regular users no direct access to the list,
-> - have the flow grant each submitter access to their own item (SharePoint's *Grant access to an item or a folder* action),
-> - give CM, CAB and Authority members access to the whole list.
+Leave **Overflow** (`Overflow.Scroll`), the border, padding, position and size as they are.
 
-> **Other files to update later:** the provisioning script and the main guide's column table don't include `SubmittedBy` yet. Add it there if you rebuild the lists from scratch.
+---
+
+## 6 — Save the notes through the form
+
+The four notes cards come off the screen but **stay in the form**, so **Save changes** and the action buttons still write them to SharePoint.
+
+In the Tree view, expand `frmDetail` and do this for each card below:
+1. If it's locked, open **Properties › Advanced** and click **🔒 Unlock to change properties**.
+2. Set **Visible** to `false`. The Description card is already hidden.
+3. Set **Update** to the formula in the table.
+
+| Card | Update |
+|---|---|
+| `Description_DataCard1` | `If(lblEditableNote.Text = "Description", txtNote.Text, ThisItem.Description)` |
+| `CABNotes_DataCard1` | `If(lblEditableNote.Text = "CAB", txtNote.Text, ThisItem.CABNotes)` |
+| `AuthorityNotes_DataCard1` | `If(lblEditableNote.Text = "Authority", txtNote.Text, ThisItem.AuthorityNotes)` |
+| `ImplementationNotes_DataCard1` | `If(lblEditableNote.Text = "Implementation", txtNote.Text, ThisItem.ImplementationNotes)` |
+| `ReviewNotes_DataCard1` | `If(lblEditableNote.Text = "Review", txtNote.Text, ThisItem.ReviewNotes)` |
+
+Each card takes the text from `txtNote` only when that note is the editable one. Otherwise it keeps what's already saved.
+
+The rule that blocks moving to Review until Implementation notes are filled in keeps working, because it checks the saved value.
+
+---
+
+## 7 — Open on the right tab
+
+### 7a. When the screen opens
+Select **DetailScreen** and replace **OnVisible** with:
+```powerfx
+Set(varCR, LookUp('Change Requests', ID = varCR.ID));
+Set(varNoteTab, Switch(varCR.Stage.Value,
+    "Change Advisory Board", "CAB",
+    "Change Authority",      "Authority",
+    "Implementation",        "Implementation",
+    "Review",                "Review",
+    "Close",                 "Review",
+    "Description"))
+```
+
+### 7b. After a move
+Select `frmDetail`, open **OnSuccess**, and add this just **before** the last line, `Set(varAction, Blank())`:
+```powerfx
+If(varAction <> "save",
+    Set(varNoteTab, Switch(varCR.Stage.Value,
+        "Change Advisory Board", "CAB",
+        "Change Authority",      "Authority",
+        "Implementation",        "Implementation",
+        "Review",                "Review",
+        "Close",                 "Review",
+        "Description")));
+```
+
+After a **Move**, **Send back** or **Reject**, the box switches to the new stage's tab. A plain **Save changes** leaves you on the tab you were on.
+
+---
+
+## 8 — Stop Reject from overwriting notes (recommended)
+
+**Reject** currently *replaces* CAB Notes or Authority Notes with the rejection comment. Now that the notes are visible in tabs, it's better to **add** the comment underneath what's already there.
+
+In `frmDetail` › **OnSuccess**, find the `"reject"` section and make two changes:
+
+| Find | Replace with |
+|---|---|
+| `CABNotes: txtComment.Text` | `CABNotes: Trim(varCR.CABNotes & Char(10) & "REJECTED: " & txtComment.Text)` |
+| `AuthorityNotes: txtComment.Text` | `AuthorityNotes: Trim(varCR.AuthorityNotes & Char(10) & "REJECTED: " & txtComment.Text)` |
 
 ---
 
@@ -146,14 +241,20 @@ Press **F5** on **BoardScreen** and check each row:
 
 | # | Do this | Expect |
 |---|---|---|
-| 1 | Open a request as a **CM team** member | **Move** and **Send back** are visible (Send back from the CAB stage onward) |
-| 2 | Have someone **not** on the CM team open the same request | **Move** and **Send back** are hidden; they can still use **Add comment** and **Save changes** |
-| 3 | Submit a new request through the form, then open the flow's latest run | **Create CR** shows SubmittedBy filled with your sign-in email |
-| 4 | Open the board as a **regular user** who has submitted one request | Only that request shows; column counts match; the toggle is hidden |
-| 5 | Submit a request with a colleague's address in the **E-mail** box, then have them open the board | The colleague sees it (they're named in RequesterEmail) |
-| 6 | Open the board as a **CM, CAB or Authority** member | All requests show; the toggle is visible, and switching it on shows only your own |
+| 1 | Open a request in **Requested** | Only the **Description** tab shows; it's bold, selected, and editable |
+| 2 | Edit the description and click **Save changes** | "Saved"; reopen the request and the new text is there |
+| 3 | As CM, **Move** it to CAB | The **CAB** tab appears and opens automatically |
+| 4 | As a **CAB member**, type CAB notes and click **Save changes** | Saved; reopen and the CAB tab shows your notes |
+| 5 | Click the **Description** tab | Description shows read-only and scrolls if it's long |
+| 6 | Open the same CAB-stage request as someone **not** on the CAB | The CAB tab is read-only; no tab is bold |
+| 7 | Type in the CAB tab, click Description, then click CAB again | Your unsaved text is still there |
+| 8 | Move a request to **Implementation** and click **Move** with no Implementation notes | Error: *Add implementation notes before moving to Review* |
+| 9 | Type notes on the **Implement** tab, then click **Move** | Saves and moves to Review; the box switches to the **Review** tab |
+| 10 | **Reject** a CAB-stage request that already has CAB notes | The CAB tab shows the original notes, then a **REJECTED:** line with your comment |
+| 11 | Open a **closed** request | All five tabs show, every tab is read-only, and the box opens on **Review** |
 
 **If something goes wrong:**
-- **A red error banner** appears: send the exact text.
-- **A control shows a red error:** check that its formula has no red underlines, and open the **App checker** (the stethoscope icon in the top toolbar) to see every error in the app.
-- **A regular user sees no requests at all:** check that SubmittedBy is being filled (row 3), and that their sign-in email matches. A temporary label with **Text** = `User().Email` shows what the app sees.
+- **A tab shows *ThisItem isn't recognized*:** the control is on the screen instead of inside `galNoteTabs`. Cut it (**Ctrl+X**), click the first tab until the pencil ✎ shows, and paste (**Ctrl+V**).
+- **Notes don't save:** check the card's **Update** formula in section 6, and that the card is still in `frmDetail`. It should be hidden, not removed.
+- **The editable box shows the wrong note:** check that `txtNote` **Default** uses `lblEditableNote.Text`, not `varNoteTab`.
+- **Anything else:** open the **App checker** (the stethoscope icon in the top toolbar) to see every formula error, and send me the exact text of any red error banner.
