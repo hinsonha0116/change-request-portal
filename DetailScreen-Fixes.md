@@ -7,7 +7,7 @@ These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Re
 - **Requested By** is a **people picker**. Start typing a name and choose anyone in your organization. It defaults to you.
 - Picking a person **fills in their email automatically**, and their phone number too if your directory stores one.
 - **A6 Program** is a drop-down of your 16 programs.
-- **Category, Change Type, Priority, Risk and Impact** are radio buttons, as on the form.
+- **Category, Change Type, Priority, Risk and Impact** are drop-downs of the SharePoint choices, and all are required.
 - The **Rollback Plan PDF** and any other files are attached on the same screen.
 - **Submit** saves the request straight to SharePoint with Stage = *Requested*, and writes the first History row.
 - **The Power Automate flow is no longer needed** for new requests. The OneDrive, form-owner and Parse JSON steps all go away.
@@ -154,35 +154,15 @@ Leave the DSN card **editable**, so people can correct it. If your directory doe
 
 ---
 
-## 5 — Radio buttons for the five choices
+## 5 — Category, Change Type, Priority, Risk and Impact (drop-downs)
 
-Do this for **Category**, **ChangeType**, **Priority**, **Risk** and **Impact**:
+These five fields stay as the **drop-downs** Power Apps created in each card. Their options come straight from the SharePoint choices, so they always match the list (`4 - Low`, `3 - Moderate` and so on). There's nothing to insert. You only make them required.
 
-1. Expand the card (e.g. `Category_DataCard…`) and select its combo box (`DataCardValueN`). Set **Visible** to `false`.
-2. Select the **card**, then choose **+ Insert › Radio**. It should appear **inside the card**.
-3. Rename it and set its properties from the table below.
-4. Select the **card** and set **Update** to `rdo….Selected` (the radio's name), for example `rdoCategory.Selected`.
+For each of the **Category**, **ChangeType**, **Priority**, **Risk** and **Impact** cards in `frmNew`, select the **card** and set **Required** to `true`.
 
-| Card | Radio name | Items |
-|---|---|---|
-| Category | `rdoCategory` | `Choices([@'Change Requests'].Category)` |
-| ChangeType | `rdoChangeType` | `Choices([@'Change Requests'].ChangeType)` |
-| Priority | `rdoPriority` | `Choices([@'Change Requests'].Priority)` |
-| Risk | `rdoRisk` | `Choices([@'Change Requests'].Risk)` |
-| Impact | `rdoImpact` | `Choices([@'Change Requests'].Impact)` |
+A red star appears on each card, and **Submit** won't save until all five are chosen. They start empty on a new request, because these SharePoint columns have no default, so the requester has to pick each one.
 
-Set these on **every** radio:
-
-| Property | Value |
-|---|---|
-| Layout | `Layout.Horizontal` |
-| X / Y | `DataCardValueN.X` / `DataCardValueN.Y` *(the hidden combo box in that card)* |
-| Width | `DataCardValueN.Width` |
-| Height | `40` |
-
-The options come straight from the SharePoint choices, so they always match the list (`4 - Low`, `3 - Moderate` and so on). No radio is pre-selected, so the requester has to choose.
-
-> **Prefer drop-downs?** Skip this section. The cards already show a drop-down for each choice, and they work as they are.
+> Don't hide or replace the drop-down inside these cards, and leave each card's **Update** as Power Apps created it.
 
 ---
 
@@ -284,9 +264,6 @@ If(
         Notify("Choose an A6 Program.", NotificationType.Error),
     IsBlank(cmbRequestedBy.Selected),
         Notify("Choose who is requesting this change.", NotificationType.Error),
-    IsBlank(rdoCategory.Selected) || IsBlank(rdoChangeType.Selected) ||
-    IsBlank(rdoPriority.Selected) || IsBlank(rdoRisk.Selected) || IsBlank(rdoImpact.Selected),
-        Notify("Choose a Category, Change Type, Priority, Risk and Impact.", NotificationType.Error),
     IsEmpty(DataCardValueN.Attachments),
         Notify("Attach the completed Rollback Plan PDF.", NotificationType.Error),
     !frmNew.Valid,
@@ -295,7 +272,7 @@ If(
 )
 ```
 
-If you kept drop-downs instead of radios (section 5), delete the line that checks the five `rdo…` controls.
+The last check (`frmNew.Valid`) covers every card set to **Required**: A6 Program, DSN, Title and Description (3d), plus the five choice drop-downs (section 5).
 
 ### 7b. `frmNew` › OnSuccess
 This writes the first History row, the same way the flow did, then returns to the board:
@@ -326,11 +303,10 @@ On **BoardScreen**, select **`btnNew`** and replace **OnSelect** with:
 ```powerfx
 NewForm(frmNew);
 Reset(cmbRequestedBy); Reset(drpA6Program);
-Reset(rdoCategory); Reset(rdoChangeType); Reset(rdoPriority); Reset(rdoRisk); Reset(rdoImpact);
 Navigate(NewScreen, ScreenTransition.Cover)
 ```
 
-The form is cleared every time, the picker goes back to you, A6 Program is empty, and no radio is selected. If you kept drop-downs, delete the `Reset(rdo…)` line.
+The form is cleared every time: the picker goes back to you, and A6 Program and the five choice drop-downs are empty. `NewForm` clears the choice drop-downs by itself.
 
 ---
 
@@ -363,26 +339,26 @@ Press **F5** on **BoardScreen** and check each row:
 
 | # | Do this | Expect |
 |---|---|---|
-| 1 | Click **+ Request a New Change** | NewScreen opens; **Requested By** shows **you**; your email is filled in and greyed out; no radio is selected |
-| 2 | Click in **Requested By** and type part of a colleague's name | Matching people appear, with names and emails |
+| 1 | Click **+ Request a New Change** | NewScreen opens; **Requested By** shows **you**; your email is filled in and greyed out; A6 Program and the five choice drop-downs are empty |
+| 2 | Click in **Requested By** and type part of a colleague's name or email | Matching people appear, with names and emails |
 | 3 | Pick the colleague | Their email replaces yours; DSN fills in too, if you did 4d |
-| 4 | Click **Submit request** with nothing else filled | Error asking for Category, Change Type, Priority, Risk and Impact |
-| 5 | Choose all five radios and click Submit with no attachment | Error: *Attach the completed Rollback Plan PDF* |
-| 6 | Attach a PDF and click Submit with Title empty | Error: *Fill in every field marked with a red star* |
-| 7 | Fill everything and click **Submit request** | "CR-000NN submitted"; back on the board, the new card is in **1. Requested** |
-| 8 | Open the new request | All fields match what you entered; the PDF opens from Attachments; History shows **Created** with *"Submitted in the app by … on behalf of …"* |
-| 9 | Check the item in SharePoint | Stage = Requested, CAB and Authority = Pending, SubmittedBy = your email, RequesterEmail = the colleague's |
-| 10 | Have the colleague (a regular user) open the board | They see the request submitted for them |
-| 11 | Click **+ Request a New Change** again | The form is empty and Requested By is back to you |
-| 12 | Click **Download Rollback Plan template** | The blank PDF opens |
-| 13 | On NewScreen, open the **A6 Program** drop-down | All 16 programs are listed, ACBN to X-COMM; nothing is selected at first |
-| 14 | Fill everything except A6 Program and click **Submit request** | Error: *Choose an A6 Program* |
+| 4 | Open the **A6 Program** drop-down | All 16 programs are listed, ACBN to X-COMM |
+| 5 | Open the **Priority** drop-down | The four SharePoint choices are listed, `4 - Low` to `1 - Critical` |
+| 6 | Click **Submit request** with nothing else filled | Error: *Choose an A6 Program* |
+| 7 | Choose an A6 Program and click Submit with no attachment | Error: *Attach the completed Rollback Plan PDF* |
+| 8 | Attach a PDF, leave **Priority** (or Title) empty, and click Submit | Error: *Fill in every field marked with a red star*; the empty field shows its star |
+| 9 | Fill everything and click **Submit request** | "CR-000NN submitted"; back on the board, the new card is in **1. Requested** |
+| 10 | Open the new request | All fields match what you entered, including the five choices; the PDF opens from Attachments; History shows **Created** with *"Submitted in the app by … on behalf of …"* |
+| 11 | Check the item in SharePoint | Stage = Requested, CAB and Authority = Pending, SubmittedBy = your email, RequesterEmail = the colleague's |
+| 12 | Have the colleague (a regular user) open the board | They see the request submitted for them |
+| 13 | Click **+ Request a New Change** again | The form is empty and Requested By is back to you |
+| 14 | Click **Download Rollback Plan template** | The blank PDF opens |
 | 15 | Open a request in *Requested* on the DetailScreen *(if you did 5b-3)* | The drop-down shows its saved program and can be changed; at later stages it's read-only |
 
 **If something goes wrong:**
 - ***Office365Users isn't recognized*:** the connector wasn't added (section 1), or your tenant blocks it.
 - **The people picker shows nothing as you type:** check that **IsSearchable** is `true` and that **Items** uses `Self.SearchText`.
 - **The email doesn't fill in:** check the RequesterEmail card's **Default** is `cmbRequestedBy.Selected.Mail`, and that you set it on the **card**, not the text box inside it.
-- **A picker or radio appears in the wrong place or outside the card:** in the Tree view it must be indented under its card. Cut it (**Ctrl+X**), select the card, and paste (**Ctrl+V**).
-- **A choice saves blank:** the card's **Update** must be `rdo….Selected`, and the radio must be inside that card.
+- **The picker or A6 Program drop-down appears in the wrong place or outside its card:** in the Tree view it must be indented under its card. Cut it (**Ctrl+X**), select the card, and paste (**Ctrl+V**).
+- **A choice saves blank or shows an error:** make sure the drop-down inside that card is the one Power Apps created, and that the card's **Update** hasn't been changed. If in doubt, remove the field (**Edit fields › ⋯ › Remove**), add it again, and set **Required** to `true`.
 - **Anything else:** open the **App checker** (the stethoscope icon in the top toolbar) to see every formula error, and send me the exact text of any red error banner.
