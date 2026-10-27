@@ -1,244 +1,282 @@
-# App updates: notes tabs
+# App updates: New Request screen with a people picker
 
-These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Request-PowerApp-Guide.md), with all earlier updates already applied:
-- the save-then-act buttons,
-- Description and History on the right,
-- Add comment,
-- CM-only buttons,
-- users seeing only their own requests.
+These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Request-PowerApp-Guide.md), with all earlier updates already applied.
 
-**What changes:** the Description box on the right of the DetailScreen becomes a tabbed **notes** box.
-- **Tabs:** across the top, **Description · CAB · Authority · Implement · Review**.
-- **Tabs appear as the request reaches each stage.** A request in Change Authority shows Description, CAB and Authority.
-- **Clicking a tab** shows that note in the same box. Long notes scroll.
-- **Only the current stage's note is editable,** following the same rules as before:
+**What changes:** new change requests are submitted **inside the app** instead of through the Microsoft Form.
+- **+ Request a New Change** opens a new **NewScreen** in the app.
+- **Requested By** is a **people picker**. Start typing a name and choose anyone in your organization. It defaults to you.
+- Picking a person **fills in their email automatically**, and their phone number too if your directory stores one.
+- **Category, Change Type, Priority, Risk and Impact** are radio buttons, as on the form.
+- The **Rollback Plan PDF** and any other files are attached on the same screen.
+- **Submit** saves the request straight to SharePoint with Stage = *Requested*, and writes the first History row.
+- **The Power Automate flow is no longer needed** for new requests. The OneDrive, form-owner and Parse JSON steps all go away.
 
-  | Note | Editable when |
-  |---|---|
-  | Description | the request is in *Requested* |
-  | CAB notes | the request is in the CAB stage, for CAB members |
-  | Authority notes | the request is in the Change Authority stage, for Change Authorities |
-  | Implementation notes | the request is in Implementation |
-  | Review notes | the request is in Review |
+Requests already submitted through the form keep working as before.
 
-  Every other tab is read-only. The editable tab is shown in **bold**.
-- **Opening a request** shows the current stage's tab first. After a move, the box switches to the new stage's tab.
-- The CAB, Authority, Implementation and Review notes **move out of the form** on the left, which leaves it shorter.
+> **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. You can also type X, Y, Width and Height into the **Properties** pane on the right.
 
-![Notes tabs: three examples](docs/notes-tabs.svg)
-
-*Three examples:*
-1. *A request in Requested shows only the Description tab, and it's editable.*
-2. *At the CAB stage, a CAB member sees Description and CAB, with CAB editable.*
-3. *A closed request shows all five tabs, read-only, here with Implement selected.*
-
-> **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar.
+**Time:** about 60–90 minutes.
 
 ---
 
-## 1 — App.Formulas: list the tabs
+## 1 — Add the Office 365 Users connector
 
-Select **App**, choose **Formulas**, and add this to the **end**:
+This is what lets the app search your organization's directory.
 
-```powerfx
-NoteTabs = Table(
-    {Key: "Description",    Label: "Description", MinStage: 1},
-    {Key: "CAB",            Label: "CAB",         MinStage: 2},
-    {Key: "Authority",      Label: "Authority",   MinStage: 3},
-    {Key: "Implementation", Label: "Implement",   MinStage: 4},
-    {Key: "Review",         Label: "Review",      MinStage: 5}
-);
-```
+1. Click the **Data** icon (the cylinder) in the far-left bar, then **Add data**.
+2. Search for **Office 365 Users**, select it, and click **Connect**.
+3. It appears under **Data** as **Office365Users**.
 
-`MinStage` is the stage number at which the tab appears. "Implementation" is shortened to *Implement* so all five tabs fit in the 426-pixel width.
+> If **Office 365 Users** isn't in the list, your tenant may block it. Check with your Power Platform admin before going further, because the people picker depends on it.
+
+**Check:** add a temporary **Text label** with **Text** = `Office365Users.MyProfileV2().displayName`. It should show your name. Delete the label afterwards.
 
 ---
 
-## 2 — Rename the Description boxes
+## 2 — Create NewScreen and its banner
 
-In the Tree view, double-click each name and rename it:
-
-| Old name | New name |
-|---|---|
-| `txtDescription` | `txtNote` |
-| `lblDescription` | `lblNote` |
-
-Power Apps updates every formula that refers to them automatically.
-
-Then **delete `lblDescTitle`** (the "Description" heading). The tabs take its place.
-
----
-
-## 3 — Hidden helper: which note is editable right now
-
-Select **DetailScreen**, insert a **Text label**, rename it `lblEditableNote`, and set:
-
-| Property | Value |
-|---|---|
-| Visible | `false` |
-| Text | see below |
-
-**Text**:
-```powerfx
-Switch(varCR.Stage.Value,
-    "Requested",             "Description",
-    "Change Advisory Board", If(IsCAB, "CAB", ""),
-    "Change Authority",      If(IsAuthority, "Authority", ""),
-    "Implementation",        "Implementation",
-    "Review",                "Review",
-    "")
-```
-
-The label shows the key of the one note the current user can edit, or nothing if they can't edit any. The other controls read it from here, so the rule is written only once.
-
----
-
-## 4 — Add the tabs
-
-### 4a. The tab gallery
-Select **DetailScreen**, insert a **Blank horizontal gallery**, rename it `galNoteTabs`, and set:
-
-| Property | Value |
-|---|---|
-| Items | `Filter(NoteTabs, MinStage <= LookUp(Stages, Name = varCR.Stage.Value).Order)` |
-| X / Y | `920` / `146` |
-| Width / Height | `426` / `30` |
-| TemplateSize | `Self.Width / 5` |
-| TemplatePadding | `0` |
-| ShowScrollbar | `false` |
-| ShowNavigation | `false` |
-| OnSelect | `Set(varNoteTab, ThisItem.Key)` |
-
-If a data-source panel pops up when you insert the gallery, close it.
-
-### 4b. What each tab looks like
-Click the first item of `galNoteTabs` until the pencil ✎ shows at its top-left, then insert these into its template. They should appear **indented under `galNoteTabs`** in the Tree view.
+1. Choose **New screen › Blank** and rename it `NewScreen`.
+2. With **NewScreen** selected, insert these controls:
 
 | # | Insert | Rename to | Properties |
 |---|---|---|---|
-| 1 | Rectangle | `rectTab` | X `1` · Y `0` · Width `Parent.TemplateWidth - 2` · Height `30` · Fill: `If(ThisItem.Key = varNoteTab, ColorValue("#1E3A6B"), RGBA(0,0,0,0.06))` |
-| 2 | Text label | `lblTab` | X `0` · Y `0` · Width `Parent.TemplateWidth` · Height `30` · Text: `ThisItem.Label` · Align: `Align.Center` · Size `10` · PaddingLeft/Right `2` · PaddingTop/Bottom `0` · FontWeight: `If(ThisItem.Key = lblEditableNote.Text, FontWeight.Bold, FontWeight.Normal)` · Color: `If(ThisItem.Key = varNoteTab, Color.White, Color.Black)` |
+| 1 | Rectangle | `rectNewHeader` | X `0` · Y `0` · Width `Parent.Width` · Height `60` · Fill: `ColorValue("#1E3A6B")` |
+| 2 | Button | `btnNewBack` | Text: `"← Board"` · OnSelect: `Navigate(BoardScreen, ScreenTransition.UnCover)` · Fill: `Color.White` · Color: `ColorValue("#1E3A6B")` · X `16` · Y `12` · Width `110` · Height `36` |
+| 3 | Text label | `lblNewTitle` | Text: `"New change request"` · Color: `Color.White` · Size `18` · FontWeight: `FontWeight.Bold` · X `140` · Y `10` · Width `500` · Height `40` |
+| 4 | Button | `btnNewTemplate` | Text: `"Download Rollback Plan template"` · OnSelect: `Launch(RollbackTemplateUrl, {}, LaunchTarget.New)` · Fill: `ColorValue("#1E3A6B")` · Color: `Color.White` · BorderColor: `Color.White` · X `Parent.Width - 420` · Y `12` · Width `250` · Height `36` |
+| 5 | Button | `btnSubmit` | Text: `"Submit request"` · Fill: `Color.White` · Color: `ColorValue("#1E3A6B")` · FontWeight: `FontWeight.Bold` · X `Parent.Width - 160` · Y `12` · Width `140` · Height `36` · OnSelect: see section 7 |
 
-The selected tab is filled navy, and the tab you can edit is **bold**.
-
----
-
-## 5 — Point the boxes at the selected note
-
-The two boxes stay where they are (X `920`, Y `176`, 426 × 200), and only one is visible at a time:
-- **`txtNote`** (editable) shows when you're on the tab you're allowed to edit.
-- **`lblNote`** (read-only) shows for every other tab.
-
-### 5a. `txtNote`
-
-| Property | Value |
-|---|---|
-| Default | see below |
-| Visible | `!IsBlank(lblEditableNote.Text) && varNoteTab = lblEditableNote.Text` |
-| HintText | `"Type " & LookUp(NoteTabs, Key = varNoteTab).Label & " notes"` |
-
-**Default**:
-```powerfx
-Switch(lblEditableNote.Text,
-    "Description",    varCR.Description,
-    "CAB",            varCR.CABNotes,
-    "Authority",      varCR.AuthorityNotes,
-    "Implementation", varCR.ImplementationNotes,
-    "Review",         varCR.ReviewNotes)
-```
-
-**Default** follows the *editable* note, not the selected tab, on purpose. That way, anything you've typed isn't wiped when you click another tab and come back.
-
-Leave **Mode** (`TextMode.MultiLine`), position and size as they are.
-
-### 5b. `lblNote`
-
-| Property | Value |
-|---|---|
-| Text | see below |
-| Visible | `!txtNote.Visible` |
-
-**Text**:
-```powerfx
-Coalesce(
-    Switch(varNoteTab,
-        "Description",    varCR.Description,
-        "CAB",            varCR.CABNotes,
-        "Authority",      varCR.AuthorityNotes,
-        "Implementation", varCR.ImplementationNotes,
-        "Review",         varCR.ReviewNotes),
-    "No notes yet.")
-```
-
-Leave **Overflow** (`Overflow.Scroll`), the border, padding, position and size as they are.
+If a button disappears behind the banner, right-click it and choose **Reorder › Bring to front**.
 
 ---
 
-## 6 — Save the notes through the form
+## 3 — Add the form `frmNew`
 
-The four notes cards come off the screen but **stay in the form**, so **Save changes** and the action buttons still write them to SharePoint.
+1. With **NewScreen** selected, choose **+ Insert › Edit form** and rename it `frmNew`.
+2. Set these properties:
 
-In the Tree view, expand `frmDetail` and do this for each card below:
-1. If it's locked, open **Properties › Advanced** and click **🔒 Unlock to change properties**.
-2. Set **Visible** to `false`. The Description card is already hidden.
-3. Set **Update** to the formula in the table.
+| Property | Value |
+|---|---|
+| DataSource | `'Change Requests'` |
+| DefaultMode | `FormMode.New` |
+| X / Y | `20` / `76` |
+| Width / Height | `Parent.Width - 40` / `Parent.Height - 96` |
+| Columns *(Properties pane)* | `2` |
+
+### 3a. Choose the fields
+1. With `frmNew` selected, go to the **Properties** pane and click **Edit fields**.
+2. Remove everything not in the list below (hover a field, then **⋯ › Remove**). Add any that are missing (**+ Add field**).
+3. Drag the fields into this order:
+
+> A6Program · RequestedBy · DSN · RequesterEmail · Title · Category · ChangeType · Priority · Risk · Impact · Description · **Attachments** · Stage · SubmittedBy · CABDecision · AuthorityDecision
+
+The last four are filled in automatically and hidden in 3c.
+
+### 3b. Unlock every card
+For each card in `frmNew`:
+1. Select it in the Tree view (e.g. `Category_DataCard2`).
+2. Open **Properties › Advanced** and click **🔒 Unlock to change properties**.
+
+> **Control names:** Power Apps names each card's input control `DataCardValue` plus a number (e.g. `DataCardValue27`). The number is different in every app. In this document, `DataCardValueN` means *the input control inside that card*. Expand the card in the Tree view to see its real name.
+
+### 3c. Hide and auto-fill the four system fields
+For each card below, set **Visible** to `false` and **Update** as shown:
 
 | Card | Update |
 |---|---|
-| `Description_DataCard1` | `If(lblEditableNote.Text = "Description", txtNote.Text, ThisItem.Description)` |
-| `CABNotes_DataCard1` | `If(lblEditableNote.Text = "CAB", txtNote.Text, ThisItem.CABNotes)` |
-| `AuthorityNotes_DataCard1` | `If(lblEditableNote.Text = "Authority", txtNote.Text, ThisItem.AuthorityNotes)` |
-| `ImplementationNotes_DataCard1` | `If(lblEditableNote.Text = "Implementation", txtNote.Text, ThisItem.ImplementationNotes)` |
-| `ReviewNotes_DataCard1` | `If(lblEditableNote.Text = "Review", txtNote.Text, ThisItem.ReviewNotes)` |
+| `Stage_DataCard…` | `{Value: "Requested"}` |
+| `SubmittedBy_DataCard…` | `Lower(User().Email)` |
+| `CABDecision_DataCard…` | `{Value: "Pending"}` |
+| `AuthorityDecision_DataCard…` | `{Value: "Pending"}` |
 
-Each card takes the text from `txtNote` only when that note is the editable one. Otherwise it keeps what's already saved.
+### 3d. Make the text fields required
+Set **Required** to `true` on the **A6Program**, **DSN**, **Title** and **Description** cards. A red star appears on each, and the form won't submit while any of them is empty.
 
-The rule that blocks moving to Review until Implementation notes are filled in keeps working, because it checks the saved value.
-
----
-
-## 7 — Open on the right tab
-
-### 7a. When the screen opens
-Select **DetailScreen** and replace **OnVisible** with:
-```powerfx
-Set(varCR, LookUp('Change Requests', ID = varCR.ID));
-Set(varNoteTab, Switch(varCR.Stage.Value,
-    "Change Advisory Board", "CAB",
-    "Change Authority",      "Authority",
-    "Implementation",        "Implementation",
-    "Review",                "Review",
-    "Close",                 "Review",
-    "Description"))
-```
-
-### 7b. After a move
-Select `frmDetail`, open **OnSuccess**, and add this just **before** the last line, `Set(varAction, Blank())`:
-```powerfx
-If(varAction <> "save",
-    Set(varNoteTab, Switch(varCR.Stage.Value,
-        "Change Advisory Board", "CAB",
-        "Change Authority",      "Authority",
-        "Implementation",        "Implementation",
-        "Review",                "Review",
-        "Close",                 "Review",
-        "Description")));
-```
-
-After a **Move**, **Send back** or **Reject**, the box switches to the new stage's tab. A plain **Save changes** leaves you on the tab you were on.
+### 3e. Make Description taller
+Select the input control inside the **Description** card (`DataCardValueN`) and set:
+- **Mode** = `TextMode.MultiLine`
+- **Height** = `150`
 
 ---
 
-## 8 — Stop Reject from overwriting notes (recommended)
+## 4 — Requested By: the people picker
 
-**Reject** currently *replaces* CAB Notes or Authority Notes with the rejection comment. Now that the notes are visible in tabs, it's better to **add** the comment underneath what's already there.
+The **RequestedBy** column stays a plain text column. The picker sits inside the card and fills the column with the chosen person's name.
 
-In `frmDetail` › **OnSuccess**, find the `"reject"` section and make two changes:
+### 4a. Add the picker to the card
+1. Expand **`RequestedBy_DataCard…`** in the Tree view and select its text input (`DataCardValueN`). Set its **Visible** to `false`.
+2. Select the **card** itself (`RequestedBy_DataCard…`). Choose **+ Insert › Combo box**. It should appear **inside the card** in the Tree view.
+3. Rename it `cmbRequestedBy` and set:
 
-| Find | Replace with |
+| Property | Value |
 |---|---|
-| `CABNotes: txtComment.Text` | `CABNotes: Trim(varCR.CABNotes & Char(10) & "REJECTED: " & txtComment.Text)` |
-| `AuthorityNotes: txtComment.Text` | `AuthorityNotes: Trim(varCR.AuthorityNotes & Char(10) & "REJECTED: " & txtComment.Text)` |
+| Items | `Office365Users.SearchUserV2({searchTerm: Self.SearchText, top: 15, isSearchTermRequired: true}).value` |
+| DefaultSelectedItems | `Office365Users.SearchUserV2({searchTerm: User().Email, top: 1}).value` |
+| SelectMultiple | `false` |
+| IsSearchable | `true` |
+| SearchFields | `["DisplayName"]` |
+| DisplayFields | `["DisplayName", "Mail"]` |
+| X / Y | `DataCardValueN.X` / `DataCardValueN.Y` *(the hidden text input from step 1)* |
+| Width | `DataCardValueN.Width` |
+| Height | `40` |
+
+4. In the **Properties** pane, set **Layout** to **Double**. Each result then shows the name with the email underneath.
+
+How it works:
+- **As you type,** the box searches your directory and shows up to 15 matches.
+- **By default,** it's set to the person filling in the form, so a request for yourself needs no clicks.
+
+### 4b. Save the chosen name
+Select the **card** `RequestedBy_DataCard…` and set **Update** to:
+```powerfx
+cmbRequestedBy.Selected.DisplayName
+```
+
+### 4c. Auto-fill the email
+Select the **card** `RequesterEmail_DataCard…` and set:
+
+| Property | Value |
+|---|---|
+| Default | `cmbRequestedBy.Selected.Mail` |
+| DisplayMode | `DisplayMode.View` |
+
+The email box now updates by itself whenever someone is picked, and users can't overtype it. The card's **Update** stays as it is, so it saves what's shown.
+
+### 4d. Auto-fill the DSN (optional)
+This works only if your directory stores DSN in the user's phone field. Select the **card** `DSN_DataCard…` and set **Default** to the phone field of the picked person. Start typing:
+```powerfx
+cmbRequestedBy.Selected.
+```
+Then pick the phone field from the list Power Apps suggests. It's usually `TelephoneNumber` or `BusinessPhones`. If it's `BusinessPhones`, use `First(cmbRequestedBy.Selected.BusinessPhones).Value`.
+
+Leave the DSN card **editable**, so people can correct it. If your directory doesn't hold DSNs, skip this step: users type it in, as on the form.
+
+---
+
+## 5 — Radio buttons for the five choices
+
+Do this for **Category**, **ChangeType**, **Priority**, **Risk** and **Impact**:
+
+1. Expand the card (e.g. `Category_DataCard…`) and select its combo box (`DataCardValueN`). Set **Visible** to `false`.
+2. Select the **card**, then choose **+ Insert › Radio**. It should appear **inside the card**.
+3. Rename it and set its properties from the table below.
+4. Select the **card** and set **Update** to `rdo….Selected` (the radio's name), for example `rdoCategory.Selected`.
+
+| Card | Radio name | Items |
+|---|---|---|
+| Category | `rdoCategory` | `Choices([@'Change Requests'].Category)` |
+| ChangeType | `rdoChangeType` | `Choices([@'Change Requests'].ChangeType)` |
+| Priority | `rdoPriority` | `Choices([@'Change Requests'].Priority)` |
+| Risk | `rdoRisk` | `Choices([@'Change Requests'].Risk)` |
+| Impact | `rdoImpact` | `Choices([@'Change Requests'].Impact)` |
+
+Set these on **every** radio:
+
+| Property | Value |
+|---|---|
+| Layout | `Layout.Horizontal` |
+| X / Y | `DataCardValueN.X` / `DataCardValueN.Y` *(the hidden combo box in that card)* |
+| Width | `DataCardValueN.Width` |
+| Height | `40` |
+
+The options come straight from the SharePoint choices, so they always match the list (`4 - Low`, `3 - Moderate` and so on). No radio is pre-selected, so the requester has to choose.
+
+> **Prefer drop-downs?** Skip this section. The cards already show a drop-down for each choice, and they work as they are.
+
+---
+
+## 6 — Attachments
+
+The **Attachments** card is already in the form. Use it for the **Rollback Plan PDF** and any other files.
+
+1. Select the **Attachments** card and set **DisplayName** to `"Rollback Plan (required) and other attachments"`. If DisplayName is locked, set the card label's **Text** instead.
+2. Select the attachment control inside the card (`DataCardValueN`) and check **MaxAttachments**. Set it to `10` to match the old form.
+
+Files are uploaded when **Submit** is clicked. **Download Rollback Plan template** in the banner opens the blank PDF.
+
+> The app keeps each file's own name. Attachments added here won't be renamed `RollbackPlan_CR-…` the way the flow did. Ask requesters to keep "Rollback" in the PDF's file name.
+
+---
+
+## 7 — Submit
+
+### 7a. `btnSubmit` › OnSelect
+This checks everything, then saves. Replace `DataCardValueN` with the name of the **attachment control** in the Attachments card.
+
+```powerfx
+If(
+    IsBlank(cmbRequestedBy.Selected),
+        Notify("Choose who is requesting this change.", NotificationType.Error),
+    IsBlank(rdoCategory.Selected) || IsBlank(rdoChangeType.Selected) ||
+    IsBlank(rdoPriority.Selected) || IsBlank(rdoRisk.Selected) || IsBlank(rdoImpact.Selected),
+        Notify("Choose a Category, Change Type, Priority, Risk and Impact.", NotificationType.Error),
+    IsEmpty(DataCardValueN.Attachments),
+        Notify("Attach the completed Rollback Plan PDF.", NotificationType.Error),
+    !frmNew.Valid,
+        Notify("Fill in every field marked with a red star.", NotificationType.Error),
+    SubmitForm(frmNew)
+)
+```
+
+If you kept drop-downs instead of radios (section 5), delete the line that checks the five `rdo…` controls.
+
+### 7b. `frmNew` › OnSuccess
+This writes the first History row, the same way the flow did, then returns to the board:
+```powerfx
+Patch('Change Request History', Defaults('Change Request History'), {
+    Title:     "CR-" & Text(Self.LastSubmit.ID, "00000"),
+    RequestID: Self.LastSubmit.ID,
+    FromStage: "",
+    ToStage:   "Requested",
+    Comment:   "Submitted in the app by " & User().FullName &
+               If(Lower(cmbRequestedBy.Selected.Mail) <> Lower(User().Email),
+                  " on behalf of " & cmbRequestedBy.Selected.DisplayName, "")
+});
+Notify("Change request CR-" & Text(Self.LastSubmit.ID, "00000") & " submitted", NotificationType.Success);
+Navigate(BoardScreen, ScreenTransition.UnCover)
+```
+
+### 7c. `frmNew` › OnFailure
+```powerfx
+Notify("Couldn't submit: " & Self.Error, NotificationType.Error)
+```
+
+---
+
+## 8 — Point the board button at the new screen
+
+On **BoardScreen**, select **`btnNew`** and replace **OnSelect** with:
+```powerfx
+NewForm(frmNew);
+Reset(cmbRequestedBy);
+Reset(rdoCategory); Reset(rdoChangeType); Reset(rdoPriority); Reset(rdoRisk); Reset(rdoImpact);
+Navigate(NewScreen, ScreenTransition.Cover)
+```
+
+The form is cleared every time, the picker goes back to you, and no radio is selected. If you kept drop-downs, delete the `Reset(rdo…)` line.
+
+---
+
+## 9 — Who can see the new request
+
+Nothing to change. The app writes **SubmittedBy** (the person who clicked Submit) and **RequesterEmail** (the person picked in Requested By). The board's "see only your own requests" filter matches either one, so:
+- **the submitter** sees the request,
+- **the person it was submitted for** sees it too,
+- **CM, CAB and Authority** see everything, as before.
+
+---
+
+## 10 — Retire the form and flow
+
+When the tests below pass and the app is published:
+
+1. **Turn off the flow.** In Power Automate, open **Change Request – Form to SharePoint**, click **Turn off**, and leave it there in case you need it again.
+2. **Close the form.** In Microsoft Forms, open the *Change Request* form, go to **⋯ › Settings**, and turn off **Accept responses**. Add a message such as *"Submit change requests in the Change Request Portal app."*
+3. **Leave `FormUrl` in App.Formulas.** Nothing uses it any more, and it does no harm.
+
+Requests that were submitted through the form stay on the board and work exactly as before.
+
+> **Migration guide:** if you migrate to production after this change, skip Steps 2 and 3 (form and flow) of [Migration-Guide.md](Migration-Guide.md). Also add **Office 365 Users** back as a data source in Step 4b if it's missing.
 
 ---
 
@@ -248,20 +286,23 @@ Press **F5** on **BoardScreen** and check each row:
 
 | # | Do this | Expect |
 |---|---|---|
-| 1 | Open a request in **Requested** | Only the **Description** tab shows; it's bold, selected, and editable |
-| 2 | Edit the description and click **Save changes** | "Saved"; reopen the request and the new text is there |
-| 3 | As CM, **Move** it to CAB | The **CAB** tab appears and opens automatically |
-| 4 | As a **CAB member**, type CAB notes and click **Save changes** | Saved; reopen and the CAB tab shows your notes |
-| 5 | Click the **Description** tab | Description shows read-only and scrolls if it's long |
-| 6 | Open the same CAB-stage request as someone **not** on the CAB | The CAB tab is read-only; no tab is bold |
-| 7 | Type in the CAB tab, click Description, then click CAB again | Your unsaved text is still there |
-| 8 | Move a request to **Implementation** and click **Move** with no Implementation notes | Error: *Add implementation notes before moving to Review* |
-| 9 | Type notes on the **Implement** tab, then click **Move** | Saves and moves to Review; the box switches to the **Review** tab |
-| 10 | **Reject** a CAB-stage request that already has CAB notes | The CAB tab shows the original notes, then a **REJECTED:** line with your comment |
-| 11 | Open a **closed** request | All five tabs show, every tab is read-only, and the box opens on **Review** |
+| 1 | Click **+ Request a New Change** | NewScreen opens; **Requested By** shows **you**; your email is filled in and greyed out; no radio is selected |
+| 2 | Click in **Requested By** and type part of a colleague's name | Matching people appear, with names and emails |
+| 3 | Pick the colleague | Their email replaces yours; DSN fills in too, if you did 4d |
+| 4 | Click **Submit request** with nothing else filled | Error asking for Category, Change Type, Priority, Risk and Impact |
+| 5 | Choose all five radios and click Submit with no attachment | Error: *Attach the completed Rollback Plan PDF* |
+| 6 | Attach a PDF and click Submit with Title empty | Error: *Fill in every field marked with a red star* |
+| 7 | Fill everything and click **Submit request** | "CR-000NN submitted"; back on the board, the new card is in **1. Requested** |
+| 8 | Open the new request | All fields match what you entered; the PDF opens from Attachments; History shows **Created** with *"Submitted in the app by … on behalf of …"* |
+| 9 | Check the item in SharePoint | Stage = Requested, CAB and Authority = Pending, SubmittedBy = your email, RequesterEmail = the colleague's |
+| 10 | Have the colleague (a regular user) open the board | They see the request submitted for them |
+| 11 | Click **+ Request a New Change** again | The form is empty and Requested By is back to you |
+| 12 | Click **Download Rollback Plan template** | The blank PDF opens |
 
 **If something goes wrong:**
-- **A tab shows *ThisItem isn't recognized*:** the control is on the screen instead of inside `galNoteTabs`. Cut it (**Ctrl+X**), click the first tab until the pencil ✎ shows, and paste (**Ctrl+V**).
-- **Notes don't save:** check the card's **Update** formula in section 6, and that the card is still in `frmDetail`. It should be hidden, not removed.
-- **The editable box shows the wrong note:** check that `txtNote` **Default** uses `lblEditableNote.Text`, not `varNoteTab`.
+- ***Office365Users isn't recognized*:** the connector wasn't added (section 1), or your tenant blocks it.
+- **The people picker shows nothing as you type:** check that **IsSearchable** is `true` and that **Items** uses `Self.SearchText`.
+- **The email doesn't fill in:** check the RequesterEmail card's **Default** is `cmbRequestedBy.Selected.Mail`, and that you set it on the **card**, not the text box inside it.
+- **A picker or radio appears in the wrong place or outside the card:** in the Tree view it must be indented under its card. Cut it (**Ctrl+X**), select the card, and paste (**Ctrl+V**).
+- **A choice saves blank:** the card's **Update** must be `rdo….Selected`, and the radio must be inside that card.
 - **Anything else:** open the **App checker** (the stethoscope icon in the top toolbar) to see every formula error, and send me the exact text of any red error banner.
