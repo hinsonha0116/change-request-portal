@@ -115,16 +115,16 @@ The **RequestedBy** column stays a plain text column. The picker sits inside the
 | DefaultSelectedItems | `Office365Users.SearchUserV2({searchTerm: User().Email, top: 1}).value` |
 | SelectMultiple | `false` |
 | IsSearchable | `true` |
-| SearchFields | `["DisplayName"]` |
+| SearchFields | `["DisplayName", "Mail"]` *(search by name or email)* |
 | DisplayFields | `["DisplayName", "Mail"]` |
 | X / Y | `DataCardValueN.X` / `DataCardValueN.Y` *(the hidden text input from step 1)* |
 | Width | `DataCardValueN.Width` |
 | Height | `40` |
 
-4. In the **Properties** pane, set **Layout** to **Double**. Each result then shows the name with the email underneath.
+4. **Optional:** `DisplayFields` usually makes each result show the name with the email underneath. If only names show, open **Fields › Edit** in the **Properties** pane. If it has a **Layout** drop-down, choose **Double**, with **Primary text** = DisplayName and **Secondary text** = Mail. Some versions don't have this option for a search-based picker. That's fine: the picker and the email auto-fill work either way.
 
 How it works:
-- **As you type,** the box searches your directory and shows up to 15 matches.
+- **As you type,** the box searches your directory by **name or email** and shows up to 15 matches.
 - **By default,** it's set to the person filling in the form, so a request for yourself needs no clicks.
 
 ### 4b. Save the chosen name
