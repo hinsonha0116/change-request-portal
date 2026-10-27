@@ -299,14 +299,29 @@ Notify("Couldn't submit: " & Self.Error, NotificationType.Error)
 
 ## 8 — Point the board button at the new screen
 
-On **BoardScreen**, select **`btnNew`** and replace **OnSelect** with:
+### 8a. `btnNew` › OnSelect (BoardScreen)
+Replace **OnSelect** with:
 ```powerfx
 NewForm(frmNew);
-Reset(cmbRequestedBy); Reset(drpA6Program);
+Set(varResetNew, true);
+Set(varResetNew, false);
 Navigate(NewScreen, ScreenTransition.Cover)
 ```
 
-The form is cleared every time: the picker goes back to you, and A6 Program and the five choice drop-downs are empty. `NewForm` clears the choice drop-downs by itself.
+### 8b. Let the button reset the picker and A6 Program
+`Reset(...)` can't be used here: controls inside a form can only be reset from within that form. Instead, each control has its own **Reset** property, which the button triggers through `varResetNew`.
+
+On **NewScreen**, select each control, find **Reset** (type "reset" in the property dropdown), and set it:
+
+| Control | Reset |
+|---|---|
+| `cmbRequestedBy` | `varResetNew` |
+| `drpA6Program` | `varResetNew` |
+
+The form is cleared every time:
+- the picker goes back to you,
+- A6 Program is empty,
+- the five choice drop-downs are empty, because `NewForm` clears everything else in the form by itself.
 
 ---
 
@@ -351,7 +366,7 @@ Press **F5** on **BoardScreen** and check each row:
 | 10 | Open the new request | All fields match what you entered, including the five choices; the PDF opens from Attachments; History shows **Created** with *"Submitted in the app by … on behalf of …"* |
 | 11 | Check the item in SharePoint | Stage = Requested, CAB and Authority = Pending, SubmittedBy = your email, RequesterEmail = the colleague's |
 | 12 | Have the colleague (a regular user) open the board | They see the request submitted for them |
-| 13 | Click **+ Request a New Change** again | The form is empty and Requested By is back to you |
+| 13 | Pick a colleague and an A6 Program, click **← Board**, then **+ Request a New Change** again | The form is empty, Requested By is back to you, and A6 Program is empty; no error appears |
 | 14 | Click **Download Rollback Plan template** | The blank PDF opens |
 | 15 | Open a request in *Requested* on the DetailScreen *(if you did 5b-3)* | The drop-down shows its saved program and can be changed; at later stages it's read-only |
 

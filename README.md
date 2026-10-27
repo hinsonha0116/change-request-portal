@@ -20,6 +20,7 @@ A Microsoft 365 change-request portal. Requests are submitted through a Microsof
 | [Build-RollbackPdf.ps1](Build-RollbackPdf.ps1) | Regenerates the Rollback Plan PDF: `./Build-RollbackPdf.ps1 -OutFile .\Rollback-Plan-Template.pdf` |
 | [Migration-Guide.md](Migration-Guide.md) | Step-by-step move from a test SharePoint site to the production site: lists, form, flow, app, permissions, testing and go-live |
 | [DetailScreen-Fixes.md](DetailScreen-Fixes.md) | Latest app update, not yet in the guide: an in-app New Request screen with a people picker that replaces the Microsoft Form and flow |
+| [Troubleshooting-Notes.md](Troubleshooting-Notes.md) | Where the New Request screen work left off: open issues (Reset error, choice drop-downs) and next steps |
 | [docs/](docs/) | Screen layout diagrams used in the guide, and `Build-Mockups.ps1`, which regenerates them |
 
 ## Setup order
