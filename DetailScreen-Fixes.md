@@ -6,6 +6,7 @@ These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Re
 - **+ Request a New Change** opens a new **NewScreen** in the app.
 - **Requested By** is a **people picker**. Start typing a name and choose anyone in your organization. It defaults to you.
 - Picking a person **fills in their email automatically**, and their phone number too if your directory stores one.
+- **A6 Program** is a drop-down of your 16 programs.
 - **Category, Change Type, Priority, Risk and Impact** are radio buttons, as on the form.
 - The **Rollback Plan PDF** and any other files are attached on the same screen.
 - **Submit** saves the request straight to SharePoint with Stage = *Requested*, and writes the first History row.
@@ -185,6 +186,80 @@ The options come straight from the SharePoint choices, so they always match the 
 
 ---
 
+## 5b — A6 Program drop-down
+
+A6 Program becomes a drop-down of your programs instead of a free-text box. The SharePoint column stays **Single line of text**, so nothing else in the app, the board or SharePoint has to change.
+
+### 5b-1. List the programs (App.Formulas)
+Select **App**, choose **Formulas**, and add this to the **end**:
+
+```powerfx
+A6Programs = [
+    "ACBN",
+    "Blacknet",
+    "C2C",
+    "Collaboration Services",
+    "CSFC",
+    "Exec Comm",
+    "EVRS",
+    "HERTR/GWRTR",
+    "NNCS",
+    "Secureview",
+    "SNCS",
+    "Unified Communications",
+    "UPNCS",
+    "VDI",
+    "VOC",
+    "X-COMM"
+];
+```
+
+To add, rename or remove a program later, edit this list and republish the app.
+
+### 5b-2. Replace the text box on NewScreen
+1. In `frmNew`, expand **`A6Program_DataCard…`** and select its text box (`DataCardValueN`). Set **Visible** to `false`.
+2. Select the **card**, then choose **+ Insert › Drop down**. Check that it appears **inside the card** in the Tree view.
+3. Rename it `drpA6Program` and set:
+
+| Property | Value |
+|---|---|
+| Items | `A6Programs` |
+| AllowEmptySelection | `true` |
+| Default | `""` |
+| X / Y | `DataCardValueN.X` / `DataCardValueN.Y` *(the hidden text box)* |
+| Width / Height | `DataCardValueN.Width` / `40` |
+
+4. Select the **card** and set **Update** to:
+   ```powerfx
+   drpA6Program.Selected.Value
+   ```
+
+The drop-down starts empty, so the requester has to choose. Sections 7a and 8 check it and reset it.
+
+### 5b-3. Same drop-down on the DetailScreen (optional)
+A6 Program can still be edited on the DetailScreen while a request is in *Requested*. To use the drop-down there as well:
+
+1. In `frmDetail`, expand **`A6Program_DataCard…`**, select its text box (`DataCardValueN`), and set **Visible** to `false`.
+2. Select the **card**, then choose **+ Insert › Drop down**. Rename it `drpA6ProgramDetail` and set:
+
+| Property | Value |
+|---|---|
+| Items | `A6Programs` |
+| AllowEmptySelection | `true` |
+| Default | `ThisItem.A6Program` |
+| DisplayMode | `If(varCR.Stage.Value = "Requested", DisplayMode.Edit, DisplayMode.View)` |
+| X / Y | `DataCardValueN.X` / `DataCardValueN.Y` |
+| Width / Height | `DataCardValueN.Width` / `40` |
+
+3. Select the **card** and set **Update** to:
+   ```powerfx
+   Coalesce(drpA6ProgramDetail.Selected.Value, ThisItem.A6Program)
+   ```
+
+> **Older requests:** requests submitted before this change keep whatever was typed. If an old value isn't one of the 16 programs, the DetailScreen drop-down shows blank. The `Coalesce` in the Update formula then keeps the old value when the request is saved, so nothing is lost unless someone picks a program.
+
+---
+
 ## 6 — Attachments
 
 The **Attachments** card is already in the form. Use it for the **Rollback Plan PDF** and any other files.
@@ -205,6 +280,8 @@ This checks everything, then saves. Replace `DataCardValueN` with the name of th
 
 ```powerfx
 If(
+    IsBlank(drpA6Program.Selected.Value),
+        Notify("Choose an A6 Program.", NotificationType.Error),
     IsBlank(cmbRequestedBy.Selected),
         Notify("Choose who is requesting this change.", NotificationType.Error),
     IsBlank(rdoCategory.Selected) || IsBlank(rdoChangeType.Selected) ||
@@ -248,12 +325,12 @@ Notify("Couldn't submit: " & Self.Error, NotificationType.Error)
 On **BoardScreen**, select **`btnNew`** and replace **OnSelect** with:
 ```powerfx
 NewForm(frmNew);
-Reset(cmbRequestedBy);
+Reset(cmbRequestedBy); Reset(drpA6Program);
 Reset(rdoCategory); Reset(rdoChangeType); Reset(rdoPriority); Reset(rdoRisk); Reset(rdoImpact);
 Navigate(NewScreen, ScreenTransition.Cover)
 ```
 
-The form is cleared every time, the picker goes back to you, and no radio is selected. If you kept drop-downs, delete the `Reset(rdo…)` line.
+The form is cleared every time, the picker goes back to you, A6 Program is empty, and no radio is selected. If you kept drop-downs, delete the `Reset(rdo…)` line.
 
 ---
 
@@ -298,6 +375,9 @@ Press **F5** on **BoardScreen** and check each row:
 | 10 | Have the colleague (a regular user) open the board | They see the request submitted for them |
 | 11 | Click **+ Request a New Change** again | The form is empty and Requested By is back to you |
 | 12 | Click **Download Rollback Plan template** | The blank PDF opens |
+| 13 | On NewScreen, open the **A6 Program** drop-down | All 16 programs are listed, ACBN to X-COMM; nothing is selected at first |
+| 14 | Fill everything except A6 Program and click **Submit request** | Error: *Choose an A6 Program* |
+| 15 | Open a request in *Requested* on the DetailScreen *(if you did 5b-3)* | The drop-down shows its saved program and can be changed; at later stages it's read-only |
 
 **If something goes wrong:**
 - ***Office365Users isn't recognized*:** the connector wasn't added (section 1), or your tenant blocks it.
