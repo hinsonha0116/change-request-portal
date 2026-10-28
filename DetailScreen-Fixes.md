@@ -7,7 +7,7 @@ These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Re
 - **Requested By** is a **people picker**. Start typing a name and choose anyone in your organization. It defaults to you.
 - Picking a person **fills in their email automatically**, and their phone number too if your directory stores one.
 - **A6 Program** is a drop-down of your 16 programs.
-- **Category, Change Type, Priority, Risk and Impact** are drop-downs of the SharePoint choices, and all are required.
+- **Category, Change Type, Priority, Risk and Impact** are drop-downs of the same choices as SharePoint, and all are required.
 - The **Rollback Plan PDF** and any other files are attached on the same screen.
 - **Submit** saves the request straight to SharePoint with Stage = *Requested*, and writes the first History row.
 - **The Power Automate flow is no longer needed** for new requests. The OneDrive, form-owner and Parse JSON steps all go away.
@@ -156,13 +156,47 @@ Leave the DSN card **editable**, so people can correct it. If your directory doe
 
 ## 5 — Category, Change Type, Priority, Risk and Impact (drop-downs)
 
-These five fields stay as the **drop-downs** Power Apps created in each card. Their options come straight from the SharePoint choices, so they always match the list (`4 - Low`, `3 - Moderate` and so on). There's nothing to insert. You only make them required.
+The combo boxes Power Apps creates in these cards don't display their options in this environment: they show *Item 1, 2, 3* or nothing. Each card shows a classic **Drop down** instead, the same control A6 Program uses. What's saved to SharePoint doesn't change.
 
-For each of the **Category**, **ChangeType**, **Priority**, **Risk** and **Impact** cards in `frmNew`, select the **card** and set **Required** to `true`.
+### 5-1. Lists in App.Formulas
+Add this to the **end** of **App › Formulas**:
+```powerfx
+CategoryChoices   = ["Hardware", "Software", "Network"];
+ChangeTypeChoices = ["Standard", "Normal", "Emergency", "Informational"];
+PriorityChoices   = ["4 - Low", "3 - Moderate", "2 - High", "1 - Critical"];
+LevelChoices      = ["3 - Moderate", "2 - High", "1 - Critical"];
+```
+The text must match the SharePoint choices exactly. If a choice is ever added or renamed in SharePoint, update these lists too.
 
-A red star appears on each card, and **Submit** won't save until all five are chosen. They start empty on a new request, because these SharePoint columns have no default, so the requester has to pick each one.
+### 5-2. Swap each card's combo box for a Drop down
+For each of the five cards in `frmNew`:
+1. Select the card's **combo box** (`DataCardValueN`) and set **Visible** to `false`. Don't delete it.
+2. Select the **card**, choose **+ Insert › Drop down**, and check that it lands **inside the card**.
+3. Rename it and set its properties:
+   - **Items** and **Default** from the table below.
+   - **AllowEmptySelection** = `true`
+   - **Reset** = `varResetNew`
+   - **X / Y** = `DataCardValueN.X` / `DataCardValueN.Y`, where `DataCardValueN` is the card's hidden combo box.
+   - **Width / Height** = `DataCardValueN.Width` / `40`
+4. Set the **card's** **Required** to `true` and its **Update** to the formula below.
 
-> Don't hide or replace the drop-down inside these cards, and leave each card's **Update** as Power Apps created it.
+| Card | Drop-down | Items | Default |
+|---|---|---|---|
+| Category | `drpCategory` | `CategoryChoices` | `ThisItem.Category.Value` |
+| ChangeType | `drpChangeType` | `ChangeTypeChoices` | `ThisItem.ChangeType.Value` |
+| Priority | `drpPriority` | `PriorityChoices` | `ThisItem.Priority.Value` |
+| Risk | `drpRisk` | `LevelChoices` | `ThisItem.Risk.Value` |
+| Impact | `drpImpact` | `LevelChoices` | `ThisItem.Impact.Value` |
+
+**Card Update** (example for Risk; use each card's own drop-down name):
+```powerfx
+If(IsBlank(drpRisk.Selected.Value), Blank(), {Value: drpRisk.Selected.Value})
+```
+An empty choice saves as blank, so the red-star required check stops Submit.
+
+Use `ThisItem.<Column>.Value` for **Default**, not `Parent.Default.Value`, which gives a *"Value isn't recognized"* error.
+
+The full copy-and-paste formulas for all five cards are in [Troubleshooting-Notes.md](Troubleshooting-Notes.md), Issue 1.
 
 ---
 
@@ -317,11 +351,13 @@ On **NewScreen**, select each control, find **Reset** (type "reset" in the prope
 |---|---|
 | `cmbRequestedBy` | `varResetNew` |
 | `drpA6Program` | `varResetNew` |
+| `drpCategory`, `drpChangeType`, `drpPriority`, `drpRisk`, `drpImpact` | `varResetNew` *(set in section 5)* |
 
 The form is cleared every time:
 - the picker goes back to you,
 - A6 Program is empty,
-- the five choice drop-downs are empty, because `NewForm` clears everything else in the form by itself.
+- the five choice drop-downs are empty,
+- `NewForm` clears everything else in the form by itself.
 
 ---
 

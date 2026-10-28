@@ -1,6 +1,6 @@
 # Troubleshooting notes: where I left off
 
-*Last updated 27 Oct 2026, part-way through the **New Request screen** update in [DetailScreen-Fixes.md](DetailScreen-Fixes.md).*
+*Last updated 28 Oct 2026, part-way through the **New Request screen** update in [DetailScreen-Fixes.md](DetailScreen-Fixes.md).*
 
 ## Status at a glance
 
@@ -10,7 +10,7 @@
 | 2 — NewScreen and its banner | ✅ Done |
 | 3 — Form `frmNew` | ✅ Done |
 | 4 — Requested By people picker | ✅ Done (picker searches name **or** email) |
-| 5 — Category, Change Type, Priority, Risk, Impact drop-downs | ⚠️ **In progress.** They show *Item 1, 2, 3* or nothing. See **Issue 1** |
+| 5 — Category, Change Type, Priority, Risk, Impact drop-downs | ⚠️ **In progress.** Risk fixed with a classic Drop down; the other four next. See **Issue 1** |
 | 5b — A6 Program drop-down | ✅ Working |
 | 6 — Attachments | ⬜ Check |
 | 7 — Submit | ⬜ Check |
@@ -53,72 +53,92 @@
 
 ## Issue 1 — Choice drop-downs show *Item 1, Item 2, Item 3*, or nothing
 
-**Symptom:**
-- The five card drop-downs on NewScreen (Category, ChangeType, Priority, Risk, Impact) show Power Apps' sample list (*Item 1, 2, 3*) in **F5**.
-- After changes, **Risk now shows nothing.**
-- **A6 Program works.** It uses a list defined inside the app (`A6Programs`).
+**Symptom:** the five card drop-downs on NewScreen (Category, ChangeType, Priority, Risk, Impact) showed Power Apps' sample list (*Item 1, 2, 3*) in **F5**, and later nothing at all.
 
-**What's been checked:**
-- **Items formulas:** each drop-down's **Items** is the original `Choices([@'Change Requests'].<Column>)`, for example `Choices([@'Change Requests'].Risk)` on `DataCardValue29`. The formula looks correct, but Power Apps isn't showing the SharePoint choices.
-- **Placeholder text:** "Find items" in Studio is just placeholder text and isn't the problem.
+**What we found:**
+- **The lists are fine.** A test label with `CountRows(LevelChoices)` showed **3**, and DisplayFields was correct.
+- **The control is the problem.** The **combo box** Power Apps puts in these cards won't display the options in this environment.
+- **The fix:** a classic **Drop down**, the same control A6 Program uses (which works), is shown in each card instead.
 
-**Plan:** use **fixed lists inside the app**, the same approach that already works for A6 Program. What gets saved to SharePoint doesn't change.
+**Status:** ✅ **Risk fixed** using the steps below. ⬜ **Category, ChangeType, Priority and Impact** still to do, the same way.
 
-### Step A — Add the lists to App.Formulas
-**App › Formulas:** add this to the **end**. Make sure the line before it ends with `;`.
+### Step A — Lists in App.Formulas (✅ done)
+**App › Formulas**, at the end:
 ```powerfx
 CategoryChoices   = ["Hardware", "Software", "Network"];
 ChangeTypeChoices = ["Standard", "Normal", "Emergency", "Informational"];
 PriorityChoices   = ["4 - Low", "3 - Moderate", "2 - High", "1 - Critical"];
 LevelChoices      = ["3 - Moderate", "2 - High", "1 - Critical"];
 ```
-The text must match the SharePoint choices **exactly**: plain hyphens, with a space on each side.
 
-### Step B — Fix Risk first
-1. Select **`DataCardValue29`** (inside `Risk_DataCard2`) and set:
+### Step B — For each card, swap the combo box for a Drop down
+Do these steps for each card. Risk is already done, and the full values are in the table in Step C.
+
+1. Expand the card in the Tree view. Select its **combo box** (`DataCardValueN`) and set **Visible** to `false`. Don't delete it.
+2. Select the **card**, then choose **+ Insert › Drop down**. Check that it lands **inside the card**.
+3. Rename the drop-down. Set its **Items** and **Default** from the table, plus these on every one:
 
    | Property | Value |
    |---|---|
-   | Items | `LevelChoices` |
-   | DisplayFields | `["Value"]` |
-   | SearchFields | `["Value"]` |
-   | DefaultSelectedItems | `Parent.Default` *(leave as is)* |
+   | AllowEmptySelection | `true` |
+   | Reset | `varResetNew` |
+   | X / Y | `DataCardValueN.X` / `DataCardValueN.Y` *(that card's hidden combo box)* |
+   | Width / Height | `DataCardValueN.Width` / `40` |
 
-2. Select the **card** `Risk_DataCard2` and set **Update**:
-   ```powerfx
-   {Value: DataCardValue29.Selected.Value}
-   ```
-3. Press **F5**, open **Risk**. It should list `3 - Moderate`, `2 - High` and `1 - Critical`.
+4. Select the **card** and set **Update** from the table.
 
-**If Risk is still empty:**
-1. Add a temporary label on NewScreen with **Text** = `CountRows(LevelChoices)`.
-   - **It shows 3:** the list is fine. Recheck **DisplayFields**: it must be exactly `["Value"]`, with straight quotes.
-   - **It shows an error:** App.Formulas has a problem. Look for a missing `;` or a red underline, or open the **App checker**.
-2. Delete the label afterwards.
+### Step C — Values to copy
 
-### Step C — Repeat for the other four
-Each drop-down is the `DataCardValueN` inside its card. Expand the card in the Tree view to see its name.
+| Card | Drop-down name | Items | Default |
+|---|---|---|---|
+| Risk ✅ | `drpRisk` | `LevelChoices` | `ThisItem.Risk.Value` |
+| Category | `drpCategory` | `CategoryChoices` | `ThisItem.Category.Value` |
+| ChangeType | `drpChangeType` | `ChangeTypeChoices` | `ThisItem.ChangeType.Value` |
+| Priority | `drpPriority` | `PriorityChoices` | `ThisItem.Priority.Value` |
+| Impact | `drpImpact` | `LevelChoices` | `ThisItem.Impact.Value` |
 
-| Card | Drop-down **Items** | Card **Update** |
-|---|---|---|
-| Category | `CategoryChoices` | `{Value: <drop-down name>.Selected.Value}` |
-| ChangeType | `ChangeTypeChoices` | `{Value: <drop-down name>.Selected.Value}` |
-| Priority | `PriorityChoices` | `{Value: <drop-down name>.Selected.Value}` |
-| Impact | `LevelChoices` | `{Value: <drop-down name>.Selected.Value}` |
+**Card Update** formulas:
 
-Also set **DisplayFields** and **SearchFields** to `["Value"]` on each drop-down.
+Risk ✅
+```powerfx
+If(IsBlank(drpRisk.Selected.Value), Blank(), {Value: drpRisk.Selected.Value})
+```
+Category
+```powerfx
+If(IsBlank(drpCategory.Selected.Value), Blank(), {Value: drpCategory.Selected.Value})
+```
+ChangeType
+```powerfx
+If(IsBlank(drpChangeType.Selected.Value), Blank(), {Value: drpChangeType.Selected.Value})
+```
+Priority
+```powerfx
+If(IsBlank(drpPriority.Selected.Value), Blank(), {Value: drpPriority.Selected.Value})
+```
+Impact
+```powerfx
+If(IsBlank(drpImpact.Selected.Value), Blank(), {Value: drpImpact.Selected.Value})
+```
+
+What each part does:
+- **`If(IsBlank(...), Blank(), ...)`:** keeps the red-star required check working. An empty choice saves as blank, so Submit catches it.
+- **`ThisItem.<Column>.Value`:** shows the request's saved choice. Use this, not `Parent.Default.Value`, which gave a *"Value isn't recognized"* error.
+- **`Reset = varResetNew`:** clears the drop-down each time **+ Request a New Change** is clicked (see Issue 2).
 
 ### Step D — Check the DetailScreen too
-On the **DetailScreen**, open a request in *Requested*. If Category, ChangeType, Priority, Risk or Impact show *Item 1, 2, 3* or nothing there too, apply Steps B and C to those cards in `frmDetail`.
+On the **DetailScreen**, open a request in *Requested*. If any of these five show *Item 1, 2, 3* or nothing in `frmDetail`, apply the same swap there.
+- Use names like `drpRiskDetail`.
+- Use the same Items, Default and Update formulas.
+- Leave out **Reset** on the DetailScreen versions.
+- Set each drop-down's **DisplayMode** to `If(varCR.Stage.Value = "Requested", DisplayMode.Edit, DisplayMode.View)`.
 
-### Step E — Confirm it saves correctly
-1. Submit a test request with all five chosen.
-2. In SharePoint (**Change Requests**), check that Category, ChangeType, Priority, Risk and Impact show the right values.
-3. On the board, the card should show the priority word and Risk and Impact.
+### Step E — Test
+1. Press **F5** and click **+ Request a New Change**. All five drop-downs list their choices and start empty.
+2. Leave **Priority** empty and click **Submit**. You should get *"Fill in every field marked with a red star"*.
+3. Fill everything in and submit. In SharePoint (**Change Requests**), check that Category, ChangeType, Priority, Risk and Impact all saved correctly.
+4. Click **+ Request a New Change** again. All five are empty again.
 
 **Keep in mind:** if a choice is ever added or renamed in SharePoint, update the matching list in App.Formulas too.
-
-**After it works:** ask Claude to write the fixed-list approach into section 5 of the updates document, so the document matches the app.
 
 ---
 
