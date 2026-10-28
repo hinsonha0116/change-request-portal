@@ -411,5 +411,5 @@ Press **F5** on **BoardScreen** and check each row:
 - **The people picker shows nothing as you type:** check that **IsSearchable** is `true` and that **Items** uses `Self.SearchText`.
 - **The email doesn't fill in:** check the RequesterEmail card's **Default** is `cmbRequestedBy.Selected.Mail`, and that you set it on the **card**, not the text box inside it.
 - **The picker or A6 Program drop-down appears in the wrong place or outside its card:** in the Tree view it must be indented under its card. Cut it (**Ctrl+X**), select the card, and paste (**Ctrl+V**).
-- **A choice saves blank or shows an error:** make sure the drop-down inside that card is the one Power Apps created, and that the card's **Update** hasn't been changed. If in doubt, remove the field (**Edit fields › ⋯ › Remove**), add it again, and set **Required** to `true`.
+- **A choice saves blank or shows an error:** check that the card's **Update** names its own drop-down (e.g. `drpRisk`), that the drop-down is inside that card, and that its **Default** uses `ThisItem.<Column>.Value`. See section 5.
 - **Anything else:** open the **App checker** (the stethoscope icon in the top toolbar) to see every formula error, and send me the exact text of any red error banner.
