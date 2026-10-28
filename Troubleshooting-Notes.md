@@ -1,6 +1,6 @@
 # Troubleshooting notes: where I left off
 
-*Last updated 28 Oct 2026, part-way through the **New Request screen** update in [DetailScreen-Fixes.md](DetailScreen-Fixes.md).*
+> ✅ **Resolved (28 Oct 2026).** Everything below is done: the New Request screen is complete, the Reset error is fixed, and the choice fields use classic Drop downs. Kept for reference, because it explains *why* the choice fields use Drop downs instead of the combo boxes Power Apps creates. The section numbers refer to the New Request update, which has since been replaced in DetailScreen-Fixes.md by the next update.
 
 ## Status at a glance
 
