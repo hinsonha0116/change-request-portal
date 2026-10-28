@@ -1,16 +1,17 @@
-# App updates: compact detail form and planned dates on New Request
+# App updates: compact detail form, planned dates on New Request, and short requester names
 
 These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Request-PowerApp-Guide.md), with all earlier updates already applied, including the New Request screen.
 
 **What changes:**
 1. **The detail form is more compact.** It's three columns instead of two, Attachments moves to the bottom and is shorter, and the text is smaller with tighter spacing, so there's less white space and less scrolling.
 2. **Planned start and planned end** can be entered on the New Request screen. They're **optional**.
+3. **The requester shows as just a name**, e.g. *Keegan Bowman*, instead of the full Microsoft 365 display name with rank and organisation, which was getting cut off on the board.
 
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. You can also type X, Y, Width and Height into the **Properties** pane on the right.
 
 > **Control names:** each field (card) has a **label** named `DataCardKey` plus a number, and a **value** control named `DataCardValue` plus a number. Date fields use `DateValueN`, `HourValueN` and `MinuteValueN` instead. The numbers are different in every app. Expand a card in the Tree view to see its real names.
 
-**Time:** about 30–45 minutes.
+**Time:** about 45 minutes.
 
 ---
 
@@ -121,6 +122,63 @@ To match the rest of the compact form, set **Size** `11` and **Height** `32` on 
 
 ---
 
+## Part 3 — Show just the requester's name
+
+**Why:** Microsoft 365 display names here look like **`BOWMAN, KEEGAN L CTR USAF USAFE A6/A654`**. Since Requested By became a people picker, that whole string is saved, and it gets cut off on the board cards.
+
+There are two parts to the fix:
+- **3a** shows a short name for requests already saved.
+- **3b** saves only the name on new requests.
+
+### 3a. Short name on the board cards
+On **BoardScreen**, select **`lblOwner`** (inside `galCards`) and replace its **Text** with:
+```powerfx
+With({n: ThisItem.RequestedBy},
+    If(Find(",", n) > 0,
+        Proper(
+            First(Split(Trim(Mid(n, Find(",", n) + 1)), " ")).Value & " " &
+            Trim(Left(n, Find(",", n) - 1))
+        ),
+        n
+    )
+) & " · " & ThisItem.A6Program & " · " & Text(ThisItem.Created, "dd mmm yyyy")
+```
+
+How it works:
+- **`BOWMAN, KEEGAN L CTR …`** becomes **`Keegan Bowman`**. The first word after the comma is the first name, the part before the comma is the last name, and `Proper` gives them normal capitalisation.
+- **A name with no comma** (e.g. *Keegan Bowman*, from requests submitted through the old form) is shown as it is.
+
+### 3b. Save only the name on new requests
+On **NewScreen**, select the **card** `RequestedBy_DataCard…` and replace its **Update** with:
+```powerfx
+Coalesce(
+    Trim(cmbRequestedBy.Selected.GivenName & " " & cmbRequestedBy.Selected.Surname),
+    cmbRequestedBy.Selected.DisplayName
+)
+```
+
+This saves the person's first and last name from the directory, for example *Keegan Bowman*. If someone has no first or last name in the directory, it falls back to the full display name.
+
+Requests submitted before this change keep the long name in SharePoint. 3a only changes how they're shown.
+
+### 3c. Short names in History (optional)
+On the **DetailScreen**, select **`lblHistWho`** (inside `galHistory`) and replace its **Text** with:
+```powerfx
+With({n: ThisItem.Author.DisplayName},
+    If(Find(",", n) > 0,
+        Proper(
+            First(Split(Trim(Mid(n, Find(",", n) + 1)), " ")).Value & " " &
+            Trim(Left(n, Find(",", n) - 1))
+        ),
+        n
+    )
+) & " · " & Text(ThisItem.Created, "dd mmm yyyy hh:mm")
+```
+
+> **Capitalisation:** `Proper` makes the first letter of each name upper case and the rest lower case, so *McDONALD* shows as *Mcdonald* and *O'NEIL* as *O'neil*. To keep the directory's capitals instead (*KEEGAN BOWMAN*), remove `Proper(` and its matching `)` in 3a and 3c.
+
+---
+
 ## Test
 
 Press **F5** on **BoardScreen** and check each row:
@@ -135,9 +193,13 @@ Press **F5** on **BoardScreen** and check each row:
 | 6 | Submit a request **with** both dates and times | It saves; the detail screen shows the same dates and times |
 | 7 | Set Planned end **before** Planned start and click Submit *(if you did 2c)* | Error: *Planned end can't be before planned start*; nothing is saved |
 | 8 | On a request in *Requested*, change a planned date and click **Save changes** | Saved; reopen it and the new date is there |
+| 9 | Look at the board cards | Each shows *First Last · A6 program · date*, with no rank or organisation |
+| 10 | Submit a request for a colleague | The new card, the detail screen's **Requested by**, and the item in SharePoint all show just *First Last* |
+| 11 | Open a request's History *(if you did 3c)* | Entries show short names, e.g. *Keegan Bowman · 23 Oct 2026 14:04* |
 
 **If something goes wrong:**
 - **A field's text is cut off:** increase that control's **Height** a little (e.g. `36`), or check that its **Y** follows the label (see 1c).
 - **The Attachments card is still narrow:** check its **Width** is `frmDetail.Width - 40`, and that **Attachments** is last in **Edit fields**.
 - **An empty planned date saves as midnight:** the card's **Update** doesn't have the `If(IsBlank(...), Blank(), ...)` wrapper from 2b.
+- **The board still shows the long name:** check that `lblOwner` **Text** starts with `With({n: ThisItem.RequestedBy}`. A name with no comma is shown unchanged on purpose.
 - **Anything else:** open the **App checker** (the stethoscope icon in the top toolbar) to see every formula error, and send me the exact text of any red error banner.
