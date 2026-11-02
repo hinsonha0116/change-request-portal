@@ -34,28 +34,31 @@ Most values are short (*Network*, *Standard*, *3 - Moderate*), so three per row 
    It now spans the full width of the form at the bottom.
 
 ### 1c. Smaller text and tighter spacing
-You can change many controls at once. Hold **Ctrl** and click them in the Tree view, then set the property once.
+Power Apps only lets you **Ctrl+click** several controls when they're in the **same container**. Each label and value is inside a different card, so you can't select all the labels at once. Instead, put the sizes in one place, then work card by card.
 
-1. **Labels:** Ctrl+click every **`DataCardKey…`** inside `frmDetail` and set:
+**1. Sizes in App.Formulas.** Add this to the **end** of **App › Formulas**:
+```powerfx
+FormLabelSize   = 11;
+FormLabelHeight = 24;
+FormValueSize   = 11;
+FormValueHeight = 32;
+```
+To change the look later, edit these four values once and every field follows.
 
-   | Property | Value |
-   |---|---|
-   | Size | `11` |
-   | Height | `24` |
+**2. For each card in `frmDetail`**, expand it in the Tree view, then:
 
-2. **Values:** Ctrl+click every **`DataCardValue…`** that's a text box or drop-down. Include your custom drop-downs (`drpRisk`, `drpA6ProgramDetail` and so on). **Skip** the attachment control and the date-picker parts. Set:
+| Select | Property | Value |
+|---|---|---|
+| **Ctrl+click** the `DataCardKey…` **and** the value control (same card, so this works) | Size | `FormLabelSize` |
+| The `DataCardKey…` only | Height | `FormLabelHeight` |
+| The value control only | Height | `FormValueHeight` |
 
-   | Property | Value |
-   |---|---|
-   | Size | `11` |
-   | Height | `32` |
+**Which is the value control?**
+- **Text and choice cards:** the visible `DataCardValue…`, or your custom drop-down (`drpRisk`, `drpA6ProgramDetail` and so on). Leave out any hidden combo box behind it.
+- **Date cards** (PlannedStart, PlannedEnd, ActualStart, ActualEnd): the `DateValue…`, `HourValue…` and `MinuteValue…` together.
+- **Attachments card:** do the **label only**. Leave the attachment control's Height at `110` (1b).
 
-3. **Dates:** Ctrl+click the date pickers (`DateValue…`) and the hour and minute drop-downs (`HourValue…`, `MinuteValue…`) in the PlannedStart, PlannedEnd, ActualStart and ActualEnd cards. Set:
-
-   | Property | Value |
-   |---|---|
-   | Size | `11` |
-   | Height | `32` |
+There are about 19 cards, which takes 10–15 minutes. After the first card, Power Apps remembers the property you last picked, so each card is just click, Ctrl+click, and type.
 
 Each card works out its own height from what's inside it, so the gaps close up on their own.
 
@@ -81,7 +84,7 @@ The labels show the SharePoint column names. To change one, select its **`DataCa
 If the **Text** property is locked, unlock the card first: **Properties › Advanced › 🔒 Unlock to change properties**.
 
 ### 1e. Same on the New Request screen (optional)
-Steps **1a**, **1c** and **1d** work the same way in `frmNew`, if you want that screen more compact too. In 1c, include `cmbRequestedBy` and `drpA6Program` with the values.
+Steps **1a**, **1c** and **1d** work the same way in `frmNew`, if you want that screen more compact too. In 1c, treat `cmbRequestedBy` and `drpA6Program` as value controls. The `Form…` sizes from App.Formulas work there too.
 
 > **Blank A6 Program on older requests:** if a request shows an empty **A6 Program** on the detail screen, its saved value probably isn't one of the 16 programs. For example, it was typed before the drop-down existed. The saved value is kept when the request is saved. To fix it, correct the value in SharePoint (**Change Requests**), or pick a program from the drop-down while the request is in *Requested*.
 
