@@ -263,3 +263,93 @@ $n += Txt 20 456 'Below the box, History stays where it is (Y 388).' 13 '#6B7280
 $svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1366 470' font-family='Segoe UI, Arial, sans-serif'>`n" + ($n -join "`n") + "`n</svg>`n"
 [IO.File]::WriteAllText((Join-Path $out 'notes-tabs.svg'), $svg, (New-Object Text.UTF8Encoding($false)))
 Write-Host "Wrote notes-tabs.svg"
+
+# ======================= Forward Schedule of Change =======================
+# Used by Forward-Schedule-of-Change.md: month grid with stage-coloured chips and a day panel.
+$c = @()
+$c += Rect 0 0 1366 60 $navy
+$c += Rect 16 12 110 36 '#fff' 'none' "rx='4'"
+$c += Txt 71 36 '← Board' 14 $navy 'bold' 'middle'
+$c += Txt 140 38 'Forward schedule of change' 20 '#fff' 'bold'
+$c += Rect 760 12 44 36 '#fff' 'none' "rx='4'"
+$c += Txt 782 37 '‹' 20 $navy 'bold' 'middle'
+$c += Txt 920 37 'November 2026' 18 '#fff' 'bold' 'middle'
+$c += Rect 1036 12 44 36 '#fff' 'none' "rx='4'"
+$c += Txt 1058 37 '›' 20 $navy 'bold' 'middle'
+$c += Rect 1206 12 140 36 '#fff' 'none' "rx='4'"
+$c += Txt 1276 36 'Today' 14 $navy 'bold' 'middle'
+
+$month = [datetime]'2026-11-01'
+$offset = (([int]$month.DayOfWeek) + 6) % 7          # Monday = 0
+$gridStart = $month.AddDays(-$offset)
+$today = [datetime]'2026-11-03'; $selDay = [datetime]'2026-11-10'
+$days = 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'
+$cw = 924 / 7; $ch = 652 / 6
+for ($i = 0; $i -lt 7; $i++) { $c += Txt ([math]::Round(20 + $cw * $i + $cw / 2)) 99 $days[$i] 12 '#4B5563' 'bold' 'middle' }
+
+# sample changes: id, title, start, end, stage index, conflict
+$chg = @(
+    @('00011', 'Switch firmware', '2026-11-04', '2026-11-04', 2, $false),
+    @('00012', 'Server move', '2026-11-10', '2026-11-10', 3, $true),
+    @('00014', 'VDI patching', '2026-11-10', '2026-11-10', 1, $true),
+    @('00009', 'SharePoint site', '2026-11-10', '2026-11-10', 0, $false),
+    @('00016', 'Printer rollout', '2026-11-10', '2026-11-10', 5, $false),
+    @('00007', 'Firewall rules', '2026-11-17', '2026-11-18', 4, $false),
+    @('00015', 'Exchange upgrade', '2026-11-24', '2026-11-24', 1, $false),
+    @('00018', 'NIPR router swap', '2026-11-26', '2026-11-27', 0, $false)
+)
+for ($k = 0; $k -lt 42; $k++) {
+    $d = $gridStart.AddDays($k)
+    $x = [math]::Round(20 + ($k % 7) * $cw); $y = [math]::Round(104 + [math]::Floor($k / 7) * $ch)
+    $w = [math]::Round($cw - 2); $h = [math]::Round($ch - 2)
+    $fill = if ($d -eq $selDay) { '#E6EEF9' } elseif ($d.Month -ne $month.Month) { '#F5F5F5' } else { '#FFFFFF' }
+    $c += Rect $x $y $w $h $fill '#DDDDDD'
+    if ($d -eq $today) {
+        $c += Rect ($x + 4) ($y + 3) 26 20 $navy 'none' "rx='10'"
+        $c += Txt ($x + 17) ($y + 17) "$($d.Day)" 11 '#fff' 'bold' 'middle'
+    } else {
+        $col = if ($d.Month -ne $month.Month) { '#A3A3A3' } else { '#111827' }
+        $c += Txt ($x + 17) ($y + 17) "$($d.Day)" 11 $col 'normal' 'middle'
+    }
+    $todays = @($chg | Where-Object { ([datetime]$_[2]) -le $d -and ([datetime]$_[3]) -ge $d })
+    $j = 0
+    foreach ($t in $todays) {
+        if ($j -ge 3) { break }
+        $cy = $y + 25 + $j * 21
+        $extra = if ($t[5]) { "stroke-width='2'" } else { '' }
+        $stroke = if ($t[5]) { '#DC2626' } else { 'none' }
+        $c += Rect ($x + 4) $cy ($w - 8) 19 $stageColors[$t[4]] $stroke $extra
+        $c += Txt ($x + 8) ($cy + 14) "CR-$($t[0]) $($t[1])" 10 '#fff'
+        $j++
+    }
+    if ($todays.Count -gt 3) { $c += Txt ($x + 6) ($y + $h - 6) "+$($todays.Count - 3) more" 10 '#4B5563' }
+}
+
+# day panel
+$c += Txt 964 92 'Tuesday 10 November 2026' 15 '#111827' 'bold'
+$list = @(
+    @('10 Nov 08:00  →  10 Nov 12:00', 'CR-00012  Server move', 'VDI · Ramstein AB, Bldg 400 · NIPR', 'Implementation  ·  ⚠ Outage 30 minutes  ·  ⛔ Possible clash', 3, $true),
+    @('10 Nov 10:00  →  10 Nov 14:00', 'CR-00014  VDI patching', 'VDI · Ramstein AB, Bldg 400 · NIPR', 'Change Advisory Board  ·  ⛔ Possible clash', 1, $true),
+    @('10 Nov 13:00  →  10 Nov 15:00', 'CR-00009  SharePoint site', 'Collaboration Services · Bldg 2120 · NIPR', 'Requested', 0, $false),
+    @('10 Nov 16:00  →  10 Nov 17:00', 'CR-00016  Printer rollout', 'Exec Comm · Bldg 2120 · NIPR', 'Close', 5, $false)
+)
+$ly = 104
+foreach ($l in $list) {
+    $c += Rect 964 $ly 382 88 '#fff' $(if ($l[5]) { '#DC2626' } else { '#D1D5DB' })
+    $c += Rect 964 $ly 5 88 $stageColors[$l[4]]
+    $c += Txt 976 ($ly + 18) $l[0] 11 '#6B7280'
+    $c += Txt 976 ($ly + 38) $l[1] 14 '#111827' 'bold'
+    $c += Txt 976 ($ly + 58) $l[2] 11 '#374151'
+    $fc = if ($l[5]) { '#DC2626' } elseif ($l[3] -like '*Outage*') { '#B45309' } else { '#4B5563' }
+    $c += Txt 976 ($ly + 78) $l[3] 11 $fc 'bold'
+    $ly += 94
+}
+$c += Txt 964 726 'Chip colour = stage · red outline = possible clash' 11 '#6B7280'
+$c += Txt 964 744 '(same location or A6 program, overlapping times)' 11 '#6B7280'
+# tags
+$c += Tag 20 64 'galWeekdays'
+$c += Tag 424 362 'galCalendar (6 × 7 days)'
+$c += Tag 158 504 'galDayChips (stage colours)'
+$c += Tag 1196 482 'galDayList'
+$c += Tag 600 64 'btnPrevMonth · lblMonth · btnNextMonth'
+Svg 'fsc-layout.svg' $c

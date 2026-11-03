@@ -1,51 +1,160 @@
-# App updates: compact detail form, planned dates on New Request, and short requester names
+# App updates: new request fields, New Request clean-up, board filters and email notifications
 
-These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Request-PowerApp-Guide.md), with all earlier updates already applied, including the New Request screen.
+These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Request-PowerApp-Guide.md), with all earlier updates already applied, including the New Request screen and the compact detail form.
 
 **What changes:**
-1. **The detail form is more compact.** It's three columns instead of two, Attachments moves to the bottom and is shorter, and the text is smaller with tighter spacing, so there's less white space and less scrolling.
-2. **Planned start and planned end** can be entered on the New Request screen. They're **optional**.
-3. **The requester shows as just a name**, e.g. *Keegan Bowman*, instead of the full Microsoft 365 display name with rank and organisation, which was getting cut off on the board.
+1. **New fields on every request:**
+   - **Impact details** and **Justification** (large text boxes)
+   - **Location**, **Network / enclave** and **Affected systems**
+   - **Outage expected?** (Yes/No) and **Outage duration**
+2. **The New Request screen gets the same clean-up as the detail screen:** three columns, smaller text and friendly labels, with the large text boxes and Attachments full width at the bottom.
+3. **The detail screen** shows all the new fields.
+4. **Email when a request is submitted:**
+   - **CM team:** every new request.
+   - **SW managers:** when Category = **Software**.
+   - **HW managers:** when Category = **Hardware**.
+5. **Optional:** each email contains a link that opens the request straight in the app.
+6. **Board quick filters** for **Category** and **Change type**.
+7. **Email at every stage change:**
+   - the **CAB** when a request reaches CAB,
+   - the **Change Authority** at their stage,
+   - the **requester** when it's sent back, approved, rejected or closed,
+   - the **CM team** when it's implemented.
 
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. You can also type X, Y, Width and Height into the **Properties** pane on the right.
 
-> **Control names:** each field (card) has a **label** named `DataCardKey` plus a number, and a **value** control named `DataCardValue` plus a number. Date fields use `DateValueN`, `HourValueN` and `MinuteValueN` instead. The numbers are different in every app. Expand a card in the Tree view to see its real names.
+> **Control names:** each field (card) has a label `DataCardKeyN` and a value `DataCardValueN`. The numbers differ in every app, so expand a card in the Tree view to see its real names.
 
-**Time:** about 45 minutes.
+**Time:** about 3 hours in total. Do the parts in order, because the emails and filters use the columns from Part 1.
+
+**Coming later** (after the move to production): **App Roles**, a SharePoint list that holds the CM, CAB, Authority and manager emails in one place, for both the app and the flows.
 
 ---
 
-## Part 1 — Compact detail form (`frmDetail`)
+## Part 1 — Add the new columns in SharePoint
 
-### 1a. Three columns
-Select `frmDetail`. In the **Properties** pane, set **Columns** to `3`.
+Open the **Change Requests** list and add these columns (**+ Add column**). Type each **name exactly as shown**, with no spaces, then click **Save**.
 
-Most values are short (*Network*, *Standard*, *3 - Moderate*), so three per row fits comfortably in the form's 880-pixel width.
+| Name | Type | Settings |
+|---|---|---|
+| `ImpactDetails` | Multiple lines of text | More options › *Use enhanced rich text* **off** |
+| `Justification` | Multiple lines of text | More options › *Use enhanced rich text* **off** |
+| `Location` | Single line of text | |
+| `Enclave` | Single line of text | The app shows a drop-down (Part 2c); the column stays plain text |
+| `AffectedSystems` | Single line of text | |
+| `OutageExpected` | Yes/No | Default value **No** |
+| `OutageDuration` | Single line of text | Free text, e.g. *30 minutes* |
 
-### 1b. Attachments: last, shorter, full width
-**Why:** the Attachments box is tall, and a row is as tall as its tallest field. So the field beside it (A6 Program, in your layout) gets a large empty gap.
+Once they exist, you can rename the *display* names (e.g. "Impact details", "Outage expected?"). The internal names stay the same.
 
-1. Select `frmDetail`, click **Edit fields**, and drag **Attachments** to the **bottom** of the list.
-2. Expand `Attachments_DataCard…` and select the attachment control inside it (`DataCardValueN`). Set **Height** to `110`, which is enough for two or three files before it scrolls.
-3. Select the **card** `Attachments_DataCard…` and set **Width** to:
-   ```powerfx
-   frmDetail.Width - 40
-   ```
-   It now spans the full width of the form at the bottom.
+`Enclave` is plain text with a drop-down in the app, the same pattern as A6 Program. That avoids the combo-box problem the Choice columns had.
 
-### 1c. Smaller text and tighter spacing
-Power Apps only lets you **Ctrl+click** several controls when they're in the **same container**. Each label and value is inside a different card, so you can't select all the labels at once. Instead, put the sizes in one place, then work card by card.
+**Refresh the app's connection:**
+1. In Power Apps Studio, click **Data** (the cylinder icon).
+2. Next to **Change Requests**, click **⋯ › Refresh**.
 
-**1. Sizes in App.Formulas.** Add this to the **end** of **App › Formulas**:
+Without this, the new columns won't appear in **Edit fields**.
+
+**Add the enclave list to App.Formulas.** Add this to the **end**, then edit the list to match your networks:
 ```powerfx
-FormLabelSize   = 11;
-FormLabelHeight = 24;
-FormValueSize   = 11;
-FormValueHeight = 32;
+EnclaveChoices = ["NIPR", "SIPR", "NIPR and SIPR", "Other"];
 ```
-To change the look later, edit these four values once and every field follows.
 
-**2. For each card in `frmDetail`**, expand it in the Tree view, then:
+> **Other files to update later:** the provisioning script and the main guide's column table don't include these columns yet. Add them if you ever rebuild the lists from scratch.
+
+---
+
+## Part 2 — New Request screen (`frmNew`): new fields and clean-up
+
+### 2a. Three columns and the new fields
+1. Select `frmNew` and set **Columns** to `3` in the **Properties** pane.
+2. Click **Edit fields › + Add field** and tick these seven: **ImpactDetails**, **Justification**, **Location**, **Enclave**, **AffectedSystems**, **OutageExpected** and **OutageDuration**. Click **Add**.
+3. **Unlock** each new card: **Properties › Advanced › 🔒 Unlock to change properties**.
+
+### 2b. Put the fields in order
+In **Edit fields**, drag the fields into this order:
+
+> A6Program · RequestedBy · DSN · RequesterEmail · Title · Category · ChangeType · Priority · Risk · Impact · PlannedStart · PlannedEnd · Enclave · Location · AffectedSystems · OutageExpected · OutageDuration · **Description** · **ImpactDetails** · **Justification** · **Attachments** · Stage · SubmittedBy · CABDecision · AuthorityDecision
+
+That gives these rows of three:
+
+| Row | Column 1 | Column 2 | Column 3 |
+|---|---|---|---|
+| 1 | A6 program | Requested by | DSN |
+| 2 | Requester email | Title | Category |
+| 3 | Change type | Priority | Risk |
+| 4 | Impact | Planned start | Planned end |
+| 5 | Network / enclave | Location | Affected systems |
+| 6 | Outage expected? | Outage duration | |
+
+Below those rows come the four full-width fields (2e). The four hidden system fields stay at the bottom.
+
+### 2c. Network / enclave drop-down
+This is the same pattern as A6 Program.
+
+1. Expand **`Enclave_DataCard…`** and select its text box (`DataCardValueN`). Set **Visible** to `false`.
+2. Select the **card**, choose **+ Insert › Drop down**, and check that it lands inside the card. Rename it `drpEnclave` and set:
+
+   | Property | Value |
+   |---|---|
+   | Items | `EnclaveChoices` |
+   | AllowEmptySelection | `true` |
+   | Default | `""` |
+   | Reset | `varResetNew` |
+   | X / Y | `DataCardValueN.X` / `DataCardValueN.Y` *(the hidden text box)* |
+   | Width / Height | `DataCardValueN.Width` / `FormValueHeight` |
+
+3. Select the **card** and set **Update** to `drpEnclave.Selected.Value`, and **Required** to `true`.
+
+### 2d. Location, Affected systems and the outage fields
+1. **Location card:**
+   - **Required** = `true`
+   - text box **HintText** = `"Base and building, e.g. Ramstein AB, Bldg 400"`
+2. **AffectedSystems card:**
+   - **Required** = `true`
+   - text box **HintText** = `"e.g. VDI servers, Exchange"`
+3. **OutageExpected card:** the card contains a **Toggle**. Rename it `tglOutage` and set:
+   - **TrueText** = `"Yes"`
+   - **FalseText** = `"No"`
+4. **OutageDuration card:** set these on the **card**:
+
+   | Property | Value |
+   |---|---|
+   | Required | `tglOutage.Value` |
+   | DisplayMode | `If(tglOutage.Value, DisplayMode.Edit, DisplayMode.Disabled)` |
+
+   Set the text box's **HintText** to `"e.g. 30 minutes"`.
+
+The duration box is greyed out until **Outage expected?** is switched to **Yes**. Once it's Yes, the duration is required.
+
+### 2e. Make the four big fields full width
+For each of the **Description**, **ImpactDetails**, **Justification** and **Attachments** cards:
+
+1. Select the **card** and set:
+
+   | Property | Value |
+   |---|---|
+   | WidthFit | `false` |
+   | Width | `frmNew.Width - 40` |
+
+2. Select the **value control** inside it and set:
+
+   | Card | Value control settings |
+   |---|---|
+   | Description | **Mode** `TextMode.MultiLine` · **Height** `90` |
+   | ImpactDetails | **Mode** `TextMode.MultiLine` · **Height** `90` · **HintText** `"Who and what is affected, and how"` |
+   | Justification | **Mode** `TextMode.MultiLine` · **Height** `90` · **HintText** `"Why this change is needed"` |
+   | Attachments | attachment control **Height** `110` |
+
+3. **Required:** decide whether **ImpactDetails** and **Justification** must be filled in, and set each card's **Required** to `true` or `false`.
+
+   To require Justification **only for Emergency changes**, set its card's **Required** to:
+   ```powerfx
+   drpChangeType.Selected.Value = "Emergency"
+   ```
+
+### 2f. Smaller text and tighter spacing
+This uses the sizes already in App.Formulas (`FormLabelSize`, `FormLabelHeight`, `FormValueHeight`). For each **visible** card in `frmNew`, expand it in the Tree view, then:
 
 | Select | Property | Value |
 |---|---|---|
@@ -54,18 +163,16 @@ To change the look later, edit these four values once and every field follows.
 | The value control only | Height | `FormValueHeight` |
 
 **Which is the value control?**
-- **Text and choice cards:** the visible `DataCardValue…`, or your custom drop-down (`drpRisk`, `drpA6ProgramDetail` and so on). Leave out any hidden combo box behind it.
-- **Date cards** (PlannedStart, PlannedEnd, ActualStart, ActualEnd): the `DateValue…`, `HourValue…` and `MinuteValue…` together.
-- **Attachments card:** do the **label only**. Leave the attachment control's Height at `110` (1b).
-
-There are about 19 cards, which takes 10–15 minutes. After the first card, Power Apps remembers the property you last picked, so each card is just click, Ctrl+click, and type.
-
-Each card works out its own height from what's inside it, so the gaps close up on their own.
+- **Text cards:** the `DataCardValue…`.
+- **Drop-down and picker cards:** `drpA6Program`, `cmbRequestedBy`, `drpEnclave`, and the five choice drop-downs (`drpCategory` and so on), not their hidden combo boxes.
+- **Outage expected?:** `tglOutage`.
+- **Dates:** `DateValue…`, `HourValue…` and `MinuteValue…` together, with the small hour and minute settings from the detail screen.
+- **The four full-width cards:** set **Size** only, and keep their taller heights from 2e.
 
 > **If a card's controls overlap or leave a gap:** select the value control and set its **Y** to `DataCardKeyN.Y + DataCardKeyN.Height + 2`, using that card's own label name.
 
-### 1d. Friendlier labels (optional)
-The labels show the SharePoint column names. To change one, select its **`DataCardKey…`** and set **Text**:
+### 2g. Friendly labels
+Select each card's `DataCardKey…` and set **Text**:
 
 | Card | Text |
 |---|---|
@@ -73,136 +180,340 @@ The labels show the SharePoint column names. To change one, select its **`DataCa
 | RequestedBy | `"Requested by"` |
 | RequesterEmail | `"Requester email"` |
 | ChangeType | `"Change type"` |
-| PlannedStart | `"Planned start"` |
-| PlannedEnd | `"Planned end"` |
-| CABDecision | `"CAB decision"` |
-| AuthorityDecision | `"Authority decision"` |
-| ActualStart | `"Actual start"` |
-| ActualEnd | `"Actual end"` |
-| ReviewOutcome | `"Review outcome"` |
+| PlannedStart / PlannedEnd | `"Planned start"` / `"Planned end"` |
+| Enclave | `"Network / enclave"` |
+| AffectedSystems | `"Affected systems"` |
+| OutageExpected | `"Outage expected?"` |
+| OutageDuration | `"Outage duration"` |
+| ImpactDetails | `"Impact details"` |
+| Attachments | `"Rollback Plan (required) and other attachments"` |
 
-If the **Text** property is locked, unlock the card first: **Properties › Advanced › 🔒 Unlock to change properties**.
-
-### 1e. Same on the New Request screen (optional)
-Steps **1a**, **1c** and **1d** work the same way in `frmNew`, if you want that screen more compact too. In 1c, treat `cmbRequestedBy` and `drpA6Program` as value controls. The `Form…` sizes from App.Formulas work there too.
-
-> **Blank A6 Program on older requests:** if a request shows an empty **A6 Program** on the detail screen, its saved value probably isn't one of the 16 programs. For example, it was typed before the drop-down existed. The saved value is kept when the request is saved. To fix it, correct the value in SharePoint (**Change Requests**), or pick a program from the drop-down while the request is in *Requested*.
+### 2h. Reset the new drop-down and toggle
+`drpEnclave` already uses `varResetNew` (2c). Set **`tglOutage` › Reset** to `varResetNew` too. Then **+ Request a New Change** always opens with the enclave empty and the outage switch on **No**.
 
 ---
 
-## Part 2 — Planned start and end on New Request (optional fields)
+## Part 3 — Show the new fields on the detail screen (`frmDetail`)
 
-### 2a. Add the fields
-1. Select `frmNew` and click **Edit fields › + Add field**. Tick **PlannedStart** and **PlannedEnd**, then click **Add**.
-2. Drag them to just after **Description**, before **Attachments**.
-3. Unlock both cards: select each card, then **Properties › Advanced › 🔒 Unlock to change properties**.
-4. Make sure **Required** is `false` on both cards. That makes them optional.
+1. Select `frmDetail`, click **Edit fields › + Add field**, tick all seven new fields, and click **Add**.
+2. Drag them into place:
+   - **Enclave**, **Location**, **AffectedSystems**, **OutageExpected** and **OutageDuration** go just after **PlannedEnd**.
+   - **ImpactDetails** and **Justification** go just before **Attachments**.
+3. **Unlock** the seven cards, then set on each **card**:
+   - **DisplayMode** = `If(varCR.Stage.Value = "Requested", DisplayMode.Edit, DisplayMode.View)`
+4. **ImpactDetails and Justification:** set the **card**'s **WidthFit** = `false` and **Width** = `frmDetail.Width - 40`. Set the text box's **Mode** = `TextMode.MultiLine` and **Height** = `90`.
+5. **Sizes:** apply the sizes from 2f, and the labels from 2g.
 
-### 2b. Keep empty dates empty
-Without this change, an empty date saves as midnight.
-
-For **each** of the two cards, set the card's **Update** to this, using that card's own control names:
-```powerfx
-If(IsBlank(DateValueN.SelectedDate), Blank(),
-   DateValueN.SelectedDate + Time(Value(HourValueN.Selected.Value), Value(MinuteValueN.Selected.Value), 0))
-```
-
-This is the same fix already on the detail screen's date cards.
-
-### 2c. Stop an end date before the start date (optional)
-Select `btnSubmit` and open **OnSelect**. Add these lines just **before** the line `!frmNew.Valid,`:
-```powerfx
-!IsBlank(DateValueS.SelectedDate) && !IsBlank(DateValueE.SelectedDate) &&
-DateValueE.SelectedDate < DateValueS.SelectedDate,
-    Notify("Planned end can't be before planned start.", NotificationType.Error),
-```
-Replace the placeholder names:
-- **`DateValueS`:** the date picker in the **PlannedStart** card.
-- **`DateValueE`:** the date picker in the **PlannedEnd** card.
-
-### 2d. Smaller text (optional)
-To match the rest of the compact form, set **Size** `11` and **Height** `32` on the two date pickers and their hour and minute drop-downs.
+Enclave shows as a plain text box on the detail screen. It's editable only in *Requested*, like the other request fields. For a drop-down there too, use the A6 Program detail pattern:
+- **Default:** `ThisItem.Enclave`
+- **Card Update:** `Coalesce(drpEnclaveDetail.Selected.Value, ThisItem.Enclave)`
 
 ---
 
-## Part 3 — Show just the requester's name
+## Part 4 — Email when a request is submitted (Power Automate)
 
-**Why:** Microsoft 365 display names here look like **`BOWMAN, KEEGAN L CTR USAF USAFE A6/A654`**. Since Requested By became a people picker, that whole string is saved, and it gets cut off on the board cards.
+A flow watches the **Change Requests** list. Whenever a new request is created, which now happens straight from the app, it emails:
+- the **CM team**, every time,
+- the **SW managers**, if Category = Software,
+- the **HW managers**, if Category = Hardware.
 
-There are two parts to the fix:
-- **3a** shows a short name for requests already saved.
-- **3b** saves only the name on new requests.
+**Network** requests go to the CM team only. Step 4e shows how to add Network managers too.
 
-### 3a. Short name on the board cards
-On **BoardScreen**, select **`lblOwner`** (inside `galCards`) and replace its **Text** with:
-```powerfx
-With({n: ThisItem.RequestedBy},
-    If(Find(",", n) > 0,
-        Proper(
-            First(Split(Trim(Mid(n, Find(",", n) + 1)), " ")).Value & " " &
-            Trim(Left(n, Find(",", n) - 1))
-        ),
-        n
-    )
-) & " · " & ThisItem.A6Program & " · " & Text(ThisItem.Created, "dd mmm yyyy")
+### 4a. Create the flow
+1. Go to **make.powerautomate.com**. Use the government address if your tenant has one.
+2. Sign in as the **shared change-management account**, if you have one. Emails are sent from this account's mailbox.
+3. Click **+ Create › Automated cloud flow**.
+4. Name it **Change Request – New request notifications**.
+5. Pick the trigger **When an item is created** (SharePoint) and click **Create**.
+6. Set **Site Address** to your site and **List Name** to **Change Requests**.
+
+> The SharePoint trigger checks for new items every few minutes, so emails can arrive **1–5 minutes** after a request is submitted.
+
+### 4b. Who gets the emails
+Add three **Initialize variable** actions (under *Variables*):
+
+| Name | Type | Value |
+|---|---|---|
+| `CMTeamEmails` | String | `cm.lead@us.af.mil;cm.analyst@us.af.mil` |
+| `SWManagerEmails` | String | `sw.manager1@us.af.mil;sw.manager2@us.af.mil` |
+| `HWManagerEmails` | String | `hw.manager1@us.af.mil;hw.manager2@us.af.mil` |
+
+Replace the example addresses with the real ones, separated by **semicolons**. If your teams have **distribution lists**, use those addresses instead, so membership changes don't need flow edits.
+
+### 4c. Build the email text once
+Add these **Compose** actions (under *Data Operation*) and rename each as shown. Paste the expressions using **fx / Expression**:
+
+| Rename to | Inputs (expression) |
+|---|---|
+| `CRNumber` | `concat('CR-', formatNumber(triggerOutputs()?['body/ID'], '00000'))` |
+| `PlannedStartText` | `if(empty(triggerOutputs()?['body/PlannedStart']), 'Not set', convertFromUtc(triggerOutputs()?['body/PlannedStart'], 'W. Europe Standard Time', 'dd MMM yyyy HH:mm'))` |
+| `PlannedEndText` | `if(empty(triggerOutputs()?['body/PlannedEnd']), 'Not set', convertFromUtc(triggerOutputs()?['body/PlannedEnd'], 'W. Europe Standard Time', 'dd MMM yyyy HH:mm'))` |
+| `OutageText` | `if(equals(triggerOutputs()?['body/OutageExpected'], true), concat('YES – ', triggerOutputs()?['body/OutageDuration']), 'No')` |
+| `EmailBody` | see below |
+
+SharePoint stores dates in UTC, so the expressions convert them to **W. Europe Standard Time** (Germany). Change that text if your users work in another time zone.
+
+**`EmailBody` › Inputs:** paste this HTML as plain text. Each `@{...}` becomes the request's value when the flow runs:
+
+```html
+<p>A new change request has been submitted.</p>
+<table cellpadding="6" style="border-collapse:collapse;font-family:Segoe UI,Arial,sans-serif;font-size:14px">
+<tr><td><b>CR number</b></td><td>@{outputs('CRNumber')}</td></tr>
+<tr><td><b>Title</b></td><td>@{triggerOutputs()?['body/Title']}</td></tr>
+<tr><td><b>Requested by</b></td><td>@{triggerOutputs()?['body/RequestedBy']} (@{triggerOutputs()?['body/RequesterEmail']})</td></tr>
+<tr><td><b>A6 program</b></td><td>@{triggerOutputs()?['body/A6Program']}</td></tr>
+<tr><td><b>Category / type</b></td><td>@{triggerOutputs()?['body/Category/Value']} / @{triggerOutputs()?['body/ChangeType/Value']}</td></tr>
+<tr><td><b>Priority</b></td><td>@{triggerOutputs()?['body/Priority/Value']}</td></tr>
+<tr><td><b>Risk / Impact</b></td><td>@{triggerOutputs()?['body/Risk/Value']} / @{triggerOutputs()?['body/Impact/Value']}</td></tr>
+<tr><td><b>Planned</b></td><td>@{outputs('PlannedStartText')} to @{outputs('PlannedEndText')}</td></tr>
+<tr><td><b>Outage</b></td><td>@{outputs('OutageText')}</td></tr>
+<tr><td><b>Network / location</b></td><td>@{triggerOutputs()?['body/Enclave']} · @{triggerOutputs()?['body/Location']}</td></tr>
+<tr><td><b>Affected systems</b></td><td>@{triggerOutputs()?['body/AffectedSystems']}</td></tr>
+<tr><td valign="top"><b>Description</b></td><td>@{triggerOutputs()?['body/Description']}</td></tr>
+<tr><td valign="top"><b>Impact details</b></td><td>@{triggerOutputs()?['body/ImpactDetails']}</td></tr>
+<tr><td valign="top"><b>Justification</b></td><td>@{triggerOutputs()?['body/Justification']}</td></tr>
+</table>
+<p>Open the Change Request Portal to review it.</p>
 ```
 
-How it works:
-- **`BOWMAN, KEEGAN L CTR …`** becomes **`Keegan Bowman`**. The first word after the comma is the first name, the part before the comma is the last name, and `Proper` gives them normal capitalisation.
-- **A name with no comma** (e.g. *Keegan Bowman*, from requests submitted through the old form) is shown as it is.
+> If the `@{...}` parts stay as plain text in the email, rebuild each one by hand. Delete it, then insert the matching item from **Dynamic content** (e.g. *Title*, *Category Value*) or the Compose output.
 
-### 3b. Save only the name on new requests
-On **NewScreen**, select the **card** `RequestedBy_DataCard…` and replace its **Update** with:
+### 4d. Email the CM team (every request)
+Add **Send an email (V2)** (Office 365 Outlook):
+
+| Field | Value |
+|---|---|
+| To | `variables('CMTeamEmails')` *(expression)* |
+| Subject | `concat('New change request ', outputs('CRNumber'), ': ', triggerOutputs()?['body/Title'])` *(expression)* |
+| Body | **Code view** (`</>`), then insert **Outputs** of `EmailBody` |
+
+### 4e. Email SW or HW managers, by Category
+1. Add a **Switch** (under *Control*). Set **On** to `triggerOutputs()?['body/Category/Value']`.
+2. **Case `Software`:** add **Send an email (V2)**:
+   - **To** = `variables('SWManagerEmails')`
+   - **Subject** = `concat('New SOFTWARE change request ', outputs('CRNumber'), ': ', triggerOutputs()?['body/Title'])`
+   - **Body** = `EmailBody`
+3. **Case `Hardware`:** add the same email, but with:
+   - **To** = `variables('HWManagerEmails')`
+   - **Subject** using `'New HARDWARE change request '`.
+4. **Default:** leave it empty.
+
+The case values must match the SharePoint choices exactly: `Software`, `Hardware`.
+
+To email **Network managers** too, add a `NetworkManagerEmails` variable and a case `Network`.
+
+> **Flag emergencies and outages:** in each email, open **Show advanced options**, click into **Importance**, choose **Enter custom value**, and use:
+> `if(or(equals(triggerOutputs()?['body/ChangeType/Value'], 'Emergency'), equals(triggerOutputs()?['body/OutageExpected'], true)), 'High', 'Normal')`
+
+> **Sending from a shared mailbox:** use **Send an email from a shared mailbox (V2)** and put the team mailbox in **Original Mailbox Address**. The flow owner needs *Send As* rights on that mailbox.
+
+### 4f. Save and test
+1. Click **Save** and make sure the flow is **On**.
+2. Submit a **Software**, a **Hardware** and a **Network** request.
+3. Within a few minutes, check that:
+   - **CM** gets all three,
+   - **SW managers** get only the Software one,
+   - **HW managers** get only the Hardware one.
+
+---
+
+## Part 5 — A link in the email that opens the request (optional)
+
+### 5a. Get the app's link
+1. In **Power Apps**, go to **Apps**.
+2. Click **⋯** next to the app, then **Details**, and copy the **Web link**.
+
+### 5b. Let the app open a request from a link
+1. **App › StartScreen:**
+   ```powerfx
+   If(!IsBlank(Param("crid")), DetailScreen, BoardScreen)
+   ```
+2. **DetailScreen › OnVisible:** change only the **first line**, the `Set(varCR, …)`, to:
+   ```powerfx
+   Set(varCR, LookUp('Change Requests', ID = If(IsBlank(varCR), Value(Param("crid")), varCR.ID)));
+   ```
+   Keep the `Set(varNoteTab, …)` line after it.
+3. **Save** and **Publish**.
+
+### 5c. Add the link to the emails
+In **`EmailBody`** (Part 4) and **`StageBody`** (Part 7), replace the last line with this, pasting your web link where shown:
+```html
+<p><a href="YOUR-WEB-LINK&crid=@{triggerOutputs()?['body/ID']}">Open @{outputs('CRNumber')} in the Change Request Portal</a></p>
+```
+
+Two adjustments:
+- **In `StageBody`**, use `@{triggerOutputs()?['body/RequestID']}` instead of `body/ID`.
+- **If your web link has no `?`**, use `?crid=` instead of `&crid=`.
+
+> Anyone who receives the link can open that request, even if the board would normally hide it from them.
+
+---
+
+## Part 6 — Board quick filters: Category and Change type
+
+### 6a. Filter lists (App.Formulas)
+Add to the **end**:
 ```powerfx
-Coalesce(
-    Trim(cmbRequestedBy.Selected.GivenName & " " & cmbRequestedBy.Selected.Surname),
-    cmbRequestedBy.Selected.DisplayName
+CategoryFilter   = ["All categories", "Hardware", "Software", "Network"];
+ChangeTypeFilter = ["All types", "Standard", "Normal", "Emergency", "Informational"];
+```
+
+### 6b. Make room in the board header
+**Download Rollback Plan template** is now on the New Request screen, so the board doesn't need it. Select **`btnTemplate`** and either delete it or set **Visible** to `false`.
+
+Then position the header controls like this, all at **Y** `15` and **Height** `40`:
+
+| Control | X | Width | Notes |
+|---|---|---|---|
+| `lblAppTitle` | `20` | `280` | |
+| `txtSearch` | `310` | `190` | |
+| `drpFilterCategory` | `510` | `130` | new (6c) |
+| `drpFilterType` | `650` | `140` | new (6c) |
+| `tglMine` | `800` | `150` | |
+| `icoRefresh` | `960` | `30` | Y `20`, Height `30` |
+| *(free)* | `1000` | `120` | kept for the **Schedule** button in [Forward-Schedule-of-Change.md](Forward-Schedule-of-Change.md) |
+| `btnNew` | `1130` | `216` | Y `13`, Height `44` |
+
+### 6c. Add the two filter drop-downs
+Select **BoardScreen** (not a gallery). Insert two **Drop down** controls and set:
+
+| Property | `drpFilterCategory` | `drpFilterType` |
+|---|---|---|
+| Items | `CategoryFilter` | `ChangeTypeFilter` |
+| Default | `"All categories"` | `"All types"` |
+| Size | `11` | `11` |
+| X / Y / Width / Height | from the table in 6b | from the table in 6b |
+
+### 6d. Use them in the card filter
+Select **`galCards`** (inside `galStages`) and replace **Items** with:
+```powerfx
+Sort(
+    Filter(
+        'Change Requests',
+        Stage.Value = ThisItem.Name,
+        (CanSeeAll && !tglMine.Value) || SubmittedBy = User().Email || RequesterEmail = User().Email,
+        IsBlank(txtSearch.Text) || StartsWith(Title, txtSearch.Text),
+        drpFilterCategory.Selected.Value = "All categories" || Category.Value = drpFilterCategory.Selected.Value,
+        drpFilterType.Selected.Value = "All types" || ChangeType.Value = drpFilterType.Selected.Value
+    ),
+    Modified,
+    SortOrder.Descending
 )
 ```
 
-This saves the person's first and last name from the directory, for example *Keegan Bowman*. If someone has no first or last name in the directory, it falls back to the full display name.
+The column counts in the stage headers follow the filters automatically.
 
-Requests submitted before this change keep the long name in SharePoint. 3a only changes how they're shown.
+---
 
-### 3c. Short names in History (optional)
-On the **DetailScreen**, select **`lblHistWho`** (inside `galHistory`) and replace its **Text** with:
-```powerfx
-With({n: ThisItem.Author.DisplayName},
-    If(Find(",", n) > 0,
-        Proper(
-            First(Split(Trim(Mid(n, Find(",", n) + 1)), " ")).Value & " " &
-            Trim(Left(n, Find(",", n) - 1))
-        ),
-        n
-    )
-) & " · " & Text(ThisItem.Created, "dd mmm yyyy hh:mm")
+## Part 7 — Email at every stage change (Power Automate)
+
+Every Move, Send back and Reject already adds a row to **Change Request History**. A second flow watches that list and emails the right people for the stage the request moved **to**:
+
+| Moved to | Who gets the email | Subject starts with |
+|---|---|---|
+| Requested *(sent back)* | Requester | *CR-… was sent back to you* |
+| Change Advisory Board | CAB members | *CR-… is ready for CAB review* |
+| Change Authority | Change Authorities | *CR-… is awaiting Change Authority approval* |
+| Implementation | Requester, CC CM team | *CR-… is approved for implementation* |
+| Review | CM team | *CR-… has been implemented and is ready for review* |
+| Close | Requester, CC CM team | *CR-… is closed* or *CR-… was rejected* |
+
+Comments (Add comment) and new submissions don't send these emails.
+
+### 7a. Create the flow
+1. **+ Create › Automated cloud flow.** Name it **Change Request – Stage notifications**.
+2. Pick the trigger **When an item is created** (SharePoint), with **List Name** = **Change Request History**.
+3. **Skip comments and new submissions.** On the trigger, open **⋯ › Settings**, then under **Trigger conditions** click **+ Add** and paste:
+   ```
+   @and(not(empty(triggerBody()?['FromStage'])), not(equals(triggerBody()?['FromStage'], triggerBody()?['ToStage'])))
+   ```
+   Click **Done**. The flow now runs only for real stage moves.
+
+### 7b. Get the request and the recipients
+1. Add **Get item** (SharePoint):
+   - **Site Address** = your site
+   - **List Name** = **Change Requests**
+   - **Id** = **RequestID** (dynamic content from the trigger)
+2. Add **Initialize variable** actions:
+
+   | Name | Type | Value |
+   |---|---|---|
+   | `CMTeamEmails` | String | same as Part 4 |
+   | `CABEmails` | String | `cab.chair@us.af.mil;cab.member@us.af.mil` |
+   | `AuthorityEmails` | String | `change.authority@us.af.mil` |
+
+3. Add **Compose** actions:
+
+   | Rename to | Inputs (expression) |
+   |---|---|
+   | `CRNumber` | `concat('CR-', formatNumber(triggerOutputs()?['body/RequestID'], '00000'))` |
+   | `RequesterEmails` | `concat(body('Get_item')?['RequesterEmail'], ';', body('Get_item')?['SubmittedBy'])` |
+   | `StageBody` | see below |
+
+**`StageBody` › Inputs:**
+```html
+<p><b>@{outputs('CRNumber')} — @{body('Get_item')?['Title']}</b> moved from <b>@{triggerOutputs()?['body/FromStage']}</b> to <b>@{triggerOutputs()?['body/ToStage']}</b>.</p>
+<table cellpadding="6" style="border-collapse:collapse;font-family:Segoe UI,Arial,sans-serif;font-size:14px">
+<tr><td><b>By</b></td><td>@{triggerOutputs()?['body/Author/DisplayName']}</td></tr>
+<tr><td valign="top"><b>Comment</b></td><td>@{triggerOutputs()?['body/Comment']}</td></tr>
+<tr><td><b>Requested by</b></td><td>@{body('Get_item')?['RequestedBy']}</td></tr>
+<tr><td><b>Category / type</b></td><td>@{body('Get_item')?['Category']?['Value']} / @{body('Get_item')?['ChangeType']?['Value']}</td></tr>
+<tr><td><b>Priority</b></td><td>@{body('Get_item')?['Priority']?['Value']}</td></tr>
+<tr><td><b>Location</b></td><td>@{body('Get_item')?['Location']}</td></tr>
+</table>
+<p>Open the Change Request Portal to see the full request.</p>
 ```
 
-> **Capitalisation:** `Proper` makes the first letter of each name upper case and the rest lower case, so *McDONALD* shows as *Mcdonald* and *O'NEIL* as *O'neil*. To keep the directory's capitals instead (*KEEGAN BOWMAN*), remove `Proper(` and its matching `)` in 3a and 3c.
+### 7c. Send to the right people
+1. Add a **Switch**. Set **On** to `triggerOutputs()?['body/ToStage']`.
+2. Add one case per row below. Inside each case, add **Send an email (V2)** with **Body** = **Code view** + the `StageBody` output. To use **CC**, open **Show advanced options**.
+
+| Case equals | To | CC | Subject (expression) |
+|---|---|---|---|
+| `Requested` | `outputs('RequesterEmails')` | | `concat(outputs('CRNumber'), ' was sent back to you: ', body('Get_item')?['Title'])` |
+| `Change Advisory Board` | `variables('CABEmails')` | | `concat(outputs('CRNumber'), ' is ready for CAB review: ', body('Get_item')?['Title'])` |
+| `Change Authority` | `variables('AuthorityEmails')` | | `concat(outputs('CRNumber'), ' is awaiting Change Authority approval: ', body('Get_item')?['Title'])` |
+| `Implementation` | `outputs('RequesterEmails')` | `variables('CMTeamEmails')` | `concat(outputs('CRNumber'), ' is approved for implementation: ', body('Get_item')?['Title'])` |
+| `Review` | `variables('CMTeamEmails')` | | `concat(outputs('CRNumber'), ' has been implemented and is ready for review: ', body('Get_item')?['Title'])` |
+| `Close` | `outputs('RequesterEmails')` | `variables('CMTeamEmails')` | `concat(outputs('CRNumber'), if(equals(body('Get_item')?['ReviewOutcome']?['Value'], 'Rejected'), ' was rejected: ', ' is closed: '), body('Get_item')?['Title'])` |
+
+The case values must match the stage names exactly, including spaces and capitals.
+
+### 7d. Save and test
+1. Click **Save** and make sure the flow is **On**.
+2. Take a test request through every stage, then send it back once and reject another.
+3. Check that each email reaches the right people, as in the table at the top of Part 7.
+4. Add a comment with **Add comment**. **No** email should be sent.
 
 ---
 
 ## Test
 
-Press **F5** on **BoardScreen** and check each row:
-
 | # | Do this | Expect |
 |---|---|---|
-| 1 | Open any request | The form shows **three** fields per row with smaller text and less white space; **Attachments** is at the bottom, full width and short |
-| 2 | Scroll the form on a request in *Requested* | Every field is still readable, and no labels or values overlap |
-| 3 | Open a request with two or more attachments | The attachment box scrolls; clicking a file opens it |
-| 4 | Click **+ Request a New Change** | **Planned start** and **Planned end** appear after Description, without red stars |
-| 5 | Submit a request with **no** planned dates | It saves; in SharePoint, PlannedStart and PlannedEnd are **blank** (not midnight) |
-| 6 | Submit a request **with** both dates and times | It saves; the detail screen shows the same dates and times |
-| 7 | Set Planned end **before** Planned start and click Submit *(if you did 2c)* | Error: *Planned end can't be before planned start*; nothing is saved |
-| 8 | On a request in *Requested*, change a planned date and click **Save changes** | Saved; reopen it and the new date is there |
-| 9 | Look at the board cards | Each shows *First Last · A6 program · date*, with no rank or organisation |
-| 10 | Submit a request for a colleague | The new card, the detail screen's **Requested by**, and the item in SharePoint all show just *First Last* |
-| 11 | Open a request's History *(if you did 3c)* | Entries show short names, e.g. *Keegan Bowman · 23 Oct 2026 14:04* |
+| 1 | Click **+ Request a New Change** | Three columns and smaller text; rows match 2b; the four big fields are full width at the bottom |
+| 2 | Look at **Outage duration** | Greyed out while **Outage expected?** is *No*; editable and required once it's *Yes* |
+| 3 | Open **Network / enclave** | Lists your `EnclaveChoices` |
+| 4 | Submit without Location, Enclave or Affected systems | Error: *Fill in every field marked with a red star* |
+| 5 | Submit a full **Software** request with an outage | Saved; SharePoint shows all the new fields filled in |
+| 6 | Open it on the detail screen | The new fields show, editable while in *Requested* |
+| 7 | Wait up to 5 minutes | **CM** and **SW managers** get the new-request email, with the Outage, Network and Location rows; marked High importance if you did the tip in 4e |
+| 8 | Submit a **Hardware** and a **Network** request | HW managers get only the Hardware one; Network goes to CM only |
+| 9 | On the board, choose **Software** in the category filter | Only Software cards show, and the column counts update |
+| 10 | Choose **Emergency** in the type filter, then set both back to *All* | Only Emergency cards show, then everything again |
+| 11 | **Move** a request to CAB | The CAB gets *"… is ready for CAB review"*, with the comment |
+| 12 | **Send back** a request to Requested | The requester gets *"… was sent back to you"* |
+| 13 | **Reject** a request | The requester (CC CM) gets *"… was rejected"* |
+| 14 | Use **Add comment** | No stage email is sent |
+| 15 | Click a link in an email *(if you did Part 5)* | The app opens on that request |
 
 **If something goes wrong:**
-- **A field's text is cut off:** increase that control's **Height** a little (e.g. `36`), or check that its **Y** follows the label (see 1c).
-- **The Attachments card is still narrow:** check its **Width** is `frmDetail.Width - 40`, and that **Attachments** is last in **Edit fields**.
-- **An empty planned date saves as midnight:** the card's **Update** doesn't have the `If(IsBlank(...), Blank(), ...)` wrapper from 2b.
-- **The board still shows the long name:** check that `lblOwner` **Text** starts with `With({n: ThisItem.RequestedBy}`. A name with no comma is shown unchanged on purpose.
-- **Anything else:** open the **App checker** (the stethoscope icon in the top toolbar) to see every formula error, and send me the exact text of any red error banner.
+- **The new fields aren't in Edit fields:** refresh the data source (end of Part 1).
+- **`tglOutage` isn't recognized:** rename the toggle inside the OutageExpected card to exactly `tglOutage`.
+- **No email at all:** check the flow is **On** and look at its **Run history**. If there's no run, check the trigger's site and list. If a run failed, open it to see which step.
+- **A stage flow runs for comments too:** check the trigger condition in 7a was saved (**⋯ › Settings**).
+- **A stage email goes to nobody:** the Switch case must match the stage name exactly, e.g. `Change Advisory Board`.
+- **Filters show nothing:** the filter lists must match the SharePoint choices exactly, and the "All" entries must match the text in the `galCards` formula (`All categories`, `All types`).
+- **The email shows `@{...}` text:** rebuild those parts with **Dynamic content** (see the note in 4c).
+- **The times are off:** change the time zone name in `PlannedStartText` and `PlannedEndText`.
+- **Anything else in the app:** open the **App checker** (the stethoscope icon) and send me the exact text of any red error banner.

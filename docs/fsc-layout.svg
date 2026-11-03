@@ -1,0 +1,157 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1366 768' font-family='Segoe UI, Arial, sans-serif'>
+<rect x='0' y='0' width='1366' height='768' fill='#FFFFFF' stroke='#9CA3AF' />
+<rect x='0' y='0' width='1366' height='60' fill='#1E3A6B' stroke='none' />
+<rect x='16' y='12' width='110' height='36' fill='#fff' stroke='none' rx='4'/>
+<text x='71' y='36' font-size='14' fill='#1E3A6B' font-weight='bold' text-anchor='middle'>← Board</text>
+<text x='140' y='38' font-size='20' fill='#fff' font-weight='bold' text-anchor='start'>Forward schedule of change</text>
+<rect x='760' y='12' width='44' height='36' fill='#fff' stroke='none' rx='4'/>
+<text x='782' y='37' font-size='20' fill='#1E3A6B' font-weight='bold' text-anchor='middle'>‹</text>
+<text x='920' y='37' font-size='18' fill='#fff' font-weight='bold' text-anchor='middle'>November 2026</text>
+<rect x='1036' y='12' width='44' height='36' fill='#fff' stroke='none' rx='4'/>
+<text x='1058' y='37' font-size='20' fill='#1E3A6B' font-weight='bold' text-anchor='middle'>›</text>
+<rect x='1206' y='12' width='140' height='36' fill='#fff' stroke='none' rx='4'/>
+<text x='1276' y='36' font-size='14' fill='#1E3A6B' font-weight='bold' text-anchor='middle'>Today</text>
+<text x='86' y='99' font-size='12' fill='#4B5563' font-weight='bold' text-anchor='middle'>Mon</text>
+<text x='218' y='99' font-size='12' fill='#4B5563' font-weight='bold' text-anchor='middle'>Tue</text>
+<text x='350' y='99' font-size='12' fill='#4B5563' font-weight='bold' text-anchor='middle'>Wed</text>
+<text x='482' y='99' font-size='12' fill='#4B5563' font-weight='bold' text-anchor='middle'>Thu</text>
+<text x='614' y='99' font-size='12' fill='#4B5563' font-weight='bold' text-anchor='middle'>Fri</text>
+<text x='746' y='99' font-size='12' fill='#4B5563' font-weight='bold' text-anchor='middle'>Sat</text>
+<text x='878' y='99' font-size='12' fill='#4B5563' font-weight='bold' text-anchor='middle'>Sun</text>
+<rect x='20' y='104' width='130' height='107' fill='#F5F5F5' stroke='#DDDDDD' />
+<text x='37' y='121' font-size='11' fill='#A3A3A3' font-weight='normal' text-anchor='middle'>26</text>
+<rect x='152' y='104' width='130' height='107' fill='#F5F5F5' stroke='#DDDDDD' />
+<text x='169' y='121' font-size='11' fill='#A3A3A3' font-weight='normal' text-anchor='middle'>27</text>
+<rect x='284' y='104' width='130' height='107' fill='#F5F5F5' stroke='#DDDDDD' />
+<text x='301' y='121' font-size='11' fill='#A3A3A3' font-weight='normal' text-anchor='middle'>28</text>
+<rect x='416' y='104' width='130' height='107' fill='#F5F5F5' stroke='#DDDDDD' />
+<text x='433' y='121' font-size='11' fill='#A3A3A3' font-weight='normal' text-anchor='middle'>29</text>
+<rect x='548' y='104' width='130' height='107' fill='#F5F5F5' stroke='#DDDDDD' />
+<text x='565' y='121' font-size='11' fill='#A3A3A3' font-weight='normal' text-anchor='middle'>30</text>
+<rect x='680' y='104' width='130' height='107' fill='#F5F5F5' stroke='#DDDDDD' />
+<text x='697' y='121' font-size='11' fill='#A3A3A3' font-weight='normal' text-anchor='middle'>31</text>
+<rect x='812' y='104' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='829' y='121' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>1</text>
+<rect x='20' y='213' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='37' y='230' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>2</text>
+<rect x='152' y='213' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<rect x='156' y='216' width='26' height='20' fill='#1E3A6B' stroke='none' rx='10'/>
+<text x='169' y='230' font-size='11' fill='#fff' font-weight='bold' text-anchor='middle'>3</text>
+<rect x='284' y='213' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='301' y='230' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>4</text>
+<rect x='288' y='238' width='122' height='19' fill='#7C3AED' stroke='none' />
+<text x='292' y='252' font-size='10' fill='#fff' font-weight='normal' text-anchor='start'>CR-00011 Switch firmware</text>
+<rect x='416' y='213' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='433' y='230' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>5</text>
+<rect x='548' y='213' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='565' y='230' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>6</text>
+<rect x='680' y='213' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='697' y='230' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>7</text>
+<rect x='812' y='213' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='829' y='230' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>8</text>
+<rect x='20' y='321' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='37' y='338' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>9</text>
+<rect x='152' y='321' width='130' height='107' fill='#E6EEF9' stroke='#DDDDDD' />
+<text x='169' y='338' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>10</text>
+<rect x='156' y='346' width='122' height='19' fill='#D97706' stroke='#DC2626' stroke-width='2'/>
+<text x='160' y='360' font-size='10' fill='#fff' font-weight='normal' text-anchor='start'>CR-00012 Server move</text>
+<rect x='156' y='367' width='122' height='19' fill='#2563EB' stroke='#DC2626' stroke-width='2'/>
+<text x='160' y='381' font-size='10' fill='#fff' font-weight='normal' text-anchor='start'>CR-00014 VDI patching</text>
+<rect x='156' y='388' width='122' height='19' fill='#6B7280' stroke='none' />
+<text x='160' y='402' font-size='10' fill='#fff' font-weight='normal' text-anchor='start'>CR-00009 SharePoint site</text>
+<text x='158' y='422' font-size='10' fill='#4B5563' font-weight='normal' text-anchor='start'>+1 more</text>
+<rect x='284' y='321' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='301' y='338' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>11</text>
+<rect x='416' y='321' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='433' y='338' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>12</text>
+<rect x='548' y='321' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='565' y='338' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>13</text>
+<rect x='680' y='321' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='697' y='338' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>14</text>
+<rect x='812' y='321' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='829' y='338' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>15</text>
+<rect x='20' y='430' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='37' y='447' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>16</text>
+<rect x='152' y='430' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='169' y='447' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>17</text>
+<rect x='156' y='455' width='122' height='19' fill='#0891B2' stroke='none' />
+<text x='160' y='469' font-size='10' fill='#fff' font-weight='normal' text-anchor='start'>CR-00007 Firewall rules</text>
+<rect x='284' y='430' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='301' y='447' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>18</text>
+<rect x='288' y='455' width='122' height='19' fill='#0891B2' stroke='none' />
+<text x='292' y='469' font-size='10' fill='#fff' font-weight='normal' text-anchor='start'>CR-00007 Firewall rules</text>
+<rect x='416' y='430' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='433' y='447' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>19</text>
+<rect x='548' y='430' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='565' y='447' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>20</text>
+<rect x='680' y='430' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='697' y='447' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>21</text>
+<rect x='812' y='430' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='829' y='447' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>22</text>
+<rect x='20' y='539' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='37' y='556' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>23</text>
+<rect x='152' y='539' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='169' y='556' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>24</text>
+<rect x='156' y='564' width='122' height='19' fill='#2563EB' stroke='none' />
+<text x='160' y='578' font-size='10' fill='#fff' font-weight='normal' text-anchor='start'>CR-00015 Exchange upgrade</text>
+<rect x='284' y='539' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='301' y='556' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>25</text>
+<rect x='416' y='539' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='433' y='556' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>26</text>
+<rect x='420' y='564' width='122' height='19' fill='#6B7280' stroke='none' />
+<text x='424' y='578' font-size='10' fill='#fff' font-weight='normal' text-anchor='start'>CR-00018 NIPR router swap</text>
+<rect x='548' y='539' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='565' y='556' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>27</text>
+<rect x='552' y='564' width='122' height='19' fill='#6B7280' stroke='none' />
+<text x='556' y='578' font-size='10' fill='#fff' font-weight='normal' text-anchor='start'>CR-00018 NIPR router swap</text>
+<rect x='680' y='539' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='697' y='556' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>28</text>
+<rect x='812' y='539' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='829' y='556' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>29</text>
+<rect x='20' y='647' width='130' height='107' fill='#FFFFFF' stroke='#DDDDDD' />
+<text x='37' y='664' font-size='11' fill='#111827' font-weight='normal' text-anchor='middle'>30</text>
+<rect x='152' y='647' width='130' height='107' fill='#F5F5F5' stroke='#DDDDDD' />
+<text x='169' y='664' font-size='11' fill='#A3A3A3' font-weight='normal' text-anchor='middle'>1</text>
+<rect x='284' y='647' width='130' height='107' fill='#F5F5F5' stroke='#DDDDDD' />
+<text x='301' y='664' font-size='11' fill='#A3A3A3' font-weight='normal' text-anchor='middle'>2</text>
+<rect x='416' y='647' width='130' height='107' fill='#F5F5F5' stroke='#DDDDDD' />
+<text x='433' y='664' font-size='11' fill='#A3A3A3' font-weight='normal' text-anchor='middle'>3</text>
+<rect x='548' y='647' width='130' height='107' fill='#F5F5F5' stroke='#DDDDDD' />
+<text x='565' y='664' font-size='11' fill='#A3A3A3' font-weight='normal' text-anchor='middle'>4</text>
+<rect x='680' y='647' width='130' height='107' fill='#F5F5F5' stroke='#DDDDDD' />
+<text x='697' y='664' font-size='11' fill='#A3A3A3' font-weight='normal' text-anchor='middle'>5</text>
+<rect x='812' y='647' width='130' height='107' fill='#F5F5F5' stroke='#DDDDDD' />
+<text x='829' y='664' font-size='11' fill='#A3A3A3' font-weight='normal' text-anchor='middle'>6</text>
+<text x='964' y='92' font-size='15' fill='#111827' font-weight='bold' text-anchor='start'>Tuesday 10 November 2026</text>
+<rect x='964' y='104' width='382' height='88' fill='#fff' stroke='#DC2626' />
+<rect x='964' y='104' width='5' height='88' fill='#D97706' stroke='none' />
+<text x='976' y='122' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>10 Nov 08:00  →  10 Nov 12:00</text>
+<text x='976' y='142' font-size='14' fill='#111827' font-weight='bold' text-anchor='start'>CR-00012  Server move</text>
+<text x='976' y='162' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>VDI · Ramstein AB, Bldg 400 · NIPR</text>
+<text x='976' y='182' font-size='11' fill='#DC2626' font-weight='bold' text-anchor='start'>Implementation  ·  ⚠ Outage 30 minutes  ·  ⛔ Possible clash</text>
+<rect x='964' y='198' width='382' height='88' fill='#fff' stroke='#DC2626' />
+<rect x='964' y='198' width='5' height='88' fill='#2563EB' stroke='none' />
+<text x='976' y='216' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>10 Nov 10:00  →  10 Nov 14:00</text>
+<text x='976' y='236' font-size='14' fill='#111827' font-weight='bold' text-anchor='start'>CR-00014  VDI patching</text>
+<text x='976' y='256' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>VDI · Ramstein AB, Bldg 400 · NIPR</text>
+<text x='976' y='276' font-size='11' fill='#DC2626' font-weight='bold' text-anchor='start'>Change Advisory Board  ·  ⛔ Possible clash</text>
+<rect x='964' y='292' width='382' height='88' fill='#fff' stroke='#D1D5DB' />
+<rect x='964' y='292' width='5' height='88' fill='#6B7280' stroke='none' />
+<text x='976' y='310' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>10 Nov 13:00  →  10 Nov 15:00</text>
+<text x='976' y='330' font-size='14' fill='#111827' font-weight='bold' text-anchor='start'>CR-00009  SharePoint site</text>
+<text x='976' y='350' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Collaboration Services · Bldg 2120 · NIPR</text>
+<text x='976' y='370' font-size='11' fill='#4B5563' font-weight='bold' text-anchor='start'>Requested</text>
+<rect x='964' y='386' width='382' height='88' fill='#fff' stroke='#D1D5DB' />
+<rect x='964' y='386' width='5' height='88' fill='#16A34A' stroke='none' />
+<text x='976' y='404' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>10 Nov 16:00  →  10 Nov 17:00</text>
+<text x='976' y='424' font-size='14' fill='#111827' font-weight='bold' text-anchor='start'>CR-00016  Printer rollout</text>
+<text x='976' y='444' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Exec Comm · Bldg 2120 · NIPR</text>
+<text x='976' y='464' font-size='11' fill='#4B5563' font-weight='bold' text-anchor='start'>Close</text>
+<text x='964' y='726' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>Chip colour = stage · red outline = possible clash</text>
+<text x='964' y='744' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>(same location or A6 program, overlapping times)</text>
+<rect x='20' y='64' width='91.2' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='26' y='78' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>galWeekdays</text>
+<rect x='424' y='362' width='184.8' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='430' y='376' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>galCalendar (6 × 7 days)</text>
+<rect x='158' y='504' width='206.4' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='164' y='518' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>galDayChips (stage colours)</text>
+<rect x='1196' y='482' width='84' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='1202' y='496' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>galDayList</text>
+<rect x='600' y='64' width='285.6' height='20' fill='#C026D3' stroke='none' rx='3'/><text x='606' y='78' font-size='12' fill='#fff' font-weight='bold' text-anchor='start'>btnPrevMonth · lblMonth · btnNextMonth</text>
+</svg>
