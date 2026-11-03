@@ -88,13 +88,13 @@ $cr = 'Change Requests'
 Add-ListIfMissing $cr
 
 # "Title" already exists on every list - it is used as the change title.
-# Choice values below must match the Microsoft Form radio-button text exactly.
+# Choice values below must match the app's choice lists (App.Formulas) exactly.
 Add-FieldIfMissing $cr 'Stage'              Choice   -Choices $Stages -Default 'Requested' -Required
 Add-FieldIfMissing $cr 'A6Program'          Text
 Add-FieldIfMissing $cr 'DSN'                Text
 Add-FieldIfMissing $cr 'RequestedBy'        Text
 Add-FieldIfMissing $cr 'RequesterEmail'     Text
-Add-FieldIfMissing $cr 'SubmittedBy'        Text   # submitter's sign-in email (Forms responder), set by the flow
+Add-FieldIfMissing $cr 'SubmittedBy'        Text   # sign-in email of whoever submitted the request
 Add-FieldIfMissing $cr 'Category'           Choice   -Choices 'Hardware','Software','Network'
 Add-FieldIfMissing $cr 'ChangeType'         Choice   -Choices 'Standard','Normal','Emergency','Informational'
 Add-FieldIfMissing $cr 'Description'        Note
@@ -106,6 +106,14 @@ Add-FieldIfMissing $cr 'FormResponseId'     Number
 Add-FieldIfMissing $cr 'PlannedStart'       DateTime
 Add-FieldIfMissing $cr 'PlannedEnd'         DateTime
 Add-FieldIfMissing $cr 'Assignee'           User
+
+# Request details added on the New Request screen
+Add-FieldIfMissing $cr 'ImpactDetails'      Note
+Add-FieldIfMissing $cr 'Justification'      Note
+Add-FieldIfMissing $cr 'Location'           Text
+Add-FieldIfMissing $cr 'AffectedSystems'    Text
+Add-FieldIfMissing $cr 'OutageExpected'     Boolean  -Default '0'   # Yes/No, defaults to No
+Add-FieldIfMissing $cr 'OutageDuration'     Text
 
 # Change Advisory Board stage
 Add-FieldIfMissing $cr 'CABDecision'        Choice   -Choices 'Pending','Approved','Rejected' -Default 'Pending'
@@ -133,6 +141,9 @@ Add-FieldIfMissing $hist 'RequestID' Number -Required
 Add-FieldIfMissing $hist 'FromStage' Text
 Add-FieldIfMissing $hist 'ToStage'   Text
 Add-FieldIfMissing $hist 'Comment'   Note
+
+# The app writes "CR-00012" into Title, so show it as "CR Number" (internal name stays Title)
+Set-PnPField -List $hist -Identity 'Title' -Values @{ Title = 'CR Number' } | Out-Null
 
 # Index columns the app filters on so queries stay fast as the lists grow
 Set-PnPField -List $cr   -Identity 'Stage'     -Values @{ Indexed = $true } | Out-Null
