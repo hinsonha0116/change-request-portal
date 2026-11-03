@@ -127,25 +127,25 @@
 <rect x='964' y='104' width='5' height='88' fill='#D97706' stroke='none' />
 <text x='976' y='122' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>10 Nov 08:00  →  10 Nov 12:00</text>
 <text x='976' y='142' font-size='14' fill='#111827' font-weight='bold' text-anchor='start'>CR-00012  Server move</text>
-<text x='976' y='162' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>VDI · Ramstein AB, Bldg 400 · NIPR</text>
+<text x='976' y='162' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>VDI · Ramstein AB, Bldg 400</text>
 <text x='976' y='182' font-size='11' fill='#DC2626' font-weight='bold' text-anchor='start'>Implementation  ·  ⚠ Outage 30 minutes  ·  ⛔ Possible clash</text>
 <rect x='964' y='198' width='382' height='88' fill='#fff' stroke='#DC2626' />
 <rect x='964' y='198' width='5' height='88' fill='#2563EB' stroke='none' />
 <text x='976' y='216' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>10 Nov 10:00  →  10 Nov 14:00</text>
 <text x='976' y='236' font-size='14' fill='#111827' font-weight='bold' text-anchor='start'>CR-00014  VDI patching</text>
-<text x='976' y='256' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>VDI · Ramstein AB, Bldg 400 · NIPR</text>
+<text x='976' y='256' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>VDI · Ramstein AB, Bldg 400</text>
 <text x='976' y='276' font-size='11' fill='#DC2626' font-weight='bold' text-anchor='start'>Change Advisory Board  ·  ⛔ Possible clash</text>
 <rect x='964' y='292' width='382' height='88' fill='#fff' stroke='#D1D5DB' />
 <rect x='964' y='292' width='5' height='88' fill='#6B7280' stroke='none' />
 <text x='976' y='310' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>10 Nov 13:00  →  10 Nov 15:00</text>
 <text x='976' y='330' font-size='14' fill='#111827' font-weight='bold' text-anchor='start'>CR-00009  SharePoint site</text>
-<text x='976' y='350' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Collaboration Services · Bldg 2120 · NIPR</text>
+<text x='976' y='350' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Collaboration Services · Bldg 2120</text>
 <text x='976' y='370' font-size='11' fill='#4B5563' font-weight='bold' text-anchor='start'>Requested</text>
 <rect x='964' y='386' width='382' height='88' fill='#fff' stroke='#D1D5DB' />
 <rect x='964' y='386' width='5' height='88' fill='#16A34A' stroke='none' />
 <text x='976' y='404' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>10 Nov 16:00  →  10 Nov 17:00</text>
 <text x='976' y='424' font-size='14' fill='#111827' font-weight='bold' text-anchor='start'>CR-00016  Printer rollout</text>
-<text x='976' y='444' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Exec Comm · Bldg 2120 · NIPR</text>
+<text x='976' y='444' font-size='11' fill='#374151' font-weight='normal' text-anchor='start'>Exec Comm · Bldg 2120</text>
 <text x='976' y='464' font-size='11' fill='#4B5563' font-weight='bold' text-anchor='start'>Close</text>
 <text x='964' y='726' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>Chip colour = stage · red outline = possible clash</text>
 <text x='964' y='744' font-size='11' fill='#6B7280' font-weight='normal' text-anchor='start'>(same location or A6 program, overlapping times)</text>

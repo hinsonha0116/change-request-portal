@@ -5,7 +5,7 @@ These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Re
 **What changes:**
 1. **New fields on every request:**
    - **Impact details** and **Justification** (large text boxes)
-   - **Location**, **Network / enclave** and **Affected systems**
+   - **Location** and **Affected systems**
    - **Outage expected?** (Yes/No) and **Outage duration**
 2. **The New Request screen gets the same clean-up as the detail screen:** three columns, smaller text and friendly labels, with the large text boxes and Attachments full width at the bottom.
 3. **The detail screen** shows all the new fields.
@@ -40,25 +40,17 @@ Open the **Change Requests** list and add these columns (**+ Add column**). Type
 | `ImpactDetails` | Multiple lines of text | More options › *Use enhanced rich text* **off** |
 | `Justification` | Multiple lines of text | More options › *Use enhanced rich text* **off** |
 | `Location` | Single line of text | |
-| `Enclave` | Single line of text | The app shows a drop-down (Part 2c); the column stays plain text |
 | `AffectedSystems` | Single line of text | |
 | `OutageExpected` | Yes/No | Default value **No** |
 | `OutageDuration` | Single line of text | Free text, e.g. *30 minutes* |
 
 Once they exist, you can rename the *display* names (e.g. "Impact details", "Outage expected?"). The internal names stay the same.
 
-`Enclave` is plain text with a drop-down in the app, the same pattern as A6 Program. That avoids the combo-box problem the Choice columns had.
-
 **Refresh the app's connection:**
 1. In Power Apps Studio, click **Data** (the cylinder icon).
 2. Next to **Change Requests**, click **⋯ › Refresh**.
 
 Without this, the new columns won't appear in **Edit fields**.
-
-**Add the enclave list to App.Formulas.** Add this to the **end**, then edit the list to match your networks:
-```powerfx
-EnclaveChoices = ["NIPR", "SIPR", "NIPR and SIPR", "Other"];
-```
 
 > **Other files to update later:** the provisioning script and the main guide's column table don't include these columns yet. Add them if you ever rebuild the lists from scratch.
 
@@ -68,13 +60,13 @@ EnclaveChoices = ["NIPR", "SIPR", "NIPR and SIPR", "Other"];
 
 ### 2a. Three columns and the new fields
 1. Select `frmNew` and set **Columns** to `3` in the **Properties** pane.
-2. Click **Edit fields › + Add field** and tick these seven: **ImpactDetails**, **Justification**, **Location**, **Enclave**, **AffectedSystems**, **OutageExpected** and **OutageDuration**. Click **Add**.
+2. Click **Edit fields › + Add field** and tick these six: **ImpactDetails**, **Justification**, **Location**, **AffectedSystems**, **OutageExpected** and **OutageDuration**. Click **Add**.
 3. **Unlock** each new card: **Properties › Advanced › 🔒 Unlock to change properties**.
 
 ### 2b. Put the fields in order
 In **Edit fields**, drag the fields into this order:
 
-> A6Program · RequestedBy · DSN · RequesterEmail · Title · Category · ChangeType · Priority · Risk · Impact · PlannedStart · PlannedEnd · Enclave · Location · AffectedSystems · OutageExpected · OutageDuration · **Description** · **ImpactDetails** · **Justification** · **Attachments** · Stage · SubmittedBy · CABDecision · AuthorityDecision
+> A6Program · RequestedBy · DSN · RequesterEmail · Title · Category · ChangeType · Priority · Risk · Impact · PlannedStart · PlannedEnd · OutageExpected · OutageDuration · Location · AffectedSystems · **Description** · **ImpactDetails** · **Justification** · **Attachments** · Stage · SubmittedBy · CABDecision · AuthorityDecision
 
 That gives these rows of three:
 
@@ -84,35 +76,19 @@ That gives these rows of three:
 | 2 | Requester email | Title | Category |
 | 3 | Change type | Priority | Risk |
 | 4 | Impact | Planned start | Planned end |
-| 5 | Network / enclave | Location | Affected systems |
-| 6 | Outage expected? | Outage duration | |
+| 5 | Outage expected? | Outage duration | Location |
+| 6 | Affected systems *(spans all three columns, one line tall)* | | |
 
-Below those rows come the four full-width fields (2e). The four hidden system fields stay at the bottom.
+Below those rows come the four full-width fields (2d). The four hidden system fields stay at the bottom.
 
-### 2c. Network / enclave drop-down
-This is the same pattern as A6 Program.
-
-1. Expand **`Enclave_DataCard…`** and select its text box (`DataCardValueN`). Set **Visible** to `false`.
-2. Select the **card**, choose **+ Insert › Drop down**, and check that it lands inside the card. Rename it `drpEnclave` and set:
-
-   | Property | Value |
-   |---|---|
-   | Items | `EnclaveChoices` |
-   | AllowEmptySelection | `true` |
-   | Default | `""` |
-   | Reset | `varResetNew` |
-   | X / Y | `DataCardValueN.X` / `DataCardValueN.Y` *(the hidden text box)* |
-   | Width / Height | `DataCardValueN.Width` / `FormValueHeight` |
-
-3. Select the **card** and set **Update** to `drpEnclave.Selected.Value`, and **Required** to `true`.
-
-### 2d. Location, Affected systems and the outage fields
+### 2c. Location, Affected systems and the outage fields
 1. **Location card:**
    - **Required** = `true`
    - text box **HintText** = `"Base and building, e.g. Ramstein AB, Bldg 400"`
-2. **AffectedSystems card:**
+2. **AffectedSystems card:** full width, but only one line tall.
    - **Required** = `true`
-   - text box **HintText** = `"e.g. VDI servers, Exchange"`
+   - **WidthFit** = `false` and **Width** = `frmNew.Width - 40` (on the card)
+   - text box **HintText** = `"e.g. VDI servers, Exchange"`, **Mode** = `TextMode.SingleLine`, **Height** = `FormValueHeight`
 3. **OutageExpected card:** the card contains a **Toggle**. Rename it `tglOutage` and set:
    - **TrueText** = `"Yes"`
    - **FalseText** = `"No"`
@@ -127,7 +103,7 @@ This is the same pattern as A6 Program.
 
 The duration box is greyed out until **Outage expected?** is switched to **Yes**. Once it's Yes, the duration is required.
 
-### 2e. Make the four big fields full width
+### 2d. Make the four big fields full width
 For each of the **Description**, **ImpactDetails**, **Justification** and **Attachments** cards:
 
 1. Select the **card** and set:
@@ -153,7 +129,7 @@ For each of the **Description**, **ImpactDetails**, **Justification** and **Atta
    drpChangeType.Selected.Value = "Emergency"
    ```
 
-### 2f. Smaller text and tighter spacing
+### 2e. Smaller text and tighter spacing
 This uses the sizes already in App.Formulas (`FormLabelSize`, `FormLabelHeight`, `FormValueHeight`). For each **visible** card in `frmNew`, expand it in the Tree view, then:
 
 | Select | Property | Value |
@@ -164,14 +140,14 @@ This uses the sizes already in App.Formulas (`FormLabelSize`, `FormLabelHeight`,
 
 **Which is the value control?**
 - **Text cards:** the `DataCardValue…`.
-- **Drop-down and picker cards:** `drpA6Program`, `cmbRequestedBy`, `drpEnclave`, and the five choice drop-downs (`drpCategory` and so on), not their hidden combo boxes.
+- **Drop-down and picker cards:** `drpA6Program`, `cmbRequestedBy`, and the five choice drop-downs (`drpCategory` and so on), not their hidden combo boxes.
 - **Outage expected?:** `tglOutage`.
 - **Dates:** `DateValue…`, `HourValue…` and `MinuteValue…` together, with the small hour and minute settings from the detail screen.
-- **The four full-width cards:** set **Size** only, and keep their taller heights from 2e.
+- **The four full-width cards:** set **Size** only, and keep their taller heights from 2d.
 
 > **If a card's controls overlap or leave a gap:** select the value control and set its **Y** to `DataCardKeyN.Y + DataCardKeyN.Height + 2`, using that card's own label name.
 
-### 2g. Friendly labels
+### 2f. Friendly labels
 Select each card's `DataCardKey…` and set **Text**:
 
 | Card | Text |
@@ -181,32 +157,29 @@ Select each card's `DataCardKey…` and set **Text**:
 | RequesterEmail | `"Requester email"` |
 | ChangeType | `"Change type"` |
 | PlannedStart / PlannedEnd | `"Planned start"` / `"Planned end"` |
-| Enclave | `"Network / enclave"` |
 | AffectedSystems | `"Affected systems"` |
 | OutageExpected | `"Outage expected?"` |
 | OutageDuration | `"Outage duration"` |
 | ImpactDetails | `"Impact details"` |
 | Attachments | `"Rollback Plan (required) and other attachments"` |
 
-### 2h. Reset the new drop-down and toggle
-`drpEnclave` already uses `varResetNew` (2c). Set **`tglOutage` › Reset** to `varResetNew` too. Then **+ Request a New Change** always opens with the enclave empty and the outage switch on **No**.
+### 2g. Reset the outage switch
+Set **`tglOutage` › Reset** to `varResetNew`. Then **+ Request a New Change** always opens with the outage switch on **No**.
 
 ---
 
 ## Part 3 — Show the new fields on the detail screen (`frmDetail`)
 
-1. Select `frmDetail`, click **Edit fields › + Add field**, tick all seven new fields, and click **Add**.
+1. Select `frmDetail`, click **Edit fields › + Add field**, tick all six new fields, and click **Add**.
 2. Drag them into place:
-   - **Enclave**, **Location**, **AffectedSystems**, **OutageExpected** and **OutageDuration** go just after **PlannedEnd**.
+   - **OutageExpected**, **OutageDuration**, **Location** and **AffectedSystems** go just after **PlannedEnd**.
    - **ImpactDetails** and **Justification** go just before **Attachments**.
-3. **Unlock** the seven cards, then set on each **card**:
+3. **Unlock** the six cards, then set on each **card**:
    - **DisplayMode** = `If(varCR.Stage.Value = "Requested", DisplayMode.Edit, DisplayMode.View)`
 4. **ImpactDetails and Justification:** set the **card**'s **WidthFit** = `false` and **Width** = `frmDetail.Width - 40`. Set the text box's **Mode** = `TextMode.MultiLine` and **Height** = `90`.
-5. **Sizes:** apply the sizes from 2f, and the labels from 2g.
+   **AffectedSystems:** set the **card**'s **WidthFit** = `false` and **Width** = `frmDetail.Width - 40` as well, but keep its text box one line tall.
+5. **Sizes:** apply the sizes from 2e, and the labels from 2f.
 
-Enclave shows as a plain text box on the detail screen. It's editable only in *Requested*, like the other request fields. For a drop-down there too, use the A6 Program detail pattern:
-- **Default:** `ThisItem.Enclave`
-- **Card Update:** `Coalesce(drpEnclaveDetail.Selected.Value, ThisItem.Enclave)`
 
 ---
 
@@ -267,7 +240,7 @@ SharePoint stores dates in UTC, so the expressions convert them to **W. Europe S
 <tr><td><b>Risk / Impact</b></td><td>@{triggerOutputs()?['body/Risk/Value']} / @{triggerOutputs()?['body/Impact/Value']}</td></tr>
 <tr><td><b>Planned</b></td><td>@{outputs('PlannedStartText')} to @{outputs('PlannedEndText')}</td></tr>
 <tr><td><b>Outage</b></td><td>@{outputs('OutageText')}</td></tr>
-<tr><td><b>Network / location</b></td><td>@{triggerOutputs()?['body/Enclave']} · @{triggerOutputs()?['body/Location']}</td></tr>
+<tr><td><b>Location</b></td><td>@{triggerOutputs()?['body/Location']}</td></tr>
 <tr><td><b>Affected systems</b></td><td>@{triggerOutputs()?['body/AffectedSystems']}</td></tr>
 <tr><td valign="top"><b>Description</b></td><td>@{triggerOutputs()?['body/Description']}</td></tr>
 <tr><td valign="top"><b>Impact details</b></td><td>@{triggerOutputs()?['body/ImpactDetails']}</td></tr>
@@ -493,19 +466,18 @@ The case values must match the stage names exactly, including spaces and capital
 |---|---|---|
 | 1 | Click **+ Request a New Change** | Three columns and smaller text; rows match 2b; the four big fields are full width at the bottom |
 | 2 | Look at **Outage duration** | Greyed out while **Outage expected?** is *No*; editable and required once it's *Yes* |
-| 3 | Open **Network / enclave** | Lists your `EnclaveChoices` |
-| 4 | Submit without Location, Enclave or Affected systems | Error: *Fill in every field marked with a red star* |
-| 5 | Submit a full **Software** request with an outage | Saved; SharePoint shows all the new fields filled in |
-| 6 | Open it on the detail screen | The new fields show, editable while in *Requested* |
-| 7 | Wait up to 5 minutes | **CM** and **SW managers** get the new-request email, with the Outage, Network and Location rows; marked High importance if you did the tip in 4e |
-| 8 | Submit a **Hardware** and a **Network** request | HW managers get only the Hardware one; Network goes to CM only |
-| 9 | On the board, choose **Software** in the category filter | Only Software cards show, and the column counts update |
-| 10 | Choose **Emergency** in the type filter, then set both back to *All* | Only Emergency cards show, then everything again |
-| 11 | **Move** a request to CAB | The CAB gets *"… is ready for CAB review"*, with the comment |
-| 12 | **Send back** a request to Requested | The requester gets *"… was sent back to you"* |
-| 13 | **Reject** a request | The requester (CC CM) gets *"… was rejected"* |
-| 14 | Use **Add comment** | No stage email is sent |
-| 15 | Click a link in an email *(if you did Part 5)* | The app opens on that request |
+| 3 | Submit without Location or Affected systems | Error: *Fill in every field marked with a red star* |
+| 4 | Submit a full **Software** request with an outage | Saved; SharePoint shows all the new fields filled in |
+| 5 | Open it on the detail screen | The new fields show, editable while in *Requested* |
+| 6 | Wait up to 5 minutes | **CM** and **SW managers** get the new-request email, with the Outage and Location rows; marked High importance if you did the tip in 4e |
+| 7 | Submit a **Hardware** and a **Network** request | HW managers get only the Hardware one; Network goes to CM only |
+| 8 | On the board, choose **Software** in the category filter | Only Software cards show, and the column counts update |
+| 9 | Choose **Emergency** in the type filter, then set both back to *All* | Only Emergency cards show, then everything again |
+| 10 | **Move** a request to CAB | The CAB gets *"… is ready for CAB review"*, with the comment |
+| 11 | **Send back** a request to Requested | The requester gets *"… was sent back to you"* |
+| 12 | **Reject** a request | The requester (CC CM) gets *"… was rejected"* |
+| 13 | Use **Add comment** | No stage email is sent |
+| 14 | Click a link in an email *(if you did Part 5)* | The app opens on that request |
 
 **If something goes wrong:**
 - **The new fields aren't in Edit fields:** refresh the data source (end of Part 1).

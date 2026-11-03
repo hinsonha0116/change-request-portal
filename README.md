@@ -19,7 +19,7 @@ A Microsoft 365 change-request portal. Requests are submitted through a Microsof
 | [Rollback-Plan-Template.pdf](Rollback-Plan-Template.pdf) | Fillable Rollback Plan form that requesters attach to every change |
 | [Build-RollbackPdf.ps1](Build-RollbackPdf.ps1) | Regenerates the Rollback Plan PDF: `./Build-RollbackPdf.ps1 -OutFile .\Rollback-Plan-Template.pdf` |
 | [Migration-Guide.md](Migration-Guide.md) | Step-by-step move from a test SharePoint site to the production site: lists, form, flow, app, permissions, testing and go-live |
-| [DetailScreen-Fixes.md](DetailScreen-Fixes.md) | Latest app update, not yet in the guide: new request fields (Impact details, Justification, Location, Network/enclave, Affected systems, Outage), New Request clean-up, board filters, and email notifications for new requests and stage changes |
+| [DetailScreen-Fixes.md](DetailScreen-Fixes.md) | Latest app update, not yet in the guide: new request fields (Impact details, Justification, Location, Affected systems, Outage), New Request clean-up, board filters, and email notifications for new requests and stage changes |
 | [Forward-Schedule-of-Change.md](Forward-Schedule-of-Change.md) | Step-by-step build of the Schedule screen: a month calendar of planned changes with clash warnings and a day panel |
 | [Troubleshooting-Notes.md](Troubleshooting-Notes.md) | Resolved notes from the New Request screen work. Explains why the choice fields use classic Drop downs |
 | [docs/](docs/) | Screen layout diagrams used in the guide, and `Build-Mockups.ps1`, which regenerates them |

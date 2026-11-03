@@ -328,10 +328,10 @@ for ($k = 0; $k -lt 42; $k++) {
 # day panel
 $c += Txt 964 92 'Tuesday 10 November 2026' 15 '#111827' 'bold'
 $list = @(
-    @('10 Nov 08:00  →  10 Nov 12:00', 'CR-00012  Server move', 'VDI · Ramstein AB, Bldg 400 · NIPR', 'Implementation  ·  ⚠ Outage 30 minutes  ·  ⛔ Possible clash', 3, $true),
-    @('10 Nov 10:00  →  10 Nov 14:00', 'CR-00014  VDI patching', 'VDI · Ramstein AB, Bldg 400 · NIPR', 'Change Advisory Board  ·  ⛔ Possible clash', 1, $true),
-    @('10 Nov 13:00  →  10 Nov 15:00', 'CR-00009  SharePoint site', 'Collaboration Services · Bldg 2120 · NIPR', 'Requested', 0, $false),
-    @('10 Nov 16:00  →  10 Nov 17:00', 'CR-00016  Printer rollout', 'Exec Comm · Bldg 2120 · NIPR', 'Close', 5, $false)
+    @('10 Nov 08:00  →  10 Nov 12:00', 'CR-00012  Server move', 'VDI · Ramstein AB, Bldg 400', 'Implementation  ·  ⚠ Outage 30 minutes  ·  ⛔ Possible clash', 3, $true),
+    @('10 Nov 10:00  →  10 Nov 14:00', 'CR-00014  VDI patching', 'VDI · Ramstein AB, Bldg 400', 'Change Advisory Board  ·  ⛔ Possible clash', 1, $true),
+    @('10 Nov 13:00  →  10 Nov 15:00', 'CR-00009  SharePoint site', 'Collaboration Services · Bldg 2120', 'Requested', 0, $false),
+    @('10 Nov 16:00  →  10 Nov 17:00', 'CR-00016  Printer rollout', 'Exec Comm · Bldg 2120', 'Close', 5, $false)
 )
 $ly = 104
 foreach ($l in $list) {

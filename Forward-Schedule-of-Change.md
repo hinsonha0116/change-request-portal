@@ -9,12 +9,12 @@ A new **Schedule** screen shows every change with planned dates on a month calen
 **What it does:**
 - **Month grid:** each day lists the changes planned for it as coloured chips. A chip's colour is the request's **stage**, the same colours as the board columns. Days with more than three changes show *"+N more"*.
 - **Conflicts:** a chip gets a **red outline** when it overlaps in time with another change at the **same location** or for the **same A6 program**.
-- **Day panel:** click a day to list its changes on the right, with times, program, location, network, stage, an outage warning and a conflict warning. Click a change to open it.
+- **Day panel:** click a day to list its changes on the right, with times, program, location, stage, an outage warning and a conflict warning. Click a change to open it.
 - **Navigation:** **‹ ›** move between months and **Today** jumps back to now. **Schedule** on the board opens the calendar, and **← Schedule** on the detail screen comes back to it.
 - **Who sees what:** the same rule as the board. CM, CAB and Authority see every change, and everyone else sees only their own.
 
 **Before you start:** do **Parts 1–3 and 6** of the current updates document ([DetailScreen-Fixes.md](DetailScreen-Fixes.md)) first. This screen uses:
-- the **Location**, **Enclave** and **Outage** fields,
+- the **Location** and **Outage** fields,
 - the gap kept in the board header for the Schedule button.
 
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. You can also type X, Y, Width and Height into the **Properties** pane on the right.
@@ -239,7 +239,7 @@ Click the first item of `galDayList` until the pencil ✎ shows, then insert the
 | 2 | Rectangle | `rectDLStage` | X `0` · Y `0` · Width `5` · Height `Parent.TemplateHeight - 4` · Fill: `LookUp(Stages, Name = ThisItem.Stage.Value).Color` |
 | 3 | Text label | `lblDLTime` | X `12` · Y `4` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · Color: `RGBA(0,0,0,0.6)` · Text: `Text(ThisItem.PlannedStart, "dd mmm hh:mm") & "  →  " & Text(ThisItem.EndAt, "dd mmm hh:mm")` |
 | 4 | Text label | `lblDLTitle` | X `12` · Y `22` · Width `Parent.TemplateWidth - 16` · Height `20` · Size `11` · FontWeight: `FontWeight.Semibold` · Text: `"CR-" & Text(ThisItem.ID, "00000") & "  " & ThisItem.Title` |
-| 5 | Text label | `lblDLMeta` | X `12` · Y `42` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · Text: `ThisItem.A6Program & " · " & ThisItem.Location & " · " & ThisItem.Enclave` |
+| 5 | Text label | `lblDLMeta` | X `12` · Y `42` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · Text: `ThisItem.A6Program & " · " & ThisItem.Location` |
 | 6 | Text label | `lblDLFlags` | X `12` · Y `62` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · FontWeight: `FontWeight.Semibold` · Text and Color: see below |
 
 **`lblDLFlags` › Text:**
@@ -294,7 +294,7 @@ Make sure a few requests have **Planned start** and **Planned end** dates this m
 | 1 | On the board, click **Schedule** | The calendar opens on the current month; today's number is highlighted navy and selected (light blue) |
 | 2 | Look at the grid | Each planned change shows as a chip on its days, coloured by stage; multi-day changes appear on every day |
 | 3 | Look at the two overlapping changes | Both chips have a **red outline** |
-| 4 | Click an empty part of a day | The right panel lists that day's changes, with time, program, location, network and stage; the clashing ones show *⛔ Possible clash* in red |
+| 4 | Click an empty part of a day | The right panel lists that day's changes, with time, program, location and stage; the clashing ones show *⛔ Possible clash* in red |
 | 5 | Check a change with an outage | The panel shows *⚠ Outage 30 minutes* (its duration) in amber |
 | 6 | Click **›**, then **‹**, then **Today** | Moves a month forward, a month back, then returns to the current month |
 | 7 | Click a chip or a panel entry | That request opens on the detail screen, and the button says **← Schedule** |
