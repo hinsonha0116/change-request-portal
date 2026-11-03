@@ -20,12 +20,13 @@ These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Re
    - the **Change Authority** at their stage,
    - the **requester** when it's sent back, approved, rejected or closed,
    - the **CM team** when it's implemented.
+8. **Detail screen clean-up** (Part 8, at the end): the newer fields get compact sizes and labels, the decisions share a row, empty fields are hidden once read-only, the outage switch shows *Yes/No*, Assignee shows a name, and read-only dates show on one line.
 
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. You can also type X, Y, Width and Height into the **Properties** pane on the right.
 
 > **Control names:** each field (card) has a label `DataCardKeyN` and a value `DataCardValueN`. The numbers differ in every app, so expand a card in the Tree view to see its real names.
 
-**Time:** about 3 hours in total. Do the parts in order, because the emails and filters use the columns from Part 1.
+**Time:** about 3½ hours in total. Do the parts in order, because the emails and filters use the columns from Part 1.
 
 **Coming later** (after the move to production): **App Roles**, a SharePoint list that holds the CM, CAB, Authority and manager emails in one place, for both the app and the flows.
 
@@ -489,3 +490,119 @@ The case values must match the stage names exactly, including spaces and capital
 - **The email shows `@{...}` text:** rebuild those parts with **Dynamic content** (see the note in 4c).
 - **The times are off:** change the time zone name in `PlannedStartText` and `PlannedEndText`.
 - **Anything else in the app:** open the **App checker** (the stethoscope icon) and send me the exact text of any red error banner.
+
+---
+
+## Part 8 — Detail screen clean-up (read-only fields)
+
+This tidies the detail screen once a request has moved past *Requested*:
+- the newer fields get the compact sizes and friendly labels,
+- the decisions share a row,
+- empty fields are hidden,
+- the Outage switch reads *Yes/No*,
+- Assignee shows a name,
+- read-only dates show on one line.
+
+All changes are in `frmDetail` on the **DetailScreen**. Unlock each card first if needed: **Properties › Advanced › 🔒 Unlock to change properties**.
+
+### 8a. Sizes and labels on the newer cards
+For **OutageExpected**, **OutageDuration**, **Location**, **AffectedSystems**, **ImpactDetails**, **Justification**, **CABDecision**, **AuthorityDecision**, **Assignee**, **ActualStart**, **ActualEnd** and **ReviewOutcome**, apply the same steps as the rest of the form:
+
+| Select | Property | Value |
+|---|---|---|
+| **Ctrl+click** the `DataCardKey…` **and** the value control (same card) | Size | `FormLabelSize` |
+| The `DataCardKey…` only | Height | `FormLabelHeight` |
+| The value control only | Height | `FormValueHeight` *(not ImpactDetails or Justification, which keep `90`)* |
+
+Then set each label's **Text**:
+
+| Card | Text |
+|---|---|
+| OutageExpected | `"Outage expected?"` |
+| OutageDuration | `"Outage duration"` |
+| AffectedSystems | `"Affected systems"` |
+| ImpactDetails | `"Impact details"` |
+| CABDecision | `"CAB decision"` |
+| AuthorityDecision | `"Authority decision"` |
+| ActualStart / ActualEnd | `"Actual start"` / `"Actual end"` |
+| ReviewOutcome | `"Review outcome"` |
+
+### 8b. Let the decisions share a row
+If **CABDecision** or **AuthorityDecision** sits alone on its row, its card is stretching to fill the row. Select each of those **cards** and set **WidthFit** = `false`.
+
+Check **Assignee**, **ActualStart**, **ActualEnd** and **ReviewOutcome** the same way. Only the full-width cards should have a fixed full **Width**: ImpactDetails, Justification, AffectedSystems and Attachments.
+
+### 8c. Hide empty fields once they can't be edited
+Set each **card**'s **Visible**:
+
+| Card | Visible |
+|---|---|
+| OutageDuration | `ThisItem.OutageExpected \|\| varCR.Stage.Value = "Requested"` |
+| Location | `!IsBlank(ThisItem.Location) \|\| varCR.Stage.Value = "Requested"` |
+| AffectedSystems | `!IsBlank(ThisItem.AffectedSystems) \|\| varCR.Stage.Value = "Requested"` |
+| ImpactDetails | `!IsBlank(ThisItem.ImpactDetails) \|\| varCR.Stage.Value = "Requested"` |
+| Justification | `!IsBlank(ThisItem.Justification) \|\| varCR.Stage.Value = "Requested"` |
+
+How it behaves:
+- **While the request is in *Requested*,** every field shows, so it can be filled in.
+- **At later stages,** an empty field disappears and the rest move up.
+- **Hidden cards still save** their existing values, so nothing is lost.
+
+### 8d. "Off" → "Yes / No"
+Select the toggle inside **OutageExpected** and set:
+- **TrueText** = `"Yes"`
+- **FalseText** = `"No"`
+
+### 8e. Assignee shows a name, not `i:0#.f|membership…`
+1. Select the combo box inside the **Assignee** card and set **DisplayFields** = `["DisplayName"]`.
+2. If it **still** shows the long ID when the request is read-only:
+   1. Set the combo box's **Visible** to `Parent.DisplayMode = DisplayMode.Edit`.
+   2. Select the **card**, insert a **Text label** inside it, rename it `lblAssigneeView`, and set:
+
+      | Property | Value |
+      |---|---|
+      | Text | see below |
+      | Visible | `Parent.DisplayMode = DisplayMode.View` |
+      | X / Y / Width | the combo box's X, Y and Width |
+      | Height / Size | `FormValueHeight` / `FormLabelSize` |
+
+      **Text** shows the short name, in the same *First Last* style as the board:
+      ```powerfx
+      With({n: ThisItem.Assignee.DisplayName},
+          If(Find(",", n) > 0,
+              Proper(First(Split(Trim(Mid(n, Find(",", n) + 1)), " ")).Value & " " & Trim(Left(n, Find(",", n) - 1))),
+              n))
+      ```
+
+### 8f. Read-only dates on one line
+For each date card (**PlannedStart**, **PlannedEnd**, **ActualStart**, **ActualEnd**):
+
+1. **Ctrl+click** its `DateValue…`, `HourValue…` and `MinuteValue…` (same card) and set **Visible** = `Parent.DisplayMode = DisplayMode.Edit`. Also hide the small `:` label if there is one.
+2. Select the **card**, insert a **Text label** inside it, and set:
+
+   | Property | Value |
+   |---|---|
+   | Text | `If(IsBlank(ThisItem.PlannedStart), "—", Text(ThisItem.PlannedStart, "dd mmm yyyy  hh:mm"))` *(use that card's own column, e.g. `ThisItem.ActualEnd`)* |
+   | Visible | `Parent.DisplayMode = DisplayMode.View` |
+   | X / Y | the `DateValue…` control's X and Y |
+   | Width | `Parent.Width - 40` |
+   | Height / Size | `FormValueHeight` / `FormLabelSize` |
+
+Read-only dates show as **22 Oct 2026  11:00**. Whenever the card is editable, the pickers come back instead:
+- **PlannedStart and PlannedEnd** in *Requested*,
+- **ActualStart and ActualEnd** in *Implementation*.
+
+The card still saves from the hidden pickers, so nothing changes in SharePoint.
+
+### Part 8 tests
+
+| # | Do this | Expect |
+|---|---|---|
+| 1 | Open a request past *Requested* with no Location, Affected systems or outage | Those fields are hidden; the rest move up with no gaps |
+| 2 | Open a request in *Requested* | Every field shows and can be edited, including empty ones |
+| 3 | Look at **CAB decision** and **Authority decision** | They sit side by side with other fields, not alone on a row |
+| 4 | Look at **Outage expected?** | Shows *Yes* or *No*, not *On/Off* |
+| 5 | Open a request with an Assignee, at *Review* or *Close* | Shows a short name, e.g. *Hayley Hinson* |
+| 6 | Look at the planned dates on a request at *CAB* or later | One line each, e.g. *22 Oct 2026  11:00* |
+| 7 | Open a request in *Implementation* | Actual start and end show date pickers; set them, **Save changes**, and reopen to check they saved |
+| 8 | Open a request in *Requested*, change a planned date and save | The pickers show, and the new date saves |
