@@ -21,12 +21,13 @@ These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Re
    - the **requester** when it's sent back, approved, rejected or closed,
    - the **CM team** when it's implemented.
 8. **Detail screen clean-up** (Part 8, at the end): the newer fields get compact sizes and labels, the decisions share a row, empty fields are hidden once read-only, the outage switch shows *Yes/No*, Assignee shows a name, and read-only dates show on one line.
+9. **Technical Review Board** (Part 9, at the end): a TRB stage for Normal changes, a route for each change type (Standard goes straight to Implementation, then Close), *Needs changes*, a TRB checklist, Informational removed for new requests, and a **Completed** button that emails the CM team.
 
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. You can also type X, Y, Width and Height into the **Properties** pane on the right.
 
 > **Control names:** each field (card) has a label `DataCardKeyN` and a value `DataCardValueN`. The numbers differ in every app, so expand a card in the Tree view to see its real names.
 
-**Time:** about 3½ hours in total. Do the parts in order, because the emails and filters use the columns from Part 1.
+**Time:** about 5½ hours in total. Do the parts in order, because the emails and filters use the columns from Part 1.
 
 **Coming later** (after the move to production): **App Roles**, a SharePoint list that holds the CM, CAB, Authority and manager emails in one place, for both the app and the flows.
 
@@ -385,10 +386,12 @@ Every Move, Send back and Reject already adds a row to **Change Request History*
 
 | Moved to | Who gets the email | Subject starts with |
 |---|---|---|
-| Requested *(sent back)* | Requester | *CR-… was sent back to you* |
+| Requested *(sent back, or TRB "needs changes")* | Requester | *CR-… was sent back to you* or *CR-… needs changes before TRB review* |
+| Technical Review Board | TRB members | *CR-… is ready for TRB review* |
 | Change Advisory Board | CAB members | *CR-… is ready for CAB review* |
 | Change Authority | Change Authorities | *CR-… is awaiting Change Authority approval* |
 | Implementation | Requester, CC CM team | *CR-… is approved for implementation* |
+| Implementation complete *(the **Completed** button, Part 9)* | CM team | *CR-… has been completed by the implementer* |
 | Review | CM team | *CR-… has been implemented and is ready for review* |
 | Close | Requester, CC CM team | *CR-… is closed* or *CR-… was rejected* |
 
@@ -413,6 +416,7 @@ Comments (Add comment) and new submissions don't send these emails.
    | Name | Type | Value |
    |---|---|---|
    | `CMTeamEmails` | String | same as Part 4 |
+   | `TRBEmails` | String | `trb.chair@us.af.mil;trb.member@us.af.mil` |
    | `CABEmails` | String | `cab.chair@us.af.mil;cab.member@us.af.mil` |
    | `AuthorityEmails` | String | `change.authority@us.af.mil` |
 
@@ -444,10 +448,12 @@ Comments (Add comment) and new submissions don't send these emails.
 
 | Case equals | To | CC | Subject (expression) |
 |---|---|---|---|
-| `Requested` | `outputs('RequesterEmails')` | | `concat(outputs('CRNumber'), ' was sent back to you: ', body('Get_item')?['Title'])` |
+| `Requested` | `outputs('RequesterEmails')` | | `concat(outputs('CRNumber'), if(startsWith(triggerOutputs()?['body/Comment'], 'NEEDS CHANGES'), ' needs changes before TRB review: ', ' was sent back to you: '), body('Get_item')?['Title'])` |
+| `Technical Review Board` | `variables('TRBEmails')` | | `concat(outputs('CRNumber'), ' is ready for TRB review: ', body('Get_item')?['Title'])` |
 | `Change Advisory Board` | `variables('CABEmails')` | | `concat(outputs('CRNumber'), ' is ready for CAB review: ', body('Get_item')?['Title'])` |
 | `Change Authority` | `variables('AuthorityEmails')` | | `concat(outputs('CRNumber'), ' is awaiting Change Authority approval: ', body('Get_item')?['Title'])` |
 | `Implementation` | `outputs('RequesterEmails')` | `variables('CMTeamEmails')` | `concat(outputs('CRNumber'), ' is approved for implementation: ', body('Get_item')?['Title'])` |
+| `Implementation complete` | `variables('CMTeamEmails')` | | `concat(outputs('CRNumber'), ' has been completed by the implementer: ', body('Get_item')?['Title'])` |
 | `Review` | `variables('CMTeamEmails')` | | `concat(outputs('CRNumber'), ' has been implemented and is ready for review: ', body('Get_item')?['Title'])` |
 | `Close` | `outputs('RequesterEmails')` | `variables('CMTeamEmails')` | `concat(outputs('CRNumber'), if(equals(body('Get_item')?['ReviewOutcome']?['Value'], 'Rejected'), ' was rejected: ', ' is closed: '), body('Get_item')?['Title'])` |
 
@@ -606,3 +612,402 @@ The card still saves from the hidden pickers, so nothing changes in SharePoint.
 | 6 | Look at the planned dates on a request at *CAB* or later | One line each, e.g. *22 Oct 2026  11:00* |
 | 7 | Open a request in *Implementation* | Actual start and end show date pickers; set them, **Save changes**, and reopen to check they saved |
 | 8 | Open a request in *Requested*, change a planned date and save | The pickers show, and the new date saves |
+
+---
+
+## Part 9 — Technical Review Board, routing by change type, and a Completed button
+
+**What changes:**
+- **New stage: Technical Review Board (TRB),** between Requested and CAB. **Only Normal changes** go through it.
+- **Each change type follows its own route:**
+
+  | Change type | Route |
+  |---|---|
+  | **Normal** | Requested → **TRB** → CAB → Change Authority → Implementation → Review → Close |
+  | **Emergency** | Requested → CAB → Change Authority → Implementation → Review → Close |
+  | **Standard** | Requested → Implementation → Close |
+  | *Informational (existing requests only)* | Requested → CAB → Change Authority → Implementation → Review → Close |
+
+- **Informational** can no longer be chosen for new requests. Existing Informational requests are left as they are and keep their old route.
+- **TRB decision:** *Approved*, *Needs changes* or *Rejected*.
+  - **Needs changes** sends the request straight back to the requester, with the TRB's comment.
+  - When the CM team moves it on again, the decision resets to *Pending*.
+- **TRB checklist:** three Yes/No checks (rollback plan reviewed, tested, security/STIG impact reviewed). **None is required** for now.
+- **A TRB tab** in the notes box, and the **progress tracker** shows only the stages on that request's route.
+- **The Completed button:** during **Implementation**, it marks the work as done and emails the **CM team** (Part 7 flow), who then move the request on. On the board, the card shows **✔ Complete**.
+
+> **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. Unlock form cards first if needed: **Properties › Advanced › 🔒 Unlock to change properties**.
+
+**Time:** about 2 hours.
+
+### 9a. SharePoint changes (Change Requests list)
+1. **Stage column:** open its settings and add the choice `Technical Review Board`, directly **after** `Requested`. Keep the spelling and capitals exactly as shown.
+2. **ChangeType column:** delete the choice `Informational`. Existing requests keep their value. It just can't be picked for new ones.
+3. **Add these columns:**
+
+   | Name | Type | Settings |
+   |---|---|---|
+   | `TRBDecision` | Choice | `Pending`, `Approved`, `Needs changes`, `Rejected` · default **Pending** |
+   | `TRBNotes` | Multiple lines of text | More options › *Use enhanced rich text* **off** |
+   | `TRBRollbackReviewed` | Yes/No | Default **No** |
+   | `TRBTested` | Yes/No | Default **No** |
+   | `TRBSecurityReviewed` | Yes/No | Default **No** |
+   | `ImplementationComplete` | Yes/No | Default **No** |
+
+4. In Power Apps Studio, go to **Data › ⋯ › Refresh** next to **Change Requests**.
+
+### 9b. App.Formulas
+**Replace** the existing `Stages` table with the one below. The new **Short** field gives the board shorter column titles. The **Types** field lists the change types that pass through each stage, and that one list controls every route in the app.
+
+```powerfx
+Stages = Table(
+    {Order: 1, Name: "Requested",              Short: "Requested",      Color: ColorValue("#6B7280"), Types: "Standard,Normal,Emergency,Informational"},
+    {Order: 2, Name: "Technical Review Board", Short: "TRB",            Color: ColorValue("#0D9488"), Types: "Normal"},
+    {Order: 3, Name: "Change Advisory Board",  Short: "CAB",            Color: ColorValue("#2563EB"), Types: "Normal,Emergency,Informational"},
+    {Order: 4, Name: "Change Authority",       Short: "Authority",      Color: ColorValue("#7C3AED"), Types: "Normal,Emergency,Informational"},
+    {Order: 5, Name: "Implementation",         Short: "Implementation", Color: ColorValue("#D97706"), Types: "Standard,Normal,Emergency,Informational"},
+    {Order: 6, Name: "Review",                 Short: "Review",         Color: ColorValue("#0891B2"), Types: "Normal,Emergency,Informational"},
+    {Order: 7, Name: "Close",                  Short: "Close",          Color: ColorValue("#16A34A"), Types: "Standard,Normal,Emergency,Informational"}
+);
+```
+
+To change a route later, for example when the Emergency process is finalised, edit the **Types** text on the stages concerned.
+
+Then make these changes:
+
+1. **Add the TRB members**, next to the CAB lines:
+   ```powerfx
+   TRBMembers = ["trb.chair@us.af.mil", "trb.member@us.af.mil"];
+   IsTRB      = Lower(User().Email) in TRBMembers;
+   ```
+2. **Let TRB members see every request.** Change `CanSeeAll` to:
+   ```powerfx
+   CanSeeAll = IsCM || IsTRB || IsCAB || IsAuthority;
+   ```
+3. **Remove `"Informational"`** from both `ChangeTypeChoices` and `ChangeTypeFilter`.
+4. **Replace the `NoteTabs` table** with this one, which adds the TRB tab:
+   ```powerfx
+   NoteTabs = Table(
+       {Key: "Description",    Label: "Description", StageName: "Requested"},
+       {Key: "TRB",            Label: "TRB",         StageName: "Technical Review Board"},
+       {Key: "CAB",            Label: "CAB",         StageName: "Change Advisory Board"},
+       {Key: "Authority",      Label: "Authority",   StageName: "Change Authority"},
+       {Key: "Implementation", Label: "Implement",   StageName: "Implementation"},
+       {Key: "Review",         Label: "Review",      StageName: "Review"}
+   );
+   ```
+
+### 9c. The board: seven columns
+1. **`galStages` › TemplateSize:** `Self.Width / 7 - 9`.
+2. **`lblHeader` › Text:** this uses the short names:
+   ```powerfx
+   ThisItem.Order & ". " & ThisItem.Short & "  (" & CountRows(galCards.AllItems) & ")"
+   ```
+3. **`lblId` (on each card):** shows **✔ Complete** once the implementer clicks Completed.
+   - **Text:**
+     ```powerfx
+     "CR-" & Text(ThisItem.ID, "00000") & If(ThisItem.Stage.Value = "Implementation" && ThisItem.ImplementationComplete, "   ✔ Complete", "")
+     ```
+   - **Color:**
+     ```powerfx
+     If(ThisItem.Stage.Value = "Implementation" && ThisItem.ImplementationComplete, ColorValue("#16A34A"), RGBA(0,0,0,0.55))
+     ```
+
+> Columns are about 186 pixels wide now, so long titles and names wrap or cut off sooner. If the **Close** column gets crowded, add `Stage.Value <> "Close" || ClosedDate >= DateAdd(Today(), -30)` to the `galCards` Filter to show only the last 30 days there.
+
+### 9d. Progress tracker shows only this request's route
+On the **DetailScreen**, set:
+
+| Control | Property | Value |
+|---|---|---|
+| `galProgress` | Items | `Filter(Stages, Coalesce(varCR.ChangeType.Value, "Normal") in Types)` |
+| `galProgress` | TemplateSize | `Self.Width / CountRows(Filter(Stages, Coalesce(varCR.ChangeType.Value, "Normal") in Types)) - 1` |
+| `lblStepNum` | Text | `CountRows(Filter(Stages, Coalesce(varCR.ChangeType.Value, "Normal") in Types, Order <= ThisItem.Order))` |
+
+The numbers count steps on that request's route. A Standard change shows **1 Requested · 2 Implementation · 3 Close**. `circStep` and `lblStepName` stay as they are.
+
+### 9e. TRB fields on the detail form
+1. Select `frmDetail` and click **Edit fields › + Add field**. Tick **TRBDecision**, **TRBRollbackReviewed**, **TRBTested**, **TRBSecurityReviewed**, **TRBNotes** and **ImplementationComplete**, then click **Add**.
+2. **Placement:**
+   - Drag the four TRB fields to just **before** CABDecision.
+   - Drag **TRBNotes** and **ImplementationComplete** to the **bottom**, with the other hidden cards.
+3. **Hidden cards:**
+   - On **TRBNotes**, set **Visible** = `false` and **Update** = `If(lblEditableNote.Text = "TRB", txtNote.Text, ThisItem.TRBNotes)`.
+   - On **ImplementationComplete**, set **Visible** = `false`. Leave its Update as it is.
+4. **On the four TRB cards:**
+   - **DisplayMode** = `If(varCR.Stage.Value = "Technical Review Board" && IsTRB, DisplayMode.Edit, DisplayMode.View)`
+   - Inside each of the three checklist cards, set the toggle's **TrueText** = `"Yes"` and **FalseText** = `"No"`.
+   - **Labels:** *TRB decision*, *Rollback plan reviewed*, *Tested in lab / test*, *Security / STIG impact reviewed*.
+   - Apply the sizes from Part 8a.
+5. **Update every stage card's Visible.** Each card appears once its stage is reached, but only if that stage is on the request's route. Use this pattern, putting the card's stage name in `"STAGE"`:
+   ```powerfx
+   With({s: LookUp(Stages, Name = "STAGE")},
+       LookUp(Stages, Name = varCR.Stage.Value).Order >= s.Order &&
+       Coalesce(varCR.ChangeType.Value, "Normal") in s.Types)
+   ```
+
+   | Cards | `"STAGE"` |
+   |---|---|
+   | TRBDecision, TRBRollbackReviewed, TRBTested, TRBSecurityReviewed | `"Technical Review Board"` |
+   | CABDecision | `"Change Advisory Board"` |
+   | AuthorityDecision | `"Change Authority"` |
+   | Assignee, ActualStart, ActualEnd | `"Implementation"` |
+   | ReviewOutcome | `"Review"` |
+
+   This **replaces** the old `.Order >= 2` / `>= 3` rules, which no longer line up now that the stages have moved. A Standard change will never show CAB, Authority or TRB fields.
+
+### 9f. Notes tabs
+| Control | Property | New value |
+|---|---|---|
+| `galNoteTabs` | Items | see below |
+| `galNoteTabs` | TemplateSize | `Self.Width / 6` |
+| `lblTab` | Size | `9` *(six tabs are tighter)* |
+
+**`galNoteTabs` › Items:**
+```powerfx
+With({curOrder: LookUp(Stages, Name = varCR.Stage.Value).Order, type: Coalesce(varCR.ChangeType.Value, "Normal")},
+    Filter(NoteTabs As t,
+        With({s: LookUp(Stages, Name = t.StageName)}, s.Order <= curOrder && type in s.Types)))
+```
+
+**`lblEditableNote` › Text:** add the TRB line:
+```powerfx
+Switch(varCR.Stage.Value,
+    "Requested",              "Description",
+    "Technical Review Board", If(IsTRB, "TRB", ""),
+    "Change Advisory Board",  If(IsCAB, "CAB", ""),
+    "Change Authority",       If(IsAuthority, "Authority", ""),
+    "Implementation",         "Implementation",
+    "Review",                 "Review",
+    "")
+```
+
+**Add `"TRB", varCR.TRBNotes,`** to the `Switch` in both of these, right after the `"Description"` line:
+- `txtNote` › **Default**
+- `lblNote` › **Text**
+
+**DetailScreen › OnVisible:** replace the `Set(varNoteTab, …)` line with this, which adds TRB:
+```powerfx
+Set(varNoteTab, Switch(varCR.Stage.Value,
+    "Technical Review Board", "TRB",
+    "Change Advisory Board",  "CAB",
+    "Change Authority",       "Authority",
+    "Implementation",         "Implementation",
+    "Review",                 "Review",
+    "Close",                  "Review",
+    "Description"))
+```
+
+### 9g. Action bar: Needs changes, Completed, and route-aware buttons
+**New layout** (every control at Y `Parent.Height - 62`, Height `44`):
+
+| Control | X | Width | Shown when |
+|---|---|---|---|
+| `btnSendBack` | 20 | 150 | CM, any stage except Requested and Close |
+| `btnReject` | 180 | 130 | TRB / CAB / Authority members at their stage |
+| `btnCompleted` *(new)* | 180 | 130 | Implementation, until marked complete |
+| `btnAddComment` | 320 | 120 | always |
+| `btnNeedsChanges` *(new)* | 450 | 150 | TRB members at the TRB stage |
+| `txtComment` | 610 | 395 | always |
+| `btnAdvance` | 1015 | 331 | CM, any stage except Close |
+
+`btnReject` and `btnCompleted` share a spot, because they're never visible at the same time.
+
+**`btnAdvance`** (OnSelect unchanged):
+- **Text:**
+  ```powerfx
+  With({type: Coalesce(varCR.ChangeType.Value, "Normal"), cur: LookUp(Stages, Name = varCR.Stage.Value)},
+      "Move to " & First(Sort(Filter(Stages, Order > cur.Order, type in Types), Order)).Name & " →")
+  ```
+- **Visible:** `varCR.Stage.Value <> "Close" && IsCM`
+
+**`btnSendBack`** (OnSelect unchanged) › **Visible:**
+```powerfx
+!(varCR.Stage.Value in ["Requested", "Close"]) && IsCM
+```
+
+**`btnReject`** (OnSelect unchanged) › **Visible:**
+```powerfx
+(varCR.Stage.Value = "Technical Review Board" && IsTRB) ||
+(varCR.Stage.Value = "Change Advisory Board" && IsCAB) ||
+(varCR.Stage.Value = "Change Authority" && IsAuthority)
+```
+
+**`btnNeedsChanges`:** insert a **Button** on DetailScreen and set:
+
+| Property | Value |
+|---|---|
+| Text | `"Needs changes"` |
+| Fill | `Color.White` |
+| Color / BorderColor | `ColorValue("#B45309")` |
+| Visible | `varCR.Stage.Value = "Technical Review Board" && IsTRB` |
+| OnSelect | `If(IsBlank(Trim(txtComment.Text)), Notify("Add a comment saying what needs to change.", NotificationType.Warning), Set(varAction, "needschanges"); SubmitForm(frmDetail))` |
+
+**`btnCompleted`:** insert a **Button** on DetailScreen and set:
+
+| Property | Value |
+|---|---|
+| Text | `"✔ Completed"` |
+| Fill | `ColorValue("#16A34A")` |
+| Visible | `varCR.Stage.Value = "Implementation" && !varCR.ImplementationComplete` |
+| OnSelect | `Set(varAction, "complete"); SubmitForm(frmDetail)` |
+
+Anyone who can open the request can click **Completed**, usually the implementer. It requires **Implementation notes** first. The comment box is optional and goes into the History.
+
+### 9h. `frmDetail` › OnSuccess (replace the whole formula)
+This version:
+- follows each change type's route,
+- adds the TRB approval rule, Needs changes and Completed,
+- resets the TRB decision when a request comes back to the TRB,
+- includes the TRB tab.
+
+```powerfx
+Set(varCR, Self.LastSubmit);
+With({type: Coalesce(varCR.ChangeType.Value, "Normal"), cur: LookUp(Stages, Name = varCR.Stage.Value)},
+Switch(varAction,
+    "advance",
+        With({nxt: First(Sort(Filter(Stages, Order > cur.Order, type in Types), Order))},
+            If(
+                cur.Name = "Technical Review Board" && varCR.TRBDecision.Value <> "Approved",
+                    Notify("The TRB decision must be Approved before this change can move on.", NotificationType.Error),
+                cur.Name = "Change Advisory Board" && varCR.CABDecision.Value <> "Approved",
+                    Notify("The CAB decision must be Approved before this change can move on.", NotificationType.Error),
+                cur.Name = "Change Authority" && varCR.AuthorityDecision.Value <> "Approved",
+                    Notify("The Change Authority decision must be Approved before this change can move on.", NotificationType.Error),
+                cur.Name = "Implementation" && IsBlank(varCR.ImplementationNotes),
+                    Notify("Add implementation notes before moving on.", NotificationType.Error),
+                cur.Name = "Review" && IsBlank(varCR.ReviewOutcome.Value),
+                    Notify("Choose a review outcome before closing.", NotificationType.Error),
+                Set(varCR, Patch('Change Requests', varCR, {
+                    Stage:      {Value: nxt.Name},
+                    ClosedDate: If(nxt.Name = "Close", Now())
+                }));
+                If(nxt.Name = "Technical Review Board",
+                    Set(varCR, Patch('Change Requests', varCR, {TRBDecision: {Value: "Pending"}})));
+                Patch('Change Request History', Defaults('Change Request History'), {
+                    Title: "CR-" & Text(varCR.ID, "00000"), RequestID: varCR.ID,
+                    FromStage: cur.Name, ToStage: nxt.Name, Comment: txtComment.Text
+                });
+                Reset(txtComment);
+                Notify("Moved to " & nxt.Name, NotificationType.Success)
+            )
+        ),
+    "back",
+        With({prv: First(Sort(Filter(Stages, Order < cur.Order, type in Types), Order, SortOrder.Descending))},
+            Set(varCR, Patch('Change Requests', varCR, {Stage: {Value: prv.Name}, ImplementationComplete: false}));
+            Patch('Change Request History', Defaults('Change Request History'), {
+                Title: "CR-" & Text(varCR.ID, "00000"), RequestID: varCR.ID,
+                FromStage: cur.Name, ToStage: prv.Name, Comment: txtComment.Text
+            });
+            Reset(txtComment);
+            Notify("Sent back to " & prv.Name, NotificationType.Warning)
+        ),
+    "reject",
+        Switch(cur.Name,
+            "Technical Review Board",
+                Set(varCR, Patch('Change Requests', varCR, {
+                    Stage: {Value: "Close"}, ReviewOutcome: {Value: "Rejected"}, ClosedDate: Now(),
+                    TRBDecision: {Value: "Rejected"},
+                    TRBNotes: Trim(varCR.TRBNotes & Char(10) & "REJECTED: " & txtComment.Text)})),
+            "Change Advisory Board",
+                Set(varCR, Patch('Change Requests', varCR, {
+                    Stage: {Value: "Close"}, ReviewOutcome: {Value: "Rejected"}, ClosedDate: Now(),
+                    CABDecision: {Value: "Rejected"},
+                    CABNotes: Trim(varCR.CABNotes & Char(10) & "REJECTED: " & txtComment.Text)})),
+            "Change Authority",
+                Set(varCR, Patch('Change Requests', varCR, {
+                    Stage: {Value: "Close"}, ReviewOutcome: {Value: "Rejected"}, ClosedDate: Now(),
+                    AuthorityDecision: {Value: "Rejected"},
+                    AuthorityNotes: Trim(varCR.AuthorityNotes & Char(10) & "REJECTED: " & txtComment.Text)}))
+        );
+        Patch('Change Request History', Defaults('Change Request History'), {
+            Title: "CR-" & Text(varCR.ID, "00000"), RequestID: varCR.ID,
+            FromStage: cur.Name, ToStage: "Close", Comment: "REJECTED: " & txtComment.Text
+        });
+        Reset(txtComment);
+        Notify("Change rejected and closed", NotificationType.Warning),
+    "needschanges",
+        Set(varCR, Patch('Change Requests', varCR, {
+            Stage: {Value: "Requested"},
+            TRBDecision: {Value: "Needs changes"},
+            TRBNotes: Trim(varCR.TRBNotes & Char(10) & "NEEDS CHANGES: " & txtComment.Text)
+        }));
+        Patch('Change Request History', Defaults('Change Request History'), {
+            Title: "CR-" & Text(varCR.ID, "00000"), RequestID: varCR.ID,
+            FromStage: cur.Name, ToStage: "Requested", Comment: "NEEDS CHANGES: " & txtComment.Text
+        });
+        Reset(txtComment);
+        Notify("Sent back to the requester for changes", NotificationType.Warning),
+    "complete",
+        If(IsBlank(varCR.ImplementationNotes),
+            Notify("Add implementation notes before marking it complete.", NotificationType.Error),
+            Set(varCR, Patch('Change Requests', varCR, {ImplementationComplete: true}));
+            Patch('Change Request History', Defaults('Change Request History'), {
+                Title: "CR-" & Text(varCR.ID, "00000"), RequestID: varCR.ID,
+                FromStage: "Implementation", ToStage: "Implementation complete", Comment: txtComment.Text
+            });
+            Reset(txtComment);
+            Notify("Marked complete. The CM team will be notified.", NotificationType.Success)
+        ),
+    Notify("Saved", NotificationType.Success)
+));
+If(varAction <> "save",
+    Set(varNoteTab, Switch(varCR.Stage.Value,
+        "Technical Review Board", "TRB",
+        "Change Advisory Board",  "CAB",
+        "Change Authority",       "Authority",
+        "Implementation",         "Implementation",
+        "Review",                 "Review",
+        "Close",                  "Review",
+        "Description")));
+Set(varAction, Blank())
+```
+
+**How the routes work:**
+- **Move** goes to the next stage on that request's route, and **Send back** to the previous one.
+- **Normal:** sent back from CAB, it returns to the **TRB**. From the TRB, it returns to Requested.
+- **Emergency:** sent back from CAB, it returns to **Requested**.
+- **Standard:** sent back from Implementation, it returns to **Requested**. Moved from Implementation, it goes straight to **Close**.
+
+### 9i. History shows "✔ Implementation complete"
+Select `lblHistMove` (inside `galHistory`) and replace its **Text** with:
+```powerfx
+If(IsBlank(ThisItem.FromStage), "Created",
+   ThisItem.ToStage = "Implementation complete", "✔ Implementation complete",
+   ThisItem.FromStage = ThisItem.ToStage, "Comment (" & ThisItem.ToStage & ")",
+   ThisItem.FromStage & " → " & ThisItem.ToStage)
+```
+
+### 9j. Emails
+The **Part 7** flow already includes the new cases. When you build it after the migration, it will:
+- email **TRB members** when a request reaches the TRB,
+- email the **CM team** when the implementer clicks **Completed**,
+- send the requester *"… needs changes before TRB review"* when the TRB uses **Needs changes**.
+
+Add the `TRBEmails` variable (7b) with your TRB members.
+
+### Part 9 tests
+
+| # | Do this | Expect |
+|---|---|---|
+| 1 | Open the board | Seven columns, with **2. TRB** between Requested and CAB |
+| 2 | Click **+ Request a New Change** and open **Change type** | Standard, Normal and Emergency only; no Informational |
+| 3 | Open a **Normal** request in Requested | The tracker shows all seven steps; Move says **Move to Technical Review Board →** |
+| 4 | Move it to TRB, then click **Move** again as CM | Error: *TRB decision must be Approved* |
+| 5 | As a **TRB member**, tick a checklist item, type a comment, and click **Needs changes** | Back to Requested; TRB notes show *NEEDS CHANGES: …*; History shows the move |
+| 6 | As CM, move it to TRB again | TRB decision is back to *Pending* |
+| 7 | As a TRB member, set the decision to **Approved**, then CM clicks **Move** | Moves to **CAB** |
+| 8 | As CM, **Send back** from CAB | Returns to **TRB** |
+| 9 | Open an **Emergency** request in Requested | The tracker has no TRB; Move says **Move to Change Advisory Board →** |
+| 10 | Open a **Standard** request in Requested | The tracker shows Requested · Implementation · Close; Move says **Move to Implementation →** |
+| 11 | Move the Standard request to Implementation | **✔ Completed** appears; CAB, Authority and TRB fields aren't shown |
+| 12 | Click **Completed** with no implementation notes, then add notes and click again | First: error. Then *Marked complete*; the board card shows **✔ Complete**; History shows *✔ Implementation complete* |
+| 13 | As CM, click **Move** on the completed Standard request | Goes straight to **Close** |
+| 14 | Open an old **Informational** request | Its tracker skips TRB and works as before |
+| 15 | **Reject** a request at TRB, as a TRB member | Goes to Close; TRB notes show *REJECTED: …* |
+
+**If something goes wrong:**
+- **A stage isn't found, or Move says "Move to  →" with no name:** the `Stages` names must match the SharePoint **Stage** choices exactly, including `Technical Review Board`.
+- **A Standard change shows CAB fields:** that card's **Visible** still uses an old `.Order >= …` rule. Use the pattern in 9e step 5.
+- **An error on `As t` in `galNoteTabs`:** check that the `NoteTabs` field is named `StageName`, not `Stage`.
+- **TRB members can't edit the TRB decision:** check their email in `TRBMembers`, in lower case, matching what `User().Email` shows.

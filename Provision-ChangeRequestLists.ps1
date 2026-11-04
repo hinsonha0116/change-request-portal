@@ -28,6 +28,7 @@ Connect-PnPOnline -Url $SiteUrl -ClientId $ClientId -Interactive
 
 $Stages = @(
     'Requested',
+    'Technical Review Board',
     'Change Advisory Board',
     'Change Authority',
     'Implementation',
@@ -96,7 +97,7 @@ Add-FieldIfMissing $cr 'RequestedBy'        Text
 Add-FieldIfMissing $cr 'RequesterEmail'     Text
 Add-FieldIfMissing $cr 'SubmittedBy'        Text   # sign-in email of whoever submitted the request
 Add-FieldIfMissing $cr 'Category'           Choice   -Choices 'Hardware','Software','Network'
-Add-FieldIfMissing $cr 'ChangeType'         Choice   -Choices 'Standard','Normal','Emergency','Informational'
+Add-FieldIfMissing $cr 'ChangeType'         Choice   -Choices 'Standard','Normal','Emergency'   # Informational retired; old items keep it
 Add-FieldIfMissing $cr 'Description'        Note
 Add-FieldIfMissing $cr 'Priority'           Choice   -Choices '4 - Low','3 - Moderate','2 - High','1 - Critical'
 Add-FieldIfMissing $cr 'Risk'               Choice   -Choices '3 - Moderate','2 - High','1 - Critical'
@@ -115,6 +116,13 @@ Add-FieldIfMissing $cr 'AffectedSystems'    Text
 Add-FieldIfMissing $cr 'OutageExpected'     Boolean  -Default '0'   # Yes/No, defaults to No
 Add-FieldIfMissing $cr 'OutageDuration'     Text
 
+# Technical Review Board stage (Normal changes only)
+Add-FieldIfMissing $cr 'TRBDecision'        Choice   -Choices 'Pending','Approved','Needs changes','Rejected' -Default 'Pending'
+Add-FieldIfMissing $cr 'TRBNotes'           Note
+Add-FieldIfMissing $cr 'TRBRollbackReviewed' Boolean -Default '0'
+Add-FieldIfMissing $cr 'TRBTested'          Boolean  -Default '0'
+Add-FieldIfMissing $cr 'TRBSecurityReviewed' Boolean -Default '0'
+
 # Change Advisory Board stage
 Add-FieldIfMissing $cr 'CABDecision'        Choice   -Choices 'Pending','Approved','Rejected' -Default 'Pending'
 Add-FieldIfMissing $cr 'CABNotes'           Note
@@ -125,6 +133,7 @@ Add-FieldIfMissing $cr 'AuthorityNotes'     Note
 
 # Implementation stage
 Add-FieldIfMissing $cr 'ImplementationNotes' Note
+Add-FieldIfMissing $cr 'ImplementationComplete' Boolean -Default '0'   # set by the Completed button
 Add-FieldIfMissing $cr 'ActualStart'        DateTime
 Add-FieldIfMissing $cr 'ActualEnd'          DateTime
 
