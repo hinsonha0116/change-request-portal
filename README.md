@@ -1,13 +1,16 @@
 # Change Request Portal (Power Apps)
 
-A Microsoft 365 change-request portal. Requests are submitted through a Microsoft Form and tracked on a Power Apps board through six stages:
+A Microsoft 365 change-request portal. Requests are submitted in a Power Apps app and tracked on a board through up to seven stages:
 
 1. Requested
-2. Change Advisory Board
-3. Change Authority
-4. Implementation
-5. Review
-6. Close
+2. Technical Review Board (TRB), for Normal changes only
+3. Change Advisory Board
+4. Change Authority
+5. Implementation
+6. PIR (post-implementation review)
+7. Close
+
+Standard changes go straight from Requested to Implementation, then Close. Emergency changes skip the TRB.
 
 ## Contents
 

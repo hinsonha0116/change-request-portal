@@ -32,7 +32,7 @@ $Stages = @(
     'Change Advisory Board',
     'Change Authority',
     'Implementation',
-    'Review',
+    'PIR',                       # post-implementation review (was 'Review')
     'Close'
 )
 

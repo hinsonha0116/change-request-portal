@@ -21,7 +21,7 @@ These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Re
    - the **requester** when it's sent back, approved, rejected or closed,
    - the **CM team** when it's implemented.
 8. **Detail screen clean-up** (Part 8, at the end): the newer fields get compact sizes and labels, the decisions share a row, empty fields are hidden once read-only, the outage switch shows *Yes/No*, Assignee shows a name, and read-only dates show on one line.
-9. **Technical Review Board** (Part 9, at the end): a TRB stage for Normal changes, a route for each change type (Standard goes straight to Implementation, then Close), *Needs changes*, a TRB checklist, Informational removed for new requests, and a **Completed** button that emails the CM team.
+9. **Technical Review Board and PIR** (Part 9, at the end): a TRB stage for Normal changes, the Review stage renamed **PIR**, a route for each change type (Standard goes straight to Implementation, then Close), *Needs changes*, a TRB checklist, Informational removed for new requests, and a **Completed** button that emails the CM team.
 
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. You can also type X, Y, Width and Height into the **Properties** pane on the right.
 
@@ -392,7 +392,7 @@ Every Move, Send back and Reject already adds a row to **Change Request History*
 | Change Authority | Change Authorities | *CR-… is awaiting Change Authority approval* |
 | Implementation | Requester, CC CM team | *CR-… is approved for implementation* |
 | Implementation complete *(the **Completed** button, Part 9)* | CM team | *CR-… has been completed by the implementer* |
-| Review | CM team | *CR-… has been implemented and is ready for review* |
+| PIR *(post-implementation review)* | CM team | *CR-… has been implemented and is ready for PIR* |
 | Close | Requester, CC CM team | *CR-… is closed* or *CR-… was rejected* |
 
 Comments (Add comment) and new submissions don't send these emails.
@@ -454,7 +454,7 @@ Comments (Add comment) and new submissions don't send these emails.
 | `Change Authority` | `variables('AuthorityEmails')` | | `concat(outputs('CRNumber'), ' is awaiting Change Authority approval: ', body('Get_item')?['Title'])` |
 | `Implementation` | `outputs('RequesterEmails')` | `variables('CMTeamEmails')` | `concat(outputs('CRNumber'), ' is approved for implementation: ', body('Get_item')?['Title'])` |
 | `Implementation complete` | `variables('CMTeamEmails')` | | `concat(outputs('CRNumber'), ' has been completed by the implementer: ', body('Get_item')?['Title'])` |
-| `Review` | `variables('CMTeamEmails')` | | `concat(outputs('CRNumber'), ' has been implemented and is ready for review: ', body('Get_item')?['Title'])` |
+| `PIR` | `variables('CMTeamEmails')` | | `concat(outputs('CRNumber'), ' has been implemented and is ready for PIR: ', body('Get_item')?['Title'])` |
 | `Close` | `outputs('RequesterEmails')` | `variables('CMTeamEmails')` | `concat(outputs('CRNumber'), if(equals(body('Get_item')?['ReviewOutcome']?['Value'], 'Rejected'), ' was rejected: ', ' is closed: '), body('Get_item')?['Title'])` |
 
 The case values must match the stage names exactly, including spaces and capitals.
@@ -531,7 +531,7 @@ Then set each label's **Text**:
 | CABDecision | `"CAB decision"` |
 | AuthorityDecision | `"Authority decision"` |
 | ActualStart / ActualEnd | `"Actual start"` / `"Actual end"` |
-| ReviewOutcome | `"Review outcome"` |
+| ReviewOutcome | `"PIR outcome"` |
 
 ### 8b. Let the decisions share a row
 If **CABDecision** or **AuthorityDecision** sits alone on its row, its card is stretching to fill the row. Select each of those **cards** and set **WidthFit** = `false`.
@@ -608,14 +608,14 @@ The card still saves from the hidden pickers, so nothing changes in SharePoint.
 | 2 | Open a request in *Requested* | Every field shows and can be edited, including empty ones |
 | 3 | Look at **CAB decision** and **Authority decision** | They sit side by side with other fields, not alone on a row |
 | 4 | Look at **Outage expected?** | Shows *Yes* or *No*, not *On/Off* |
-| 5 | Open a request with an Assignee, at *Review* or *Close* | Shows a short name, e.g. *Hayley Hinson* |
+| 5 | Open a request with an Assignee, at *PIR* or *Close* | Shows a short name, e.g. *Hayley Hinson* |
 | 6 | Look at the planned dates on a request at *CAB* or later | One line each, e.g. *22 Oct 2026  11:00* |
 | 7 | Open a request in *Implementation* | Actual start and end show date pickers; set them, **Save changes**, and reopen to check they saved |
 | 8 | Open a request in *Requested*, change a planned date and save | The pickers show, and the new date saves |
 
 ---
 
-## Part 9 — Technical Review Board, routing by change type, and a Completed button
+## Part 9 — Technical Review Board, routing by change type, PIR, and a Completed button
 
 **What changes:**
 - **New stage: Technical Review Board (TRB),** between Requested and CAB. **Only Normal changes** go through it.
@@ -623,12 +623,13 @@ The card still saves from the hidden pickers, so nothing changes in SharePoint.
 
   | Change type | Route |
   |---|---|
-  | **Normal** | Requested → **TRB** → CAB → Change Authority → Implementation → Review → Close |
-  | **Emergency** | Requested → CAB → Change Authority → Implementation → Review → Close |
+  | **Normal** | Requested → **TRB** → CAB → Change Authority → Implementation → PIR → Close |
+  | **Emergency** | Requested → CAB → Change Authority → Implementation → PIR → Close |
   | **Standard** | Requested → Implementation → Close |
-  | *Informational (existing requests only)* | Requested → CAB → Change Authority → Implementation → Review → Close |
+  | *Informational (existing requests only)* | Requested → CAB → Change Authority → Implementation → PIR → Close |
 
 - **Informational** can no longer be chosen for new requests. Existing Informational requests are left as they are and keep their old route.
+- **The Review stage is renamed PIR** (post-implementation review), everywhere in the app, the emails and SharePoint.
 - **TRB decision:** *Approved*, *Needs changes* or *Rejected*.
   - **Needs changes** sends the request straight back to the requester, with the TRB's comment.
   - When the CM team moves it on again, the decision resets to *Pending*.
@@ -654,7 +655,11 @@ The card still saves from the hidden pickers, so nothing changes in SharePoint.
    | `TRBSecurityReviewed` | Yes/No | Default **No** |
    | `ImplementationComplete` | Yes/No | Default **No** |
 
-4. In Power Apps Studio, go to **Data › ⋯ › Refresh** next to **Change Requests**.
+4. **Rename Review to PIR** in the **Stage** column:
+   1. Open the column's settings, change the choice `Review` to `PIR`, and click **Save**.
+   2. SharePoint doesn't update requests that are *already* in Review. In the **Change Requests** list, filter **Stage** to *Review*, then edit each of those requests and set Stage to **PIR**. In a list view, **Edit in grid view** makes this quick.
+   3. Old **History** rows keep saying *Review*. They're a record of what happened, so leave them as they are.
+5. In Power Apps Studio, go to **Data › ⋯ › Refresh** next to **Change Requests**.
 
 ### 9b. App.Formulas
 **Replace** the existing `Stages` table with the one below. The new **Short** field gives the board shorter column titles. The **Types** field lists the change types that pass through each stage, and that one list controls every route in the app.
@@ -666,7 +671,7 @@ Stages = Table(
     {Order: 3, Name: "Change Advisory Board",  Short: "CAB",            Color: ColorValue("#2563EB"), Types: "Normal,Emergency,Informational"},
     {Order: 4, Name: "Change Authority",       Short: "Authority",      Color: ColorValue("#7C3AED"), Types: "Normal,Emergency,Informational"},
     {Order: 5, Name: "Implementation",         Short: "Implementation", Color: ColorValue("#D97706"), Types: "Standard,Normal,Emergency,Informational"},
-    {Order: 6, Name: "Review",                 Short: "Review",         Color: ColorValue("#0891B2"), Types: "Normal,Emergency,Informational"},
+    {Order: 6, Name: "PIR",                    Short: "PIR",            Color: ColorValue("#0891B2"), Types: "Normal,Emergency,Informational"},
     {Order: 7, Name: "Close",                  Short: "Close",          Color: ColorValue("#16A34A"), Types: "Standard,Normal,Emergency,Informational"}
 );
 ```
@@ -693,7 +698,7 @@ Then make these changes:
        {Key: "CAB",            Label: "CAB",         StageName: "Change Advisory Board"},
        {Key: "Authority",      Label: "Authority",   StageName: "Change Authority"},
        {Key: "Implementation", Label: "Implement",   StageName: "Implementation"},
-       {Key: "Review",         Label: "Review",      StageName: "Review"}
+       {Key: "Review",         Label: "PIR",         StageName: "PIR"}
    );
    ```
 
@@ -752,9 +757,13 @@ The numbers count steps on that request's route. A Standard change shows **1 Req
    | CABDecision | `"Change Advisory Board"` |
    | AuthorityDecision | `"Change Authority"` |
    | Assignee, ActualStart, ActualEnd | `"Implementation"` |
-   | ReviewOutcome | `"Review"` |
+   | ReviewOutcome | `"PIR"` |
 
    This **replaces** the old `.Order >= 2` / `>= 3` rules, which no longer line up now that the stages have moved. A Standard change will never show CAB, Authority or TRB fields.
+
+6. **Rename the PIR labels:** set the **ReviewOutcome** card's label **Text** to `"PIR outcome"`. The notes tab already says **PIR** (from `NoteTabs` in 9b).
+
+   Inside the formulas, the PIR notes tab keeps the key `"Review"` on purpose. It's only an internal name that links the tab to the **ReviewNotes** column, so it doesn't need to change.
 
 ### 9f. Notes tabs
 | Control | Property | New value |
@@ -778,7 +787,7 @@ Switch(varCR.Stage.Value,
     "Change Advisory Board",  If(IsCAB, "CAB", ""),
     "Change Authority",       If(IsAuthority, "Authority", ""),
     "Implementation",         "Implementation",
-    "Review",                 "Review",
+    "PIR",                    "Review",
     "")
 ```
 
@@ -793,7 +802,7 @@ Set(varNoteTab, Switch(varCR.Stage.Value,
     "Change Advisory Board",  "CAB",
     "Change Authority",       "Authority",
     "Implementation",         "Implementation",
-    "Review",                 "Review",
+    "PIR",                    "Review",
     "Close",                  "Review",
     "Description"))
 ```
@@ -876,8 +885,8 @@ Switch(varAction,
                     Notify("The Change Authority decision must be Approved before this change can move on.", NotificationType.Error),
                 cur.Name = "Implementation" && IsBlank(varCR.ImplementationNotes),
                     Notify("Add implementation notes before moving on.", NotificationType.Error),
-                cur.Name = "Review" && IsBlank(varCR.ReviewOutcome.Value),
-                    Notify("Choose a review outcome before closing.", NotificationType.Error),
+                cur.Name = "PIR" && IsBlank(varCR.ReviewOutcome.Value),
+                    Notify("Choose a PIR outcome before closing.", NotificationType.Error),
                 Set(varCR, Patch('Change Requests', varCR, {
                     Stage:      {Value: nxt.Name},
                     ClosedDate: If(nxt.Name = "Close", Now())
@@ -957,7 +966,7 @@ If(varAction <> "save",
         "Change Advisory Board",  "CAB",
         "Change Authority",       "Authority",
         "Implementation",         "Implementation",
-        "Review",                 "Review",
+        "PIR",                    "Review",
         "Close",                  "Review",
         "Description")));
 Set(varAction, Blank())
@@ -1005,6 +1014,7 @@ Add the `TRBEmails` variable (7b) with your TRB members.
 | 13 | As CM, click **Move** on the completed Standard request | Goes straight to **Close** |
 | 14 | Open an old **Informational** request | Its tracker skips TRB and works as before |
 | 15 | **Reject** a request at TRB, as a TRB member | Goes to Close; TRB notes show *REJECTED: …* |
+| 16 | Move a Normal request on from Implementation | It goes to **PIR**: the board column reads **6. PIR**, the tracker says *PIR*, and the notes tab says *PIR*. Moving on needs a **PIR outcome**. |
 
 **If something goes wrong:**
 - **A stage isn't found, or Move says "Move to  →" with no name:** the `Stages` names must match the SharePoint **Stage** choices exactly, including `Technical Review Board`.
