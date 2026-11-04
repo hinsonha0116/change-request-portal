@@ -538,6 +538,10 @@ If **CABDecision** or **AuthorityDecision** sits alone on its row, its card is s
 
 Check **Assignee**, **ActualStart**, **ActualEnd** and **ReviewOutcome** the same way. Only the full-width cards should have a fixed full **Width**: ImpactDetails, Justification, AffectedSystems and Attachments.
 
+**Still on their own row?** Two more things to check:
+1. **Hidden cards in between.** In **Edit fields**, drag every hidden card to the very **bottom** of the list, below Attachments: Description, CABNotes, AuthorityNotes, ImplementationNotes, ReviewNotes, and later TRBNotes and ImplementationComplete. Hidden cards sitting between visible ones upset the 3-column layout. Moving them fixed it when this was first built.
+2. **An old width.** If a card still has its width from the 2-column layout (about 400), set the card's **Width** to `frmDetail.Width / 3 - 15`, and the control inside it to `Parent.Width - 40`.
+
 ### 8c. Hide empty fields once they can't be edited
 Set each **card**'s **Visible**:
 

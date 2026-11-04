@@ -1,6 +1,6 @@
 # Troubleshooting notes: where I left off
 
-> ✅ **Resolved (28 Oct 2026).** Everything below is done: the New Request screen is complete, the Reset error is fixed, and the choice fields use classic Drop downs. Kept for reference, because it explains *why* the choice fields use Drop downs instead of the combo boxes Power Apps creates. The section numbers refer to the New Request update, which has since been replaced in DetailScreen-Fixes.md by the next update.
+> ✅ **Issues 1 and 2 resolved (28 Oct 2026); Issue 3 resolved (4 Nov 2026).** Everything below is done: the New Request screen is complete, the Reset error is fixed, and the choice fields use classic Drop downs. Kept for reference, because it explains *why* the choice fields use Drop downs instead of the combo boxes Power Apps creates. The section numbers refer to the New Request update, which has since been replaced in DetailScreen-Fixes.md by the next update.
 
 ## Status at a glance
 
@@ -150,8 +150,37 @@ On the **DetailScreen**, open a request in *Requested*. If any of these five sho
 4. **Section 10:** once everything passes, turn off the flow and close the Microsoft Form.
 5. **Publish**, and have users fully close and reopen the app, sometimes twice.
 
+## Issue 3 — CAB decision and Authority decision each on their own row (✅ resolved 4 Nov 2026)
+
+**Symptom:** on the detail screen (`frmDetail`, 3 columns), **CAB decision** and **Authority decision** each took a whole row, even after setting **WidthFit** to `false`. This was during Part 8b of the updates document.
+
+**Cause:** the **hidden** cards (Visible = `false`) were sitting *between* the visible ones in **Edit fields**:
+
+> … AffectedSystems · **Description** · CABDecision · **CABNotes** · AuthorityDecision · **AuthorityNotes** · Assignee · … · **ImplementationNotes** · ReviewOutcome · **ReviewNotes** · …
+
+Even though they're hidden, they still upset the 3-column layout around them.
+
+**Fix:** in the **Fields** panel, drag every hidden card to the **very bottom** of the list, below Attachments:
+- Description
+- CABNotes
+- AuthorityNotes
+- ImplementationNotes
+- ReviewNotes
+- TRBNotes and ImplementationComplete, once Part 9 adds them
+
+CAB decision and Authority decision then sat side by side straight away.
+
+**If it happens again, also check the Width:**
+- **Card Width:** after switching from 2 to 3 columns, a card can keep its old width, about 400 on an 800-wide form. Set the card's **Width** to `frmDetail.Width / 3 - 15`.
+- **Inner control Width:** set the control inside the card to **Width** = `Parent.Width - 40`.
+
+**Rule of thumb:** in any form, keep hidden cards at the **bottom** of **Edit fields**, and put only visible cards in the order you want them to appear.
+
+---
+
 ## Handy checks
 - **App checker** (the stethoscope icon in the top toolbar): lists every formula error and where it is.
 - **Temporary label with `User().Email`:** shows which email the app sees for the signed-in user.
 - **Data › ⋯ › Refresh** next to a list: picks up new or changed SharePoint columns.
 - **A control that should be inside a card or gallery** must be indented under it in the Tree view. To move one there: **Ctrl+X**, select the card or gallery, then **Ctrl+V**.
+- **Hidden form cards** belong at the **bottom** of **Edit fields**. Hidden cards in between visible ones can break the column layout (Issue 3).
