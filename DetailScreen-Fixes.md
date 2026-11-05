@@ -23,6 +23,7 @@ These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Re
 8. **Detail screen clean-up** (Part 8, at the end): the newer fields get compact sizes and labels, the decisions share a row, empty fields are hidden once read-only, the outage switch shows *Yes/No*, Assignee shows a name, and read-only dates show on one line.
 9. **Technical Review Board and PIR** (Part 9, at the end): a TRB stage for Normal changes, the Review stage renamed **PIR**, a route for each change type (Standard goes straight to Implementation, then Close), *Needs changes*, a TRB checklist, Informational removed for new requests, and a **Completed** button that emails the CM team.
 10. **Tidy the action bar and notes tabs** (Part 10, at the end): smaller buttons side by side so they don't cover the comment box, and tab labels that don't wrap.
+11. **Line up read-only values** (Part 11, at the end): in read-only mode, drop-down values like Priority and Risk show as plain text lined up under their titles.
 
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. You can also type X, Y, Width and Height into the **Properties** pane on the right.
 
@@ -1077,3 +1078,68 @@ With six tabs, each is about 71 pixels wide, so *Description* only just fits at 
 | 1 | Open a Normal request at the **TRB** stage as someone who is both CM and a TRB member | Send back, Reject, Needs changes and Add comment sit side by side, each on one line, and none covers the comment box |
 | 2 | Open a request at **Implementation** | ✔ Completed shows where Reject would be; nothing overlaps |
 | 3 | Look at the notes tabs on a request at **PIR** or **Close** | All tab labels (Description/Details, TRB, CAB, Authority, Implement, PIR) are on one line |
+
+---
+
+## Part 11 — Line up read-only drop-down values under their titles
+
+**Why:** in read-only mode, a drop-down (or combo box) still draws its value with its own inner spacing. So on the detail screen, *2 - High*, *Approved* and similar values sit slightly out of line with their titles (*Priority*, *CAB decision*). Plain text fields don't have this problem.
+
+**Fix:** use the same pattern as Part 8f for dates.
+- When a card is **read-only**, hide its drop-down and show a plain **text label** instead, lined up exactly with the card's title.
+- When the card is **editable**, the drop-down comes back.
+
+The card still saves from the hidden drop-down, so nothing changes in SharePoint.
+
+All changes are in `frmDetail` on the **DetailScreen**.
+
+### 11a. Which cards
+Do this for every card whose value is a drop-down or combo box:
+
+| Card | Read-only text |
+|---|---|
+| Category | `ThisItem.Category.Value` |
+| ChangeType | `ThisItem.ChangeType.Value` |
+| Priority | `ThisItem.Priority.Value` |
+| Risk | `ThisItem.Risk.Value` |
+| Impact | `ThisItem.Impact.Value` |
+| TRBDecision | `ThisItem.TRBDecision.Value` |
+| CABDecision | `ThisItem.CABDecision.Value` |
+| AuthorityDecision | `ThisItem.AuthorityDecision.Value` |
+| ReviewOutcome *(PIR outcome)* | `ThisItem.ReviewOutcome.Value` |
+| A6Program *(only if you gave it a drop-down on the detail screen)* | `ThisItem.A6Program` |
+
+### 11b. For each of those cards
+1. Expand the card in the Tree view. Select the drop-down or combo box inside it, which is the **visible** one: `DataCardValueN`, or your own name such as `drpRisk`. Set:
+   - **Visible** = `Parent.DisplayMode = DisplayMode.Edit`
+2. Select the **card**, choose **+ Insert › Text label**, and check it lands **inside the card**. Rename it after the card, for example `lblRiskView`, and set:
+
+   | Property | Value |
+   |---|---|
+   | Text | the read-only text from 11a, wrapped so empty values show a dash, e.g. `Coalesce(ThisItem.Risk.Value, "—")` |
+   | Visible | `Parent.DisplayMode = DisplayMode.View` |
+   | X | `DataCardKeyN.X` *(the card's title label)* |
+   | PaddingLeft | `DataCardKeyN.PaddingLeft` |
+   | Y | the drop-down's **Y** (e.g. `DataCardValueN.Y`) |
+   | Width | `Parent.Width - DataCardKeyN.X - 10` |
+   | Height / Size | `FormValueHeight` / `FormLabelSize` |
+   | PaddingTop / PaddingBottom | `0` |
+   | VerticalAlign | `VerticalAlign.Middle` |
+   | Color | `Color.Black` |
+
+   Using the title's own **X** and **PaddingLeft** is what makes the value start at exactly the same point as the title above it.
+
+### 11c. Same alignment for the dates and Assignee
+The read-only labels you added in **Part 8e** (`lblAssigneeView`) and **Part 8f** (the one-line dates) should line up the same way. On each of those labels, set:
+- **X** = `DataCardKeyN.X`
+- **PaddingLeft** = `DataCardKeyN.PaddingLeft`
+
+### Part 11 tests
+
+| # | Do this | Expect |
+|---|---|---|
+| 1 | Open a request past *Requested* | Category, Change type, Priority, Risk and Impact values start exactly under their titles, like the text fields |
+| 2 | Look at the decisions on a request at **CAB** or later | *Approved* / *Pending* sit directly under *CAB decision* and *Authority decision* |
+| 3 | Look at the dates and Assignee | They line up under their titles too |
+| 4 | Open a request in *Requested* | Priority, Risk and the rest show their drop-downs and can be changed; save and reopen to confirm they saved |
+| 5 | As a CAB member, open a request at **CAB** | CAB decision shows its drop-down (editable); the other decisions show as aligned text |
