@@ -219,10 +219,66 @@ CAB decision and Authority decision then sat side by side straight away.
 
 ---
 
+## Reference — every choice list in App.Formulas (5 Nov 2026)
+
+The app's drop-downs read their options from these lists, not from SharePoint (see Issues 1 and 4).
+
+Rules for all of them:
+- **Placement:** keep them at the end of **App › Formulas**, with every line ending in `;`.
+- **Exact match:** each list must match its SharePoint choices **exactly**, spelling and capitals included.
+- **Changes:** if a choice is changed in SharePoint, update the matching list here.
+
+### Lists used on the New Request screen and the board
+```powerfx
+A6Programs        = ["ACBN", "Blacknet", "C2C", "Collaboration Services", "CSFC", "Exec Comm", "EVRS", "HERTR/GWRTR", "NNCS", "Secureview", "SNCS", "Unified Communications", "UPNCS", "VDI", "VOC", "X-COMM"];
+CategoryChoices   = ["Hardware", "Software", "Network"];
+ChangeTypeChoices = ["Standard", "Normal", "Emergency"];
+PriorityChoices   = ["4 - Low", "3 - Moderate", "2 - High", "1 - Critical"];
+LevelChoices      = ["3 - Moderate", "2 - High", "1 - Critical"];
+CategoryFilter    = ["All categories", "Hardware", "Software", "Network"];
+ChangeTypeFilter  = ["All types", "Standard", "Normal", "Emergency"];
+```
+`"Informational"` was removed from **ChangeTypeChoices** and **ChangeTypeFilter** in Part 9.
+
+### Lists for the decision drop-downs (detail screen)
+```powerfx
+TRBDecisionChoices   = ["Pending", "Approved", "Needs changes", "Rejected"];
+DecisionChoices      = ["Pending", "Approved", "Rejected"];
+ReviewOutcomeChoices = ["Successful", "Successful with issues", "Failed", "Rolled back", "Rejected"];
+```
+
+### Which drop-down uses which list
+If a card's combo box shows *Item 1, 2, 3*, swap it for a classic **Drop down**, as in Issue 4:
+1. Hide the combo box.
+2. Insert a Drop down inside the card.
+3. Set the card's **Update**.
+
+| Card (detail screen) | Drop-down name | Items | Default | Card **Update** |
+|---|---|---|---|---|
+| TRBDecision | `drpTRBDecision` | `TRBDecisionChoices` | `Coalesce(ThisItem.TRBDecision.Value, "Pending")` | `{Value: drpTRBDecision.Selected.Value}` |
+| CABDecision | `drpCABDecision` | `DecisionChoices` | `Coalesce(ThisItem.CABDecision.Value, "Pending")` | `{Value: drpCABDecision.Selected.Value}` |
+| AuthorityDecision | `drpAuthorityDecision` | `DecisionChoices` | `Coalesce(ThisItem.AuthorityDecision.Value, "Pending")` | `{Value: drpAuthorityDecision.Selected.Value}` |
+| ReviewOutcome *(PIR outcome)* | `drpReviewOutcome` | `ReviewOutcomeChoices` | `ThisItem.ReviewOutcome.Value` | `If(IsBlank(drpReviewOutcome.Selected.Value), Blank(), {Value: drpReviewOutcome.Selected.Value})` |
+
+On each of those drop-downs, also set:
+- **AllowEmptySelection** = `true` on **drpReviewOutcome only**, so it starts blank and the *"choose a PIR outcome"* rule works.
+- **DisplayMode** = `Parent.DisplayMode`
+- **Visible** = `Parent.DisplayMode = DisplayMode.Edit`. The Part 11 read-only label shows the value otherwise.
+- **X / Y / Width:** copy them from the hidden combo box.
+- **Height** = `FormValueHeight`
+- **Size** = `FormLabelSize`
+
+**Request fields on the detail screen:** Category, Change type, Priority, Risk and Impact are editable there while a request is in *Requested*. If their combo boxes show *Item 1, 2, 3*, make the same swap with these settings:
+- **Items:** `CategoryChoices`, `ChangeTypeChoices`, `PriorityChoices` and `LevelChoices`.
+- **Default:** `ThisItem.<Column>.Value`.
+- **Card Update:** `If(IsBlank(drpX.Selected.Value), Blank(), {Value: drpX.Selected.Value})`.
+
+---
+
 ## Handy checks
 - **App checker** (the stethoscope icon in the top toolbar): lists every formula error and where it is.
 - **Temporary label with `User().Email`:** shows which email the app sees for the signed-in user.
 - **Data › ⋯ › Refresh** next to a list: picks up new or changed SharePoint columns.
 - **A control that should be inside a card or gallery** must be indented under it in the Tree view. To move one there: **Ctrl+X**, select the card or gallery, then **Ctrl+V**.
 - **Hidden form cards** belong at the **bottom** of **Edit fields**. Hidden cards in between visible ones can break the column layout (Issue 3).
-- **A drop-down shows *Item 1, 2, 3*:** the card-generated combo box isn't reading the choices. Refresh the data source first. If that doesn't help, use a classic **Drop down** with a list in App.Formulas (Issues 1 and 4).
+- **A drop-down shows *Item 1, 2, 3*:** the card-generated combo box isn't reading the choices. Refresh the data source first. If that doesn't help, use a classic **Drop down** with a list in App.Formulas (Issues 1 and 4). The lists are in **Reference — every choice list**.
