@@ -156,6 +156,7 @@ Set-PnPField -List $hist -Identity 'Title' -Values @{ Title = 'CR Number' } | Ou
 
 # Index columns the app filters on so queries stay fast as the lists grow
 Set-PnPField -List $cr   -Identity 'Stage'     -Values @{ Indexed = $true } | Out-Null
+Set-PnPField -List $cr   -Identity 'PlannedStart' -Values @{ Indexed = $true } | Out-Null   # used by the calendar
 Set-PnPField -List $hist -Identity 'RequestID' -Values @{ Indexed = $true } | Out-Null
 
 # ---------------------------------------------------------------- Rollback template

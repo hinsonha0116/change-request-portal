@@ -21,7 +21,7 @@ Standard changes go straight from Requested to Implementation, then Close. Emerg
 | [Provision-ChangeRequestLists.ps1](Provision-ChangeRequestLists.ps1) | Creates the SharePoint lists and uploads the rollback template (PnP.PowerShell) |
 | [Rollback-Plan-Template.pdf](Rollback-Plan-Template.pdf) | Fillable Rollback Plan form that requesters attach to every change |
 | [Build-RollbackPdf.ps1](Build-RollbackPdf.ps1) | Regenerates the Rollback Plan PDF: `./Build-RollbackPdf.ps1 -OutFile .\Rollback-Plan-Template.pdf` |
-| [Migration-Guide.md](Migration-Guide.md) | Step-by-step move from a test SharePoint site to the production site: lists, form, flow, app, permissions, testing and go-live |
+| [Migration-Guide.md](Migration-Guide.md) | Step-by-step move from the test SharePoint site to production: lists, template, app copy, permissions, testing, go-live, and the email flows and roles to build afterwards |
 | [DetailScreen-Fixes.md](DetailScreen-Fixes.md) | Latest app update, not yet in the guide: new request fields (Impact details, Justification, Location, Affected systems, Outage), New Request clean-up, board filters, and email notifications for new requests and stage changes |
 | [Forward-Schedule-of-Change.md](Forward-Schedule-of-Change.md) | Step-by-step build of the Schedule screen: a month calendar of planned changes with clash warnings and a day panel |
 | [TODO.md](TODO.md) | Everything left to implement, in order: test-site build, migration, and production follow-ups |

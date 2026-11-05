@@ -1,31 +1,32 @@
 # Change Request Portal: to-do list
 
-*Created 4 Nov 2026. Tick items off (`- [x]`) as they're done.*
+*Created 4 Nov 2026, updated 5 Nov 2026. Tick items off (`- [x]`) as they're done.*
 
 ## Phase 1: build on the test site (before migration)
 
 **Updates document ([DetailScreen-Fixes.md](DetailScreen-Fixes.md)), all parts except the email ones:**
-- [ ] **Part 1:** new SharePoint columns (Impact details, Justification, Location, Affected systems, Outage expected, Outage duration)
-- [ ] **Part 2:** New Request screen clean-up and the new fields
-- [ ] **Part 3:** new fields on the detail screen
-- [ ] **Part 6:** board quick filters (`drpFilterCategory`, `drpFilterType`) and the header layout
-- [ ] **Part 8:** detail screen clean-up (decisions side by side, empty fields hidden, Yes/No, Assignee name, one-line dates)
-- [ ] **Part 9:** Technical Review Board, routes for each change type, PIR rename, Needs changes, TRB checklist, Completed button. *Do step 9a.4 (rename Review → PIR) before replacing the `Stages` table.*
+- [x] **Part 1:** new SharePoint columns (Impact details, Justification, Location, Affected systems, Outage expected, Outage duration)
+- [x] **Part 2:** New Request screen clean-up and the new fields
+- [x] **Part 3:** new fields on the detail screen
+- [x] **Part 6:** board quick filters (`drpFilterCategory`, `drpFilterType`) and the header layout
+- [x] **Part 8:** detail screen clean-up (decisions side by side, empty fields hidden, Yes/No, Assignee name, one-line dates)
+- [x] **Part 9:** Technical Review Board, routes for each change type, PIR rename, Needs changes, TRB checklist, Completed button. *Do step 9a.4 (rename Review → PIR) before replacing the `Stages` table.*
+- [x] **Parts 10 and 11:** tidy the action bar and notes tabs; line up read-only values
 - ⏭ **Skip Parts 4, 5 and 7** (email flows and the email link). These get built in production.
 
 **Other app work:**
-- [ ] **Forward Schedule of Change** (calendar), from [Forward-Schedule-of-Change.md](Forward-Schedule-of-Change.md). Build it after Part 9.
+- [x] **Forward Schedule of Change** (calendar), from [Forward-Schedule-of-Change.md](Forward-Schedule-of-Change.md). Build it after Part 9.
 - [ ] **Retire the old Microsoft Form and its flow,** if not done yet: turn off the flow, and stop the form accepting responses.
 - [ ] **Run the test checklists** in Parts 1–3, 6, 8 and 9, and in the calendar guide.
 
 **Documents (ask Claude when ready):**
 - [ ] Fold every update into the **main guide** ([Change-Request-PowerApp-Guide.md](Change-Request-PowerApp-Guide.md)).
-- [ ] Update the **migration guide**: skip the form and flow steps, add Office 365 Users, add the TRB and PIR SharePoint changes.
+- [x] Update the **migration guide**: skip the form and flow steps, add Office 365 Users, add the TRB and PIR SharePoint changes.
 - [ ] Redraw the guide's **board and detail-screen diagrams** (`docs/Build-Mockups.ps1`).
 
 ## Phase 2: migrate to production
 
-Using [Migration-Guide.md](Migration-Guide.md):
+Using [Migration-Guide.md](Migration-Guide.md) (updated 5 Nov 2026 for the current app):
 - [ ] Create the production lists. Use *From existing list*, or run the updated [Provision-ChangeRequestLists.ps1](Provision-ChangeRequestLists.ps1).
 - [ ] Upload the Rollback Plan template and copy its new link.
 - [ ] ⏭ Skip Steps 2–3 (Microsoft Form and its flow).
