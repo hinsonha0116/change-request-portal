@@ -22,6 +22,7 @@ These changes build on the app from [Change-Request-PowerApp-Guide.md](Change-Re
    - the **CM team** when it's implemented.
 8. **Detail screen clean-up** (Part 8, at the end): the newer fields get compact sizes and labels, the decisions share a row, empty fields are hidden once read-only, the outage switch shows *Yes/No*, Assignee shows a name, and read-only dates show on one line.
 9. **Technical Review Board and PIR** (Part 9, at the end): a TRB stage for Normal changes, the Review stage renamed **PIR**, a route for each change type (Standard goes straight to Implementation, then Close), *Needs changes*, a TRB checklist, Informational removed for new requests, and a **Completed** button that emails the CM team.
+10. **Tidy the action bar and notes tabs** (Part 10, at the end): smaller buttons side by side so they don't cover the comment box, and tab labels that don't wrap.
 
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. You can also type X, Y, Width and Height into the **Properties** pane on the right.
 
@@ -1025,3 +1026,54 @@ Add the `TRBEmails` variable (7b) with your TRB members.
 - **A Standard change shows CAB fields:** that card's **Visible** still uses an old `.Order >= …` rule. Use the pattern in 9e step 5.
 - **An error on `As t` in `galNoteTabs`:** check that the `NoteTabs` field is named `StageName`, not `Stage`.
 - **TRB members can't edit the TRB decision:** check their email in `TRBMembers`, in lower case, matching what `User().Email` shows.
+
+---
+
+## Part 10 — Tidy the action bar and the notes tabs
+
+This part comes **after Part 9**. It adjusts controls you already built in Parts 9f and 9g, so the action-bar buttons sit side by side without covering the comment box, and the notes tab labels don't wrap.
+
+### 10a. Action bar: smaller buttons, side by side
+Every control uses **Y** = `Parent.Height - 58` and **Height** = `40`.
+
+On the five buttons (Send back, Reject, Completed, Needs changes, Add comment), also set:
+- **Size** = `11`
+- **PaddingLeft** = `4`
+- **PaddingRight** = `4`
+
+That stops the text wrapping onto two lines.
+
+| Control | X | Width | Text |
+|---|---|---|---|
+| `btnSendBack` | `20` | `110` | `"← Send back"` |
+| `btnReject` | `136` | `110` | `"Reject"` |
+| `btnCompleted` | `136` | `110` | `"✔ Completed"` *(same spot as Reject; they never show together)* |
+| `btnNeedsChanges` | `252` | `120` | `"Needs changes"` |
+| `btnAddComment` | `378` | `110` | `"Add comment"` |
+| `txtComment` | `494` | `515` | *(no change)* |
+| `btnAdvance` | `1015` | `331` | *(no change)* |
+
+All the buttons now sit to the **left** of the comment box, so none of them can cover it, even at the TRB stage when Send back, Reject and Needs changes all show. The comment box stays directly beside **Move**.
+
+When a button is hidden, its space is left empty. That's expected.
+
+### 10b. Notes tabs: smaller text, no wrapping
+Select **`lblTab`** (inside `galNoteTabs`) and set:
+
+| Property | Value |
+|---|---|
+| Size | `8` |
+| Wrap | `false` |
+| PaddingLeft / PaddingRight | `0` |
+| PaddingTop / PaddingBottom | `0` |
+| Align | `Align.Center` |
+
+With six tabs, each is about 71 pixels wide, so *Description* only just fits at size 8. If it's still cut off, shorten its label in **App.Formulas › `NoteTabs`**: change `Label: "Description"` to `Label: "Details"`. Only the label changes. The key stays `"Description"`, so nothing else needs editing.
+
+### Part 10 tests
+
+| # | Do this | Expect |
+|---|---|---|
+| 1 | Open a Normal request at the **TRB** stage as someone who is both CM and a TRB member | Send back, Reject, Needs changes and Add comment sit side by side, each on one line, and none covers the comment box |
+| 2 | Open a request at **Implementation** | ✔ Completed shows where Reject would be; nothing overlaps |
+| 3 | Look at the notes tabs on a request at **PIR** or **Close** | All tab labels (Description/Details, TRB, CAB, Authority, Implement, PIR) are on one line |
