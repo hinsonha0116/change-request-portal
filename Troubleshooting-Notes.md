@@ -1,6 +1,6 @@
 # Troubleshooting notes: where I left off
 
-> ✅ **Issues 1 and 2 resolved (28 Oct 2026); Issue 3 resolved (4 Nov 2026).** Everything below is done: the New Request screen is complete, the Reset error is fixed, and the choice fields use classic Drop downs. Kept for reference, because it explains *why* the choice fields use Drop downs instead of the combo boxes Power Apps creates. The section numbers refer to the New Request update, which has since been replaced in DetailScreen-Fixes.md by the next update.
+> ✅ **Issues 1 and 2 resolved (28 Oct 2026); Issue 3 resolved (4 Nov 2026). Issue 4 (5 Nov 2026) has the fix for the TRB decision drop-down.** Everything below is done: the New Request screen is complete, the Reset error is fixed, and the choice fields use classic Drop downs. Kept for reference, because it explains *why* the choice fields use Drop downs instead of the combo boxes Power Apps creates. The section numbers refer to the New Request update, which has since been replaced in DetailScreen-Fixes.md by the next update.
 
 ## Status at a glance
 
@@ -178,9 +178,51 @@ CAB decision and Authority decision then sat side by side straight away.
 
 ---
 
+## Issue 4 — TRB decision drop-down shows *Item 1, 2, 3* instead of the choices (5 Nov 2026)
+
+**Symptom:** on the detail screen, the **TRB decision** drop-down (the combo box Power Apps created in `TRBDecision_DataCard…`) lists *Item 1, Item 2, Item 3* instead of *Pending / Approved / Needs changes / Rejected*.
+
+**Cause:** this is the same combo-box problem as **Issue 1**. The card-generated combo box doesn't display the SharePoint choices in this environment. With a newly added column, the app may also not have loaded its choices yet.
+
+**Fix:**
+
+1. **Try a refresh first.**
+   1. Go to **Data › ⋯ › Refresh** next to **Change Requests**.
+   2. Click once into the combo box's **Items** formula.
+   3. Press **F5** to test.
+2. **If it still shows Item 1, 2, 3,** switch to a classic **Drop down**:
+   1. **App.Formulas:** add this to the end:
+      ```powerfx
+      TRBDecisionChoices = ["Pending", "Approved", "Needs changes", "Rejected"];
+      ```
+   2. In `frmDetail` › `TRBDecision_DataCard…`, set the combo box (`DataCardValueN`) **Visible** = `false`.
+   3. Select the **card**, choose **+ Insert › Drop down** (inside the card), rename it `drpTRBDecision`, and set:
+
+      | Property | Value |
+      |---|---|
+      | Items | `TRBDecisionChoices` |
+      | Default | `Coalesce(ThisItem.TRBDecision.Value, "Pending")` |
+      | DisplayMode | `Parent.DisplayMode` |
+      | Visible | `Parent.DisplayMode = DisplayMode.Edit` |
+      | X / Y | `DataCardValueN.X` / `DataCardValueN.Y` |
+      | Width / Height | `DataCardValueN.Width` / `FormValueHeight` |
+      | Size | `FormLabelSize` |
+
+   4. Select the **card** and set **Update** = `{Value: drpTRBDecision.Selected.Value}`.
+
+**Check:**
+1. Open a Normal request at **TRB** as a TRB member. The drop-down lists the four choices.
+2. Set **Approved**, then **Save changes**, and reopen the request to confirm it saved.
+3. CM's **Move** now goes to CAB.
+
+**Same fix for the other decisions:** if **CAB decision**, **Authority decision** or **PIR outcome** ever show *Item 1, 2, 3*, use the same steps with a list such as `["Pending", "Approved", "Rejected"]`. The PIR outcome uses the ReviewOutcome choices: `["Successful", "Successful with issues", "Failed", "Rolled back", "Rejected"]`.
+
+---
+
 ## Handy checks
 - **App checker** (the stethoscope icon in the top toolbar): lists every formula error and where it is.
 - **Temporary label with `User().Email`:** shows which email the app sees for the signed-in user.
 - **Data › ⋯ › Refresh** next to a list: picks up new or changed SharePoint columns.
 - **A control that should be inside a card or gallery** must be indented under it in the Tree view. To move one there: **Ctrl+X**, select the card or gallery, then **Ctrl+V**.
 - **Hidden form cards** belong at the **bottom** of **Edit fields**. Hidden cards in between visible ones can break the column layout (Issue 3).
+- **A drop-down shows *Item 1, 2, 3*:** the card-generated combo box isn't reading the choices. Refresh the data source first. If that doesn't help, use a classic **Drop down** with a list in App.Formulas (Issues 1 and 4).
