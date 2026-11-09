@@ -202,7 +202,9 @@ Click the first chip slot until the pencil ✎ shows, then insert:
 | # | Insert | Rename to | Properties |
 |---|---|---|---|
 | 1 | Rectangle | `rectChip` | X `0` · Y `0` · Width `Parent.TemplateWidth` · Height `Parent.TemplateHeight` · Fill: `LookUp(Stages, Name = ThisItem.Stage.Value).Color` · BorderColor: `If(ThisItem.HasConflict, Color.Red, Color.Transparent)` · BorderThickness `2` |
-| 2 | Text label | `lblChip` | Text: `"CR-" & Text(ThisItem.ID, "00000") & " " & ThisItem.Title` · X `4` · Y `0` · Width `Parent.TemplateWidth - 6` · Height `Parent.TemplateHeight` · Size `8` · Color: `Color.White` · PaddingTop/Bottom/Left/Right `0` |
+| 2 | Text label | `lblChip` | Text: `Coalesce(ThisItem.CRNumber, "CR-" & Text(ThisItem.ID, "00000")) & " " & ThisItem.A6Program` · Tooltip: `ThisItem.Title` · X `4` · Y `0` · Width `Parent.TemplateWidth - 6` · Height `Parent.TemplateHeight` · Size `8` · Color: `Color.White` · PaddingTop/Bottom/Left/Right `0` |
+
+Each chip shows just the **CR number and A6 program**, so it fits in a day cell. Hover over it to see the title, or click the day to see the full details in the day panel (section 5). Requests submitted before CR numbers by year (Part 12 of the updates doc) show their old `CR-000NN` number.
 
 Clicking a **chip** opens that request. Clicking **empty space** in a day selects the day for the panel in section 5.
 
@@ -238,7 +240,7 @@ Click the first item of `galDayList` until the pencil ✎ shows, then insert the
 | 1 | Rectangle | `rectDLCard` | X `0` · Y `0` · Width `Parent.TemplateWidth` · Height `Parent.TemplateHeight - 4` · Fill: `Color.White` · BorderColor: `If(ThisItem.HasConflict, Color.Red, RGBA(0,0,0,0.15))` · BorderThickness `1` |
 | 2 | Rectangle | `rectDLStage` | X `0` · Y `0` · Width `5` · Height `Parent.TemplateHeight - 4` · Fill: `LookUp(Stages, Name = ThisItem.Stage.Value).Color` |
 | 3 | Text label | `lblDLTime` | X `12` · Y `4` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · Color: `RGBA(0,0,0,0.6)` · Text: `Text(ThisItem.PlannedStart, "dd mmm hh:mm") & "  →  " & Text(ThisItem.EndAt, "dd mmm hh:mm")` |
-| 4 | Text label | `lblDLTitle` | X `12` · Y `22` · Width `Parent.TemplateWidth - 16` · Height `20` · Size `11` · FontWeight: `FontWeight.Semibold` · Text: `"CR-" & Text(ThisItem.ID, "00000") & "  " & ThisItem.Title` |
+| 4 | Text label | `lblDLTitle` | X `12` · Y `22` · Width `Parent.TemplateWidth - 16` · Height `20` · Size `11` · FontWeight: `FontWeight.Semibold` · Text: `Coalesce(ThisItem.CRNumber, "CR-" & Text(ThisItem.ID, "00000")) & "  " & ThisItem.Title` |
 | 5 | Text label | `lblDLMeta` | X `12` · Y `42` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · Text: `ThisItem.A6Program & " · " & ThisItem.Location` |
 | 6 | Text label | `lblDLFlags` | X `12` · Y `62` · Width `Parent.TemplateWidth - 16` · Height `18` · Size `9` · FontWeight: `FontWeight.Semibold` · Text and Color: see below |
 
