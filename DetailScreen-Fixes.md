@@ -1285,3 +1285,32 @@ Number them **before** anyone submits a new request, so the app carries on from 
 | 5 | Open the Schedule screen | The chip and the day list show the new number |
 | 6 | Open an older request, if you have any | It still shows its old `CR-000NN` number, or its new one if you filled it in (12g) |
 | 7 | Check the emails, once the flows are built | The subject and body show `CR-2026-…` |
+
+---
+
+## Part 13 — Clear the comment box when leaving the detail screen
+
+If someone types in the comment box and then leaves the detail screen without clicking **Add comment**, the text used to stay there for the next request they opened. This clears it every time the screen is left, whether by the back button, the calendar, or any other way.
+
+### 13a. Reset the comment box on leaving
+1. In the Tree view, select **DetailScreen** itself, at the top.
+2. In the property drop-down at the top left, pick **OnHidden**.
+3. Enter:
+   ```powerfx
+   Reset(txtComment)
+   ```
+   If OnHidden already has a formula, add `;` to the end of it and put this on the next line.
+
+**OnHidden** runs whenever you leave the screen.
+
+### 13b. Check the default
+Select **`txtComment`** and make sure **Default** is `""`. `Reset` puts the box back to its Default, so any text there would come back instead of an empty box.
+
+### Part 13 tests
+
+| # | Do this | Expect |
+|---|---|---|
+| 1 | Open a request, type a comment, and go **back** without clicking Add comment | — |
+| 2 | Open the same request, or another one | The comment box is empty |
+| 3 | Open a request from the **Schedule** screen, type a comment, and go back | The comment box is empty next time |
+| 4 | Type a comment and click **Add comment** | It still saves to the History as usual |
