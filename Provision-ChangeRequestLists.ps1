@@ -96,6 +96,7 @@ Add-FieldIfMissing $cr 'DSN'                Text
 Add-FieldIfMissing $cr 'RequestedBy'        Text
 Add-FieldIfMissing $cr 'RequesterEmail'     Text
 Add-FieldIfMissing $cr 'SubmittedBy'        Text   # sign-in email of whoever submitted the request
+Add-FieldIfMissing $cr 'CRNumber'           Text   # CR-2026-001: year + count, set by the app on submit
 Add-FieldIfMissing $cr 'Category'           Choice   -Choices 'Hardware','Software','Network'
 Add-FieldIfMissing $cr 'ChangeType'         Choice   -Choices 'Standard','Normal','Emergency'   # Informational retired; old items keep it
 Add-FieldIfMissing $cr 'Description'        Note
@@ -157,6 +158,7 @@ Set-PnPField -List $hist -Identity 'Title' -Values @{ Title = 'CR Number' } | Ou
 # Index columns the app filters on so queries stay fast as the lists grow
 Set-PnPField -List $cr   -Identity 'Stage'     -Values @{ Indexed = $true } | Out-Null
 Set-PnPField -List $cr   -Identity 'PlannedStart' -Values @{ Indexed = $true } | Out-Null   # used by the calendar
+Set-PnPField -List $cr   -Identity 'CRNumber'  -Values @{ Indexed = $true } | Out-Null   # app finds this year's last number
 Set-PnPField -List $hist -Identity 'RequestID' -Values @{ Indexed = $true } | Out-Null
 
 # ---------------------------------------------------------------- Rollback template

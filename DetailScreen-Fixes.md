@@ -1168,3 +1168,120 @@ The read-only labels you added in **Part 8e** (`lblAssigneeView`) and **Part 8f*
 | 3 | Look at the dates and Assignee | They line up under their titles too |
 | 4 | Open a request in *Requested* | Priority, Risk and the rest show their drop-downs and can be changed; save and reopen to confirm they saved |
 | 5 | As a CAB member, open a request at **CAB** | CAB decision shows its drop-down (editable); the other decisions show as aligned text |
+
+---
+
+## Part 12 — CR numbers by year (CR-2026-001)
+
+CR numbers change from `CR-00012`, which was built from the SharePoint item ID, to **`CR-2026-001`**. The middle part is the year the request was submitted. The last part counts up from **001** and **restarts every 1 January**, so the first request of 2027 is `CR-2027-001`.
+
+SharePoint item IDs never restart, so the number now has to be **saved** on each request instead of worked out from the ID. That needs a new column, a hidden card on the New Request form, and a small change everywhere the number is shown.
+
+### 12a. New SharePoint column
+1. In the **Change Requests** list, add a column:
+
+   | Name | Type | Notes |
+   |---|---|---|
+   | `CRNumber` | Single line of text | Not required. Type the name with no space, so the internal name is `CRNumber`. |
+
+2. **Index it:** **⚙ › List settings › Indexed columns › Create a new index**, then pick **CRNumber**. The app searches this column for the last number used this year, and the index keeps that search fast as the list grows.
+3. In the app, open **Data**, click **…** next to **Change Requests**, then **Refresh**, so the app sees the new column.
+
+### 12b. Give each new request its number
+1. Select **`frmNew`**, click **Edit fields › + Add field**, tick **CRNumber** and click **Add**.
+2. Drag **CRNumber** to the **bottom**, with the other hidden fields from 2h.
+3. Select the **CRNumber card**, **Unlock** it, and set:
+
+   | Property | Value |
+   |---|---|
+   | Visible | `false` |
+   | Update | the formula below |
+
+   ```powerfx
+   With(
+       {
+           prefix: "CR-" & Text(Year(Today())) & "-",
+           lastCR: First(
+               Sort(
+                   Filter('Change Requests', StartsWith(CRNumber, "CR-" & Text(Year(Today())) & "-")),
+                   ID,
+                   SortOrder.Descending
+               )
+           )
+       },
+       prefix & Text(If(IsBlank(lastCR), 1, Value(Mid(lastCR.CRNumber, 9)) + 1), "000")
+   )
+   ```
+
+   **How it works:** it finds this year's most recent request and adds 1 to its number. If there's none yet this year, it starts at `001`. `Mid(…, 9)` reads everything after `CR-2026-`.
+
+> **Two requests at the same second:** if two people click Submit at exactly the same moment, they could get the same number. With the number of change requests A6 handles this is very unlikely. If it ever matters, see 12f.
+
+### 12c. Use the saved number after submitting
+In **`frmNew` › OnSuccess**, replace **every** `"CR-" & Text(Self.LastSubmit.ID, "00000")` with:
+```powerfx
+Self.LastSubmit.CRNumber
+```
+There are two: the **Title** in the History `Patch`, and the text in the **Notify** message.
+
+### 12d. Show the new number everywhere else
+Requests submitted before this change have no CRNumber. These formulas show the new number when there is one, and the old `CR-000NN` number otherwise.
+
+**Find them:** in the Tree view, click the **search** (magnifying glass) and type `"CR-"`. That lists every control that builds a CR number. Change each one:
+
+| Where | Old | New |
+|---|---|---|
+| **BoardScreen › `lblId`** (on each card, 9c) | `"CR-" & Text(ThisItem.ID, "00000")` | `Coalesce(ThisItem.CRNumber, "CR-" & Text(ThisItem.ID, "00000"))` |
+| **DetailScreen › `lblCRTitle`** (header) | `"CR-" & Text(varCR.ID, "00000")` | `Coalesce(varCR.CRNumber, "CR-" & Text(varCR.ID, "00000"))` |
+| **DetailScreen › `frmDetail` › OnSuccess** (every History `Patch`, 9g) | `Title: "CR-" & Text(varCR.ID, "00000")` | `Title: Coalesce(varCR.CRNumber, "CR-" & Text(varCR.ID, "00000"))` |
+| **DetailScreen › any other button** that writes a History row (e.g. Add comment) | same as above | same as above |
+| **CalendarScreen › `lblChip`** | `"CR-" & Text(ThisItem.ID, "00000")` | `Coalesce(ThisItem.CRNumber, "CR-" & Text(ThisItem.ID, "00000"))` |
+| **CalendarScreen › `lblDLTitle`** | `"CR-" & Text(ThisItem.ID, "00000")` | `Coalesce(ThisItem.CRNumber, "CR-" & Text(ThisItem.ID, "00000"))` |
+
+Only replace the `"CR-" & Text(…, "00000")` part, and keep the rest of each formula. For example, `lblId` keeps its `& If(… "✔ Complete" …)` ending.
+
+**Optional, search by CR number:** in **`galCards` › Items** (Part 6), change the search line to:
+```powerfx
+IsBlank(txtSearch.Text) || StartsWith(Title, txtSearch.Text) || StartsWith(CRNumber, txtSearch.Text),
+```
+Typing `CR-2026-01` then finds `CR-2026-010` to `CR-2026-019`.
+
+**Don't change:** anything that uses the **ID** to *find* a request, such as `LookUp('Change Requests', ID = …)`, `RequestID: varCR.ID`, or the email link `Param("crid")` in Part 5. Those still use the SharePoint ID, which is correct.
+
+### 12e. Email flows
+- **Part 4 flow,** `CRNumber` Compose: change the expression to
+  ```
+  coalesce(triggerOutputs()?['body/CRNumber'], concat('CR-', formatNumber(triggerOutputs()?['body/ID'], '00000')))
+  ```
+- **Part 7 flow,** `CRNumber` Compose: the History row's **Title** already holds the CR number, so change the expression to
+  ```
+  triggerOutputs()?['body/Title']
+  ```
+
+If you haven't built these flows yet, use these expressions when you do.
+
+### 12f. Optional: block duplicate numbers
+To make duplicates impossible, set **CRNumber** to **Enforce unique values: Yes** (**List settings**, then click **CRNumber**). If two requests then try to take the same number, the second one fails with an error, and the requester just clicks **Submit** again to get the next number.
+
+Do this **only once every request has a CRNumber** (12g). SharePoint refuses to turn it on while any values are duplicated, and older requests with an empty CRNumber may count as duplicates.
+
+### 12g. Older requests (optional)
+Requests submitted before this change keep their old `CR-000NN` number, thanks to the `Coalesce` in 12d. To give them new-style numbers instead:
+1. Open the **Change Requests** list and click **Edit in grid view**.
+2. Sort by **Created**, oldest first.
+3. Type `CR-2026-001`, `CR-2026-002` and so on into **CRNumber**, in order, using each request's **submitted year**.
+4. Their **History** rows keep the old number in *CR Number*. Edit those too if you want them to match.
+
+Number them **before** anyone submits a new request, so the app carries on from your last number.
+
+### Part 12 tests
+
+| # | Do this | Expect |
+|---|---|---|
+| 1 | Submit a request (the first of the year) | Notify says **CR-2026-001 submitted**; the card shows `CR-2026-001` |
+| 2 | Submit another | It gets `CR-2026-002` |
+| 3 | Open it | The detail header shows `CR-2026-002 — title` |
+| 4 | Move it to the next stage | The History row's *CR Number* is `CR-2026-002` |
+| 5 | Open the Schedule screen | The chip and the day list show the new number |
+| 6 | Open an older request, if you have any | It still shows its old `CR-000NN` number, or its new one if you filled it in (12g) |
+| 7 | Check the emails, once the flows are built | The subject and body show `CR-2026-…` |

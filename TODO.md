@@ -38,6 +38,8 @@ Using [Migration-Guide.md](Migration-Guide.md) (updated 5 Nov 2026 for the curre
 
 ## Phase 3: in production, after go-live
 
+- [ ] **Part 12:** CR numbers by year (`CR-2026-001`): new `CRNumber` column, hidden card on New Request, new number on the board, detail, calendar and emails.
+
 - [ ] **App Roles** list: one list holding the CM, TRB, CAB, Authority and SW/HW manager emails. *Guide still to be written by Claude.*
 - [ ] Switch App.Formulas (`IsCM`, `IsTRB`, `IsCAB`, `IsAuthority`) to read from App Roles.
 - [ ] **Part 4 flow:** new-request emails (CM always, SW/HW managers by category), reading recipients from App Roles.

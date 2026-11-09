@@ -100,7 +100,7 @@ A wrong internal name, or a missing choice, is the most common migration problem
 
 **Check these columns exist, with these exact internal names.** Open **⚙ › List settings**, click a column, and the end of the browser address shows `Field=…`:
 
-> A6Program · DSN · RequestedBy · RequesterEmail · SubmittedBy · Description · ImpactDetails · Justification · Location · AffectedSystems · OutageExpected · OutageDuration · PlannedStart · PlannedEnd · Assignee · TRBRollbackReviewed · TRBTested · TRBSecurityReviewed · TRBNotes · CABNotes · AuthorityNotes · ImplementationNotes · ImplementationComplete · ActualStart · ActualEnd · ReviewNotes · ClosedDate
+> A6Program · DSN · RequestedBy · RequesterEmail · SubmittedBy · CRNumber · Description · ImpactDetails · Justification · Location · AffectedSystems · OutageExpected · OutageDuration · PlannedStart · PlannedEnd · Assignee · TRBRollbackReviewed · TRBTested · TRBSecurityReviewed · TRBNotes · CABNotes · AuthorityNotes · ImplementationNotes · ImplementationComplete · ActualStart · ActualEnd · ReviewNotes · ClosedDate
 
 **Change Request History:** check that `RequestID`, `FromStage`, `ToStage` and `Comment` exist, and that **Title** shows as *CR Number*.
 
