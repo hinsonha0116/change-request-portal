@@ -170,6 +170,31 @@ Select each card's `DataCardKey…` and set **Text**:
 ### 2g. Reset the outage switch
 Set **`tglOutage` › Reset** to `varResetNew`. Then **+ Request a New Change** always opens with the outage switch on **No**.
 
+### 2h. Hide the four system fields
+**Stage**, **SubmittedBy**, **CABDecision** and **AuthorityDecision** must stay in `frmNew` so the request saves with the right starting values, but requesters shouldn't see them. **Hide them; don't remove them.**
+
+For each of the four **cards** (`Stage_DataCard…`, `SubmittedBy_DataCard…`, `CABDecision_DataCard…`, `AuthorityDecision_DataCard…`), select the **card** itself, not the control inside it. **Unlock** it if needed, then set:
+
+| Card | Visible | Update |
+|---|---|---|
+| Stage | `false` | `{Value: "Requested"}` |
+| SubmittedBy | `false` | `User().Email` |
+| CABDecision | `false` | `{Value: "Pending"}` |
+| AuthorityDecision | `false` | `{Value: "Pending"}` |
+
+**Update** fills in each value when the form is submitted, even though the card is hidden.
+
+- **Keep them last:** in **Edit fields**, these four must be the **last** fields, after **Attachments**. Hidden cards between visible ones break the 3-column layout. See Issue 3 in [Troubleshooting-Notes.md](Troubleshooting-Notes.md).
+- **SubmittedBy matters most:** if its Update is missing, the field saves empty, and a regular user won't see their own request on the board.
+
+**Test:**
+1. Submit a request.
+2. Open the item in the **Change Requests** list and check that:
+   - Stage = **Requested**
+   - SubmittedBy = **your sign-in email**
+   - CAB decision and Authority decision = **Pending**
+3. Check that the request shows up on the board for you.
+
 ---
 
 ## Part 3 — Show the new fields on the detail screen (`frmDetail`)
