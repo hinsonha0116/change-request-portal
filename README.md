@@ -24,6 +24,7 @@ Standard changes go straight from Requested to Implementation, then Close. Emerg
 | [Migration-Guide.md](Migration-Guide.md) | Step-by-step move from the test SharePoint site to production: lists, template, app copy, permissions, testing, go-live, and the email flows and roles to build afterwards |
 | [DetailScreen-Fixes.md](DetailScreen-Fixes.md) | Latest app update, not yet in the guide: new request fields (Impact details, Justification, Location, Affected systems, Outage), New Request clean-up, board filters, and email notifications for new requests and stage changes |
 | [Forward-Schedule-of-Change.md](Forward-Schedule-of-Change.md) | Step-by-step build of the Schedule screen: a month calendar of planned changes with clash warnings and a day panel |
+| [SharePoint-Intro.md](SharePoint-Intro.md) | Intro text for the Change Management SharePoint page: how to submit a request, the routes for each change type, and the schedule |
 | [TODO.md](TODO.md) | Everything left to implement, in order: test-site build, migration, and production follow-ups |
 | [Troubleshooting-Notes.md](Troubleshooting-Notes.md) | Resolved notes from the New Request screen work. Explains why the choice fields use classic Drop downs |
 | [docs/](docs/) | Screen layout diagrams used in the guide, and `Build-Mockups.ps1`, which regenerates them |
