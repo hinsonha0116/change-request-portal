@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("", views.board, name="board"),
+    path("requests/", views.request_list, name="request_list"),
     path("new/", views.new_request, name="new_request"),
     path("requests/<int:pk>/", views.detail, name="detail"),
     path("requests/<int:pk>/attachments/", views.upload_attachment, name="upload_attachment"),

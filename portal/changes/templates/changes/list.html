@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}List{% endblock %}
+{% block main_class %}full{% endblock %}
+{% block content %}
+<div class="tiles">
+  {% for tile in tiles %}
+  <a class="tile tone-{{ tile.tone }}" href="{{ tile.url }}">
+    <span class="tile-count">{{ tile.count }}</span>
+    <span class="tile-label">{{ tile.label }}</span>
+  </a>
+  {% endfor %}
+</div>
+
+<div class="listbar">
+  <nav class="tabs" aria-label="Views">
+    {% for item in views %}
+    <a href="{{ item.url }}"{% if item.active %} class="active" aria-current="page"{% endif %}>{{ item.label }}</a>
+    {% endfor %}
+  </nav>
+  <form method="get" class="filters">
+    <input type="hidden" name="view" value="{{ view }}">
+    {% if sort %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
+    {% if starting_soon %}<input type="hidden" name="starting" value="7">{% endif %}
+    <input type="search" name="q" value="{{ search }}" placeholder="Search number, title, requester, program" aria-label="Search">
+    <select name="stage" aria-label="Stage">
+      <option value="">All stages</option>
+      {% for value, label in stages %}<option value="{{ value }}"{% if value == chosen.stage %} selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <select name="type" aria-label="Change type">
+      <option value="">All types</option>
+      {% for value, label in change_types %}<option value="{{ value }}"{% if value == chosen.type %} selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <select name="category" aria-label="Category">
+      <option value="">All categories</option>
+      {% for value, label in categories %}<option value="{{ value }}"{% if value == chosen.category %} selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <select name="priority" aria-label="Priority">
+      <option value="">All priorities</option>
+      {% for value, label in priorities %}<option value="{{ value }}"{% if value == chosen.priority %} selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <button class="button">Filter</button>
+    <a class="button plain" href="?view={{ view }}">Clear</a>
+  </form>
+</div>
+
+{% if starting_soon %}<p class="hint">Showing only requests planned to start in the next 7 days. <a href="?view={{ view }}">Show all</a></p>{% endif %}
+
+<div class="table-wrap panel flush">
+  <table class="requests">
+    <thead>
+      <tr>
+        {% for column in columns %}
+        <th scope="col" aria-sort="{{ column.aria }}"><a href="{{ column.url }}">{{ column.label }}{% if column.arrow %} <span aria-hidden="true">{{ column.arrow }}</span>{% endif %}</a></th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for cr in page %}
+      <tr>
+        <td class="nowrap"><a class="number" href="{% url 'detail' cr.pk %}?from=list">{{ cr.cr_number }}</a></td>
+        <td class="title-cell">{{ cr.title }}
+          {% if cr.outage_expected %}<span class="tag outage-tag" title="Outage expected: {{ cr.outage_duration }}">Outage</span>{% endif %}
+          {% if cr.stage == "implementation" and cr.implementation_complete %}<span class="complete">✔ Complete</span>{% endif %}</td>
+        <td class="nowrap"><span class="pill stage-{{ cr.stage }}">{{ cr.get_stage_display }}</span></td>
+        <td>{{ cr.get_change_type_display }}</td>
+        <td>{{ cr.get_category_display }}</td>
+        <td class="nowrap"><span class="dot-priority p{{ cr.priority }}" aria-hidden="true"></span>{{ cr.get_priority_display }}</td>
+        <td class="nowrap">{{ cr.get_risk_display }}</td>
+        <td>{{ cr.requested_by }}</td>
+        <td>{% if cr.assignee %}{{ cr.assignee.get_full_name|default:cr.assignee.username }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td class="nowrap">{% if cr.planned_start %}{{ cr.planned_start|date:"j M Y H:i" }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td class="nowrap" title="{{ cr.updated_at|date:'j M Y H:i' }}">{{ cr.updated_at|timesince }} ago</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="{{ columns|length }}" class="empty">No requests match this view and these filters.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="pager">
+  <span class="muted">{% if page.paginator.count %}{{ page.start_index }}–{{ page.end_index }} of {{ page.paginator.count }}{% else %}0 requests{% endif %}</span>
+  {% if previous_url %}<a class="button" href="{{ previous_url }}">‹ Previous</a>{% endif %}
+  {% if next_url %}<a class="button" href="{{ next_url }}">Next ›</a>{% endif %}
+</div>
+{% endblock %}

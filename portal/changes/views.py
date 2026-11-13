@@ -4,7 +4,8 @@ import io
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models, transaction
-from django.db.models import Q
+from django.core.paginator import Paginator
+from django.db.models import Case, IntegerField, Q, When
 from django.http import FileResponse, Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -18,7 +19,7 @@ from accounts.models import Role
 from . import schedule as fsc
 from . import workflow
 from .forms import REQUEST_FIELD_ORDER, AttachmentForm, NewRequestForm, detail_form
-from .models import Attachment, Category, ChangeRequest, ChangeType, Stage
+from .models import Attachment, Category, ChangeRequest, ChangeType, Priority, Stage
 from .services import submit_request
 from .workflow import WorkflowError
 
@@ -91,6 +92,150 @@ def board(request):
         "categories": Category.choices,
         "change_types": ChangeType.choices,
         "close_days": CLOSE_COLUMN_DAYS,
+    })
+
+
+# ---------------------------------------------------------------- list
+
+LIST_PAGE_SIZE = 25
+LIST_VIEWS = [
+    ("open", "Open"),
+    ("action", "Needs my action"),
+    ("mine", "My requests"),
+    ("closed", "Closed"),
+    ("all", "All"),
+]
+# key, heading, what to order by
+LIST_COLUMNS = [
+    ("number", "Number", ["id"]),
+    ("title", "Title", ["title"]),
+    ("stage", "Stage", ["stage_order"]),
+    ("type", "Type", ["change_type"]),
+    ("category", "Category", ["category"]),
+    ("priority", "Priority", ["priority"]),
+    ("risk", "Risk", ["risk"]),
+    ("requester", "Requested by", ["requested_by"]),
+    ("assignee", "Assigned to", ["assignee__last_name", "assignee__username"]),
+    ("start", "Planned start", ["planned_start"]),
+    ("updated", "Updated", ["updated_at"]),
+]
+STAGE_ORDER = Case(
+    *[When(stage=stage, then=position) for position, stage in enumerate(Stage.values)],
+    output_field=IntegerField(),
+)
+
+
+def _query(request, **changes):
+    """The current query string with some values changed. An empty value removes the key."""
+    params = request.GET.copy()
+    for key, value in changes.items():
+        if value in (None, ""):
+            params.pop(key, None)
+        else:
+            params[key] = value
+    return "?" + params.urlencode()
+
+
+def _apply_view(requests, view, user):
+    if view == "open":
+        return requests.exclude(stage=Stage.CLOSE)
+    if view == "closed":
+        return requests.filter(stage=Stage.CLOSE)
+    if view == "action":
+        return requests.filter(workflow.needs_action(user))
+    if view == "mine":
+        return requests.filter(pk__in=workflow.own_requests(user))
+    return requests
+
+
+@login_required
+def request_list(request):
+    """Every request the user may see, as a sortable, filterable table."""
+    user = request.user
+    visible = workflow.visible_to(user)
+    now = timezone.now()
+    week_ahead = now + datetime.timedelta(days=7)
+
+    view = request.GET.get("view")
+    if view not in dict(LIST_VIEWS):
+        view = "open"
+    search = request.GET.get("q", "").strip()
+    chosen = {
+        "stage": request.GET.get("stage", ""),
+        "type": request.GET.get("type", ""),
+        "category": request.GET.get("category", ""),
+        "priority": request.GET.get("priority", ""),
+    }
+    starting_soon = request.GET.get("starting") == "7"
+
+    requests = _apply_view(visible, view, user)
+    if search:
+        requests = requests.filter(
+            Q(title__icontains=search) | Q(cr_number__icontains=search)
+            | Q(requested_by__icontains=search) | Q(a6_program__icontains=search)
+        )
+    if chosen["stage"] in Stage.values:
+        requests = requests.filter(stage=chosen["stage"])
+    if chosen["type"] in ChangeType.values:
+        requests = requests.filter(change_type=chosen["type"])
+    if chosen["category"] in Category.values:
+        requests = requests.filter(category=chosen["category"])
+    if chosen["priority"] in Priority.values:
+        requests = requests.filter(priority=chosen["priority"])
+    if starting_soon:
+        requests = requests.filter(planned_start__gte=now, planned_start__lt=week_ahead)
+
+    sort = request.GET.get("sort", "")
+    descending = sort.startswith("-")
+    sort_key = sort.lstrip("-")
+    order_fields = {key: fields for key, _, fields in LIST_COLUMNS}
+    if sort_key not in order_fields:
+        sort_key, descending = "updated", True
+    ordering = [("-" if descending else "") + field for field in order_fields[sort_key]]
+    requests = requests.annotate(stage_order=STAGE_ORDER).order_by(*ordering, "-id").select_related("assignee")
+
+    columns = []
+    for key, label, _ in LIST_COLUMNS:
+        active = key == sort_key
+        next_sort = f"-{key}" if active and not descending else key
+        columns.append({
+            "key": key,
+            "label": label,
+            "url": _query(request, sort=next_sort, page=None),
+            "aria": ("descending" if descending else "ascending") if active else "none",
+            "arrow": ("▼" if descending else "▲") if active else "",
+        })
+
+    page = Paginator(requests, LIST_PAGE_SIZE).get_page(request.GET.get("page"))
+    open_requests = visible.exclude(stage=Stage.CLOSE)
+    tiles = [
+        {"label": "Open", "count": open_requests.count(), "url": "?view=open", "tone": "navy"},
+        {"label": "Needs my action", "count": visible.filter(workflow.needs_action(user)).count(),
+         "url": "?view=action", "tone": "amber"},
+        {"label": "Open emergencies", "count": open_requests.filter(change_type=ChangeType.EMERGENCY).count(),
+         "url": "?view=open&type=emergency", "tone": "red"},
+        {"label": "Starting in 7 days",
+         "count": open_requests.filter(planned_start__gte=now, planned_start__lt=week_ahead).count(),
+         "url": "?view=open&starting=7", "tone": "teal"},
+        {"label": "Closed", "count": visible.filter(stage=Stage.CLOSE).count(), "url": "?view=closed", "tone": "green"},
+    ]
+    return render(request, "changes/list.html", {
+        "page": page,
+        "columns": columns,
+        "tiles": tiles,
+        "views": [{"key": key, "label": label, "url": _query(request, view=key, page=None), "active": key == view}
+                  for key, label in LIST_VIEWS],
+        "view": view,
+        "sort": request.GET.get("sort", ""),
+        "search": search,
+        "chosen": chosen,
+        "starting_soon": starting_soon,
+        "stages": Stage.choices,
+        "change_types": ChangeType.choices,
+        "categories": Category.choices,
+        "priorities": Priority.choices,
+        "previous_url": _query(request, page=page.previous_page_number()) if page.has_previous() else "",
+        "next_url": _query(request, page=page.next_page_number()) if page.has_next() else "",
     })
 
 
@@ -169,9 +314,19 @@ def _tracker(cr):
     ]
 
 
+# Where the detail screen's back button goes, by the ?from= value it was opened with.
+ORIGINS = {"schedule": ("schedule", "← Schedule"), "list": ("request_list", "← List")}
+
+
+def _origin(request):
+    origin = request.GET.get("from")
+    return origin if origin in ORIGINS else ""
+
+
 def _detail_url(request, cr):
     url = reverse("detail", args=[cr.pk])
-    return f"{url}?from=schedule" if request.GET.get("from") == "schedule" else url
+    origin = _origin(request)
+    return f"{url}?from={origin}" if origin else url
 
 
 def _render_detail(request, cr, form):
@@ -187,7 +342,8 @@ def _render_detail(request, cr, form):
         "history": cr.history.select_related("actor"),
         "attachments": cr.attachments.defer("data"),
         "upload_form": AttachmentForm() if cr.stage != Stage.CLOSE else None,
-        "from_schedule": request.GET.get("from") == "schedule",
+        "origin": _origin(request),
+        "back": ORIGINS.get(_origin(request), ("board", "← Board")),
         "advance_label": f"Move to {Stage(target).label} →" if is_cm and target else "",
         "can_send_back": is_cm and cr.stage not in (Stage.REQUESTED, Stage.CLOSE),
         "can_reject": on_own_board,

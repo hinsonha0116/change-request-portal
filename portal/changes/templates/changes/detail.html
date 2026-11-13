@@ -2,8 +2,7 @@
 {% block title %}{{ cr.cr_number }}{% endblock %}
 {% block content %}
 <div class="page-head">
-  {% if from_schedule %}<a class="button" href="{% url 'schedule' %}">← Schedule</a>
-  {% else %}<a class="button" href="{% url 'board' %}">← Board</a>{% endif %}
+  <a class="button" href="{% url back.0 %}">{{ back.1 }}</a>
   <h1>{{ cr.cr_number }} — {{ cr.title }}</h1>
   {% if cr.stage == "implementation" and cr.implementation_complete %}<span class="complete">✔ Complete</span>{% endif %}
 </div>
@@ -68,7 +67,7 @@
       </ul>
       {% if upload_form %}
       <form method="post" enctype="multipart/form-data" class="stack"
-            action="{% url 'upload_attachment' cr.pk %}{% if from_schedule %}?from=schedule{% endif %}">
+            action="{% url 'upload_attachment' cr.pk %}{% if origin %}?from={{ origin }}{% endif %}">
         {% csrf_token %}
         <label for="{{ upload_form.files.id_for_label }}">Add files</label>
         {{ upload_form.files }}

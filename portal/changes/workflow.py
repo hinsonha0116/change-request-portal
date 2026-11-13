@@ -135,6 +135,25 @@ def visible_to(user):
     return own_requests(user) | ChangeRequest.objects.filter(category__in=managed_categories(user))
 
 
+def needs_action(user):
+    """A filter for the requests that are waiting on this user to do something."""
+    waiting = Q(stage=Stage.IMPLEMENTATION, implementation_complete=False, assignee=user)
+    mine = Q(submitted_by=user)
+    if user.email:
+        mine |= Q(requester_email__iexact=user.email)
+    waiting |= Q(stage=Stage.REQUESTED, trb_decision=TRBDecision.NEEDS_CHANGES) & mine
+    for stage, (role, decision_field, _) in BOARDS.items():
+        if user.has_role(role):
+            waiting |= Q(stage=stage, **{decision_field: Decision.PENDING})
+    if user.has_role(Role.CM):
+        # New requests to send on, approvals to act on, finished work to move, and reviews to close.
+        waiting |= Q(stage=Stage.REQUESTED) | Q(stage=Stage.PIR)
+        waiting |= Q(stage=Stage.IMPLEMENTATION, implementation_complete=True)
+        for stage, (_, decision_field, _) in BOARDS.items():
+            waiting |= Q(stage=stage, **{decision_field: Decision.APPROVED})
+    return waiting
+
+
 def editable_fields(cr, user):
     """The fields this user may change on this request at its current stage."""
     if not can_view(cr, user):

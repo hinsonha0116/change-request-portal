@@ -14,7 +14,7 @@ A Django rebuild of the Power Apps portal, meant to run in a Kubernetes cluster 
 | `changes/workflow.py` | Routes for each change type, who can do what, and every stage action |
 | `changes/notify.py` | Who is told about what, in the app and by email |
 | `changes/schedule.py` | The month grid and clash detection for the schedule |
-| `changes/views.py`, `forms.py`, `templates/`, `static/` | The screens |
+| `changes/views.py`, `forms.py`, `templates/`, `static/` | The screens: board, list, New Request, detail, schedule and notifications |
 | `changes/management/commands/seed_demo.py` | Demo users and requests for local work |
 | `changes/tests/` | Tests for every route, rule, permission and screen |
 | `config/` | Settings, read from environment variables. `settings_dev.py` is for local work only |
@@ -53,7 +53,7 @@ Start the app, then open http://localhost:8000:
 .venv/Scripts/python manage.py runserver --settings config.settings_dev
 ```
 
-The demo users are `pat` and `sam` (requesters), `cm`, `trb`, `cab` and `authority`. Their shared password is `DEMO_PASSWORD` in `changes/management/commands/seed_demo.py`. `cm` can also open the admin site at `/admin/` to add users and roles.
+The demo users are `pat` and `sam` (requesters), `cm`, `trb`, `cab` and `authority`. `cm` holds every role and is a superuser, so that one account can approve and move a request through every step. Their shared password is `DEMO_PASSWORD` in `changes/management/commands/seed_demo.py`. `cm` can also open the admin site at `/admin/` to add users and roles.
 
 `config.settings_dev` turns debug on and uses a local SQLite file. The PostgreSQL driver is only installed on Linux (the container image).
 

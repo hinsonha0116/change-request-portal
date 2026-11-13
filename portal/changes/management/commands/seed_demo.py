@@ -15,7 +15,8 @@ DEMO_PASSWORD = "demo-portal-local"
 DEMO_USERS = [
     ("pat", "Pat", "Requester", []),
     ("sam", "Sam", "Implementer", []),
-    ("cm", "Casey", "Change-Manager", [Role.CM]),
+    # cm holds every role and is a superuser, so one account can walk a request through every step.
+    ("cm", "Casey", "Change-Manager", list(Role)),
     ("trb", "Terry", "Review-Board", [Role.TRB]),
     ("cab", "Cameron", "Advisory-Board", [Role.CAB]),
     ("authority", "Alex", "Authority", [Role.AUTHORITY]),

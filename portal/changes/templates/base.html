@@ -12,6 +12,7 @@
   {% if user.is_authenticated %}
   <nav>
     <a href="{% url 'board' %}">Board</a>
+    <a href="{% url 'request_list' %}">List</a>
     <a href="{% url 'schedule' %}">Schedule</a>
     <a href="{% url 'notifications' %}">Notifications{% if unread_count %} <span class="badge">{{ unread_count }}</span>{% endif %}</a>
     {% if can_manage_people %}<a href="{% url 'people' %}">People</a>{% endif %}
