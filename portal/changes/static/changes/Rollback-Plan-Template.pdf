@@ -1,0 +1,538 @@
+%PDF-1.7
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R /AcroForm 3 0 R /ViewerPreferences << /DisplayDocTitle true >> >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [73 0 R 75 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Fields [9 0 R 10 0 R 11 0 R 12 0 R 13 0 R 14 0 R 15 0 R 16 0 R 17 0 R 18 0 R 19 0 R 20 0 R 21 0 R 22 0 R 23 0 R 24 0 R 25 0 R 26 0 R 27 0 R 28 0 R 29 0 R 30 0 R 31 0 R 32 0 R 33 0 R 34 0 R 35 0 R 36 0 R 37 0 R 38 0 R 39 0 R 40 0 R 41 0 R 42 0 R 43 0 R 44 0 R 45 0 R 46 0 R 47 0 R 48 0 R 49 0 R 50 0 R 51 0 R 52 0 R 53 0 R 54 0 R 55 0 R 56 0 R 57 0 R 58 0 R 59 0 R 60 0 R 61 0 R 62 0 R 63 0 R 64 0 R 65 0 R 66 0 R 67 0 R 68 0 R 69 0 R 70 0 R 71 0 R] /NeedAppearances true /DR << /Font << /Helv 4 0 R /ZaDb 6 0 R >> >> /DA (/Helv 9 Tf 0 g) >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /ZapfDingbats >>
+endobj
+7 0 obj
+<< /Type /XObject /Subtype /Form /BBox [0 0 11 11] /Resources << /Font << /ZaDb 6 0 R >> >> /Length 40 >>
+stream
+q 0 g BT /ZaDb 9 Tf 1.6 2 Td (4) Tj ET Q
+endstream
+endobj
+8 0 obj
+<< /Type /XObject /Subtype /Form /BBox [0 0 11 11] /Length 0 >>
+stream
+
+endstream
+endobj
+9 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (CRNumber) /TU (CR Number \(if assigned\)) /Rect [51 645 199 663] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+10 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (ChangeTitle) /TU (Change Title) /Rect [211 645 561 663] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+11 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (A6Program) /TU (A6 Program) /Rect [51 607 249 625] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+12 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (RequestedBy) /TU (Requested By) /Rect [261 607 459 625] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+13 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (DSN) /TU (DSN) /Rect [471 607 561 625] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+14 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Email) /TU (E-mail) /Rect [51 569 299 587] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+15 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (PlannedDate) /TU (Planned Change Date) /Rect [311 569 429 587] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+16 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (DatePrepared) /TU (Date Prepared) /Rect [441 569 561 587] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+17 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (RollbackTriggers) /TU () /Rect [51 449 561 519] /F 4 /DA (/Helv 9 Tf 0 g) /Ff 4096 /MK << >> >>
+endobj
+18 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (DecisionAuthority) /TU (Rollback Decision Authority \(Name / Rank / Position\)) /Rect [51 381 389 399] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+19 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (DecisionAuthorityDSN) /TU (Decision Authority DSN) /Rect [401 381 561 399] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+20 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (PointOfNoReturn) /TU (Point of No Return \(date / time\)) /Rect [51 343 213 361] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+21 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (RollbackDuration) /TU (Estimated Rollback Duration) /Rect [225 343 387 361] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+22 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (MaxOutage) /TU (Maximum Acceptable Outage) /Rect [399 343 561 361] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+23 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Btn /T (ChkConfigBackup) /TU (Configuration backup taken) /Rect [56 290 67 301] /F 4 /V /Off /AS /Off /MK << /CA (4) >> /DA (/ZaDb 0 Tf 0 g) /AP << /N << /Yes 7 0 R /Off 8 0 R >> >> >>
+endobj
+24 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Btn /T (ChkTested) /TU (Rollback procedure tested \(lab / test environment\)) /Rect [306 290 317 301] /F 4 /V /Off /AS /Off /MK << /CA (4) >> /DA (/ZaDb 0 Tf 0 g) /AP << /N << /Yes 7 0 R /Off 8 0 R >> >> >>
+endobj
+25 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Btn /T (ChkSnapshot) /TU (System snapshot / image captured) /Rect [56 272 67 283] /F 4 /V /Off /AS /Off /MK << /CA (4) >> /DA (/ZaDb 0 Tf 0 g) /AP << /N << /Yes 7 0 R /Off 8 0 R >> >> >>
+endobj
+26 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Btn /T (ChkMedia) /TU (Rollback media / software available on site) /Rect [306 272 317 283] /F 4 /V /Off /AS /Off /MK << /CA (4) >> /DA (/ZaDb 0 Tf 0 g) /AP << /N << /Yes 7 0 R /Off 8 0 R >> >> >>
+endobj
+27 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Btn /T (ChkBaseline) /TU (Baseline performance recorded) /Rect [56 254 67 265] /F 4 /V /Off /AS /Off /MK << /CA (4) >> /DA (/ZaDb 0 Tf 0 g) /AP << /N << /Yes 7 0 R /Off 8 0 R >> >> >>
+endobj
+28 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Btn /T (ChkNotified) /TU (Stakeholders notified of rollback window) /Rect [306 254 317 265] /F 4 /V /Off /AS /Off /MK << /CA (4) >> /DA (/ZaDb 0 Tf 0 g) /AP << /N << /Yes 7 0 R /Off 8 0 R >> >> >>
+endobj
+29 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (BackupDetails) /TU (Backup / snapshot location and details) /Rect [51 159 561 227] /F 4 /DA (/Helv 9 Tf 0 g) /Ff 4096 /MK << >> >>
+endobj
+30 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Dependencies) /TU (Dependent systems / services affected by a rollback) /Rect [51 77 561 135] /F 4 /DA (/Helv 9 Tf 0 g) /Ff 4096 /MK << >> >>
+endobj
+31 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step1_Action) /TU (Step 1 action) /Rect [81 677 361 697] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+32 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step1_Responsible) /TU (Step 1 responsible) /Rect [363 677 471 697] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+33 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step1_Time) /TU (Step 1 est. time) /Rect [473 677 561 697] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+34 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step2_Action) /TU (Step 2 action) /Rect [81 655 361 675] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+35 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step2_Responsible) /TU (Step 2 responsible) /Rect [363 655 471 675] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+36 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step2_Time) /TU (Step 2 est. time) /Rect [473 655 561 675] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+37 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step3_Action) /TU (Step 3 action) /Rect [81 633 361 653] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+38 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step3_Responsible) /TU (Step 3 responsible) /Rect [363 633 471 653] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+39 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step3_Time) /TU (Step 3 est. time) /Rect [473 633 561 653] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+40 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step4_Action) /TU (Step 4 action) /Rect [81 611 361 631] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+41 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step4_Responsible) /TU (Step 4 responsible) /Rect [363 611 471 631] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+42 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step4_Time) /TU (Step 4 est. time) /Rect [473 611 561 631] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+43 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step5_Action) /TU (Step 5 action) /Rect [81 589 361 609] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+44 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step5_Responsible) /TU (Step 5 responsible) /Rect [363 589 471 609] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+45 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step5_Time) /TU (Step 5 est. time) /Rect [473 589 561 609] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+46 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step6_Action) /TU (Step 6 action) /Rect [81 567 361 587] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+47 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step6_Responsible) /TU (Step 6 responsible) /Rect [363 567 471 587] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+48 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step6_Time) /TU (Step 6 est. time) /Rect [473 567 561 587] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+49 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step7_Action) /TU (Step 7 action) /Rect [81 545 361 565] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+50 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step7_Responsible) /TU (Step 7 responsible) /Rect [363 545 471 565] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+51 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step7_Time) /TU (Step 7 est. time) /Rect [473 545 561 565] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+52 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step8_Action) /TU (Step 8 action) /Rect [81 523 361 543] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+53 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step8_Responsible) /TU (Step 8 responsible) /Rect [363 523 471 543] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+54 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step8_Time) /TU (Step 8 est. time) /Rect [473 523 561 543] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+55 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step9_Action) /TU (Step 9 action) /Rect [81 501 361 521] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+56 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step9_Responsible) /TU (Step 9 responsible) /Rect [363 501 471 521] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+57 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step9_Time) /TU (Step 9 est. time) /Rect [473 501 561 521] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+58 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step10_Action) /TU (Step 10 action) /Rect [81 479 361 499] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+59 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step10_Responsible) /TU (Step 10 responsible) /Rect [363 479 471 499] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+60 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Step10_Time) /TU (Step 10 est. time) /Rect [473 479 561 499] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+61 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Verification) /TU () /Rect [51 367 561 429] /F 4 /DA (/Helv 9 Tf 0 g) /Ff 4096 /MK << >> >>
+endobj
+62 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (Communication) /TU () /Rect [51 267 561 319] /F 4 /DA (/Helv 9 Tf 0 g) /Ff 4096 /MK << >> >>
+endobj
+63 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (PreparedBy) /TU (Prepared By \(Name / Rank\)) /Rect [51 195 269 217] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+64 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Sig /T (PreparedBySig) /TU (Signature) /Rect [281 195 479 217] /F 4 >>
+endobj
+65 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (PreparedDate) /TU (Date) /Rect [491 195 561 217] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+66 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (ReviewedBy) /TU (Reviewed By - Change Manager \(Name / Rank\)) /Rect [51 149 269 171] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+67 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Sig /T (ReviewedBySig) /TU (Signature) /Rect [281 149 479 171] /F 4 >>
+endobj
+68 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (ReviewedDate) /TU (Date) /Rect [491 149 561 171] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+69 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (ApprovedBy) /TU (Approved By - Change Authority \(Name / Rank\)) /Rect [51 103 269 125] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+70 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Sig /T (ApprovedBySig) /TU (Signature) /Rect [281 103 479 125] /F 4 >>
+endobj
+71 0 obj
+<< /Type /Annot /Subtype /Widget /FT /Tx /T (ApprovedDate) /TU (Date) /Rect [491 103 561 125] /F 4 /DA (/Helv 9 Tf 0 g) /MK << >> >>
+endobj
+72 0 obj
+<<  /Length 3972 >>
+stream
+BT /F2 20 Tf 0.12 0.23 0.42 rg 50 752 Td (ROLLBACK PLAN) Tj ET
+BT /F1 9 Tf 0.3 g 50 736 Td (Required attachment for change requests submitted through the Change Request Portal) Tj ET
+0.12 0.23 0.42 RG 1.5 w 50 726 m 562 726 l S
+BT /F1 7.5 Tf 0.35 g 50 712 Td (Complete every section, save the PDF, then upload it to the "Rollback Plan" question on the Change Request form.) Tj ET
+0.12 0.23 0.42 rg 50 682 512 16 re f
+BT /F2 9.5 Tf 1 g 56 686.5 Td (1. CHANGE INFORMATION) Tj ET
+BT /F2 7.5 Tf 0.2 g 50 667 Td (CR Number \(if assigned\)) Tj ET
+0.95 0.96 0.99 rg 50 644 150 20 re f
+0.55 G 0.75 w 50 644 150 20 re S
+BT /F2 7.5 Tf 0.2 g 210 667 Td (Change Title) Tj ET
+0.95 0.96 0.99 rg 210 644 352 20 re f
+0.55 G 0.75 w 210 644 352 20 re S
+BT /F2 7.5 Tf 0.2 g 50 629 Td (A6 Program) Tj ET
+0.95 0.96 0.99 rg 50 606 200 20 re f
+0.55 G 0.75 w 50 606 200 20 re S
+BT /F2 7.5 Tf 0.2 g 260 629 Td (Requested By) Tj ET
+0.95 0.96 0.99 rg 260 606 200 20 re f
+0.55 G 0.75 w 260 606 200 20 re S
+BT /F2 7.5 Tf 0.2 g 470 629 Td (DSN) Tj ET
+0.95 0.96 0.99 rg 470 606 92 20 re f
+0.55 G 0.75 w 470 606 92 20 re S
+BT /F2 7.5 Tf 0.2 g 50 591 Td (E-mail) Tj ET
+0.95 0.96 0.99 rg 50 568 250 20 re f
+0.55 G 0.75 w 50 568 250 20 re S
+BT /F2 7.5 Tf 0.2 g 310 591 Td (Planned Change Date) Tj ET
+0.95 0.96 0.99 rg 310 568 120 20 re f
+0.55 G 0.75 w 310 568 120 20 re S
+BT /F2 7.5 Tf 0.2 g 440 591 Td (Date Prepared) Tj ET
+0.95 0.96 0.99 rg 440 568 122 20 re f
+0.55 G 0.75 w 440 568 122 20 re S
+0.12 0.23 0.42 rg 50 536 512 16 re f
+BT /F2 9.5 Tf 1 g 56 540.5 Td (2. ROLLBACK TRIGGERS) Tj ET
+BT /F1 7.5 Tf 0.35 g 50 526 Td (Conditions that will cause this change to be rolled back \(e.g., service outage, failed validation, error thresholds\).) Tj ET
+0.95 0.96 0.99 rg 50 448 512 72 re f
+0.55 G 0.75 w 50 448 512 72 re S
+0.12 0.23 0.42 rg 50 418 512 16 re f
+BT /F2 9.5 Tf 1 g 56 422.5 Td (3. ROLLBACK DECISION AND TIMING) Tj ET
+BT /F2 7.5 Tf 0.2 g 50 403 Td (Rollback Decision Authority \(Name / Rank / Position\)) Tj ET
+0.95 0.96 0.99 rg 50 380 340 20 re f
+0.55 G 0.75 w 50 380 340 20 re S
+BT /F2 7.5 Tf 0.2 g 400 403 Td (Decision Authority DSN) Tj ET
+0.95 0.96 0.99 rg 400 380 162 20 re f
+0.55 G 0.75 w 400 380 162 20 re S
+BT /F2 7.5 Tf 0.2 g 50 365 Td (Point of No Return \(date / time\)) Tj ET
+0.95 0.96 0.99 rg 50 342 164 20 re f
+0.55 G 0.75 w 50 342 164 20 re S
+BT /F2 7.5 Tf 0.2 g 224 365 Td (Estimated Rollback Duration) Tj ET
+0.95 0.96 0.99 rg 224 342 164 20 re f
+0.55 G 0.75 w 224 342 164 20 re S
+BT /F2 7.5 Tf 0.2 g 398 365 Td (Maximum Acceptable Outage) Tj ET
+0.95 0.96 0.99 rg 398 342 164 20 re f
+0.55 G 0.75 w 398 342 164 20 re S
+0.12 0.23 0.42 rg 50 310 512 16 re f
+BT /F2 9.5 Tf 1 g 56 314.5 Td (4. PRE-CHANGE PREPARATION) Tj ET
+1 g 56 290 11 11 re f
+0.55 G 0.75 w 56 290 11 11 re S
+BT /F1 8.5 Tf 0 g 73 292 Td (Configuration backup taken) Tj ET
+1 g 306 290 11 11 re f
+0.55 G 0.75 w 306 290 11 11 re S
+BT /F1 8.5 Tf 0 g 323 292 Td (Rollback procedure tested \(lab / test environment\)) Tj ET
+1 g 56 272 11 11 re f
+0.55 G 0.75 w 56 272 11 11 re S
+BT /F1 8.5 Tf 0 g 73 274 Td (System snapshot / image captured) Tj ET
+1 g 306 272 11 11 re f
+0.55 G 0.75 w 306 272 11 11 re S
+BT /F1 8.5 Tf 0 g 323 274 Td (Rollback media / software available on site) Tj ET
+1 g 56 254 11 11 re f
+0.55 G 0.75 w 56 254 11 11 re S
+BT /F1 8.5 Tf 0 g 73 256 Td (Baseline performance recorded) Tj ET
+1 g 306 254 11 11 re f
+0.55 G 0.75 w 306 254 11 11 re S
+BT /F1 8.5 Tf 0 g 323 256 Td (Stakeholders notified of rollback window) Tj ET
+BT /F2 7.5 Tf 0.2 g 50 231 Td (Backup / snapshot location and details) Tj ET
+0.95 0.96 0.99 rg 50 158 512 70 re f
+0.55 G 0.75 w 50 158 512 70 re S
+BT /F2 7.5 Tf 0.2 g 50 139 Td (Dependent systems / services affected by a rollback) Tj ET
+0.95 0.96 0.99 rg 50 76 512 60 re f
+0.55 G 0.75 w 50 76 512 60 re S
+0.7 G 0.5 w 50 40 m 562 40 l S
+BT /F1 7.5 Tf 0.4 g 50 28 Td (Form CR-RB-01  |  Rollback Plan  |  Attach to Change Request) Tj ET
+BT /F1 7.5 Tf 0.4 g 520 28 Td (Page 1 of 2) Tj ET
+
+endstream
+endobj
+73 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 72 0 R /Annots [9 0 R 10 0 R 11 0 R 12 0 R 13 0 R 14 0 R 15 0 R 16 0 R 17 0 R 18 0 R 19 0 R 20 0 R 21 0 R 22 0 R 23 0 R 24 0 R 25 0 R 26 0 R 27 0 R 28 0 R 29 0 R 30 0 R] >>
+endobj
+74 0 obj
+<<  /Length 5318 >>
+stream
+BT /F2 12 Tf 0.12 0.23 0.42 rg 50 752 Td (ROLLBACK PLAN \(continued\)) Tj ET
+0.12 0.23 0.42 RG 1.5 w 50 744 m 562 744 l S
+0.12 0.23 0.42 rg 50 714 512 16 re f
+BT /F2 9.5 Tf 1 g 56 718.5 Td (5. ROLLBACK PROCEDURE) Tj ET
+0.86 0.89 0.95 rg 50 698 512 16 re f
+0.55 G 0.75 w 50 698 512 16 re S
+BT /F2 8 Tf 0 g 54 703 Td (Step) Tj ET
+BT /F2 8 Tf 0 g 84 703 Td (Action / Command) Tj ET
+BT /F2 8 Tf 0 g 366 703 Td (Responsible) Tj ET
+BT /F2 8 Tf 0 g 476 703 Td (Est. Time) Tj ET
+0.55 G 0.75 w 50 676 30 22 re S
+0.95 0.96 0.99 rg 80 676 282 22 re f
+0.55 G 0.75 w 80 676 282 22 re S
+0.95 0.96 0.99 rg 362 676 110 22 re f
+0.55 G 0.75 w 362 676 110 22 re S
+0.95 0.96 0.99 rg 472 676 90 22 re f
+0.55 G 0.75 w 472 676 90 22 re S
+BT /F2 9 Tf 0 g 62 683 Td (1) Tj ET
+0.55 G 0.75 w 50 654 30 22 re S
+0.95 0.96 0.99 rg 80 654 282 22 re f
+0.55 G 0.75 w 80 654 282 22 re S
+0.95 0.96 0.99 rg 362 654 110 22 re f
+0.55 G 0.75 w 362 654 110 22 re S
+0.95 0.96 0.99 rg 472 654 90 22 re f
+0.55 G 0.75 w 472 654 90 22 re S
+BT /F2 9 Tf 0 g 62 661 Td (2) Tj ET
+0.55 G 0.75 w 50 632 30 22 re S
+0.95 0.96 0.99 rg 80 632 282 22 re f
+0.55 G 0.75 w 80 632 282 22 re S
+0.95 0.96 0.99 rg 362 632 110 22 re f
+0.55 G 0.75 w 362 632 110 22 re S
+0.95 0.96 0.99 rg 472 632 90 22 re f
+0.55 G 0.75 w 472 632 90 22 re S
+BT /F2 9 Tf 0 g 62 639 Td (3) Tj ET
+0.55 G 0.75 w 50 610 30 22 re S
+0.95 0.96 0.99 rg 80 610 282 22 re f
+0.55 G 0.75 w 80 610 282 22 re S
+0.95 0.96 0.99 rg 362 610 110 22 re f
+0.55 G 0.75 w 362 610 110 22 re S
+0.95 0.96 0.99 rg 472 610 90 22 re f
+0.55 G 0.75 w 472 610 90 22 re S
+BT /F2 9 Tf 0 g 62 617 Td (4) Tj ET
+0.55 G 0.75 w 50 588 30 22 re S
+0.95 0.96 0.99 rg 80 588 282 22 re f
+0.55 G 0.75 w 80 588 282 22 re S
+0.95 0.96 0.99 rg 362 588 110 22 re f
+0.55 G 0.75 w 362 588 110 22 re S
+0.95 0.96 0.99 rg 472 588 90 22 re f
+0.55 G 0.75 w 472 588 90 22 re S
+BT /F2 9 Tf 0 g 62 595 Td (5) Tj ET
+0.55 G 0.75 w 50 566 30 22 re S
+0.95 0.96 0.99 rg 80 566 282 22 re f
+0.55 G 0.75 w 80 566 282 22 re S
+0.95 0.96 0.99 rg 362 566 110 22 re f
+0.55 G 0.75 w 362 566 110 22 re S
+0.95 0.96 0.99 rg 472 566 90 22 re f
+0.55 G 0.75 w 472 566 90 22 re S
+BT /F2 9 Tf 0 g 62 573 Td (6) Tj ET
+0.55 G 0.75 w 50 544 30 22 re S
+0.95 0.96 0.99 rg 80 544 282 22 re f
+0.55 G 0.75 w 80 544 282 22 re S
+0.95 0.96 0.99 rg 362 544 110 22 re f
+0.55 G 0.75 w 362 544 110 22 re S
+0.95 0.96 0.99 rg 472 544 90 22 re f
+0.55 G 0.75 w 472 544 90 22 re S
+BT /F2 9 Tf 0 g 62 551 Td (7) Tj ET
+0.55 G 0.75 w 50 522 30 22 re S
+0.95 0.96 0.99 rg 80 522 282 22 re f
+0.55 G 0.75 w 80 522 282 22 re S
+0.95 0.96 0.99 rg 362 522 110 22 re f
+0.55 G 0.75 w 362 522 110 22 re S
+0.95 0.96 0.99 rg 472 522 90 22 re f
+0.55 G 0.75 w 472 522 90 22 re S
+BT /F2 9 Tf 0 g 62 529 Td (8) Tj ET
+0.55 G 0.75 w 50 500 30 22 re S
+0.95 0.96 0.99 rg 80 500 282 22 re f
+0.55 G 0.75 w 80 500 282 22 re S
+0.95 0.96 0.99 rg 362 500 110 22 re f
+0.55 G 0.75 w 362 500 110 22 re S
+0.95 0.96 0.99 rg 472 500 90 22 re f
+0.55 G 0.75 w 472 500 90 22 re S
+BT /F2 9 Tf 0 g 62 507 Td (9) Tj ET
+0.55 G 0.75 w 50 478 30 22 re S
+0.95 0.96 0.99 rg 80 478 282 22 re f
+0.55 G 0.75 w 80 478 282 22 re S
+0.95 0.96 0.99 rg 362 478 110 22 re f
+0.55 G 0.75 w 362 478 110 22 re S
+0.95 0.96 0.99 rg 472 478 90 22 re f
+0.55 G 0.75 w 472 478 90 22 re S
+BT /F2 9 Tf 0 g 59 485 Td (10) Tj ET
+0.12 0.23 0.42 rg 50 446 512 16 re f
+BT /F2 9.5 Tf 1 g 56 450.5 Td (6. POST-ROLLBACK VERIFICATION) Tj ET
+BT /F1 7.5 Tf 0.35 g 50 436 Td (How you will confirm the system has been restored to its pre-change state \(tests, checks, monitoring\).) Tj ET
+0.95 0.96 0.99 rg 50 366 512 64 re f
+0.55 G 0.75 w 50 366 512 64 re S
+0.12 0.23 0.42 rg 50 336 512 16 re f
+BT /F2 9.5 Tf 1 g 56 340.5 Td (7. COMMUNICATION PLAN) Tj ET
+BT /F1 7.5 Tf 0.35 g 50 326 Td (Who will be notified if a rollback occurs, and how \(e-mail, phone/DSN, Teams, NOTAM / outage notice\).) Tj ET
+0.95 0.96 0.99 rg 50 266 512 54 re f
+0.55 G 0.75 w 50 266 512 54 re S
+0.12 0.23 0.42 rg 50 236 512 16 re f
+BT /F2 9.5 Tf 1 g 56 240.5 Td (8. SIGNATURES) Tj ET
+BT /F2 7.5 Tf 0.2 g 50 221 Td (Prepared By \(Name / Rank\)) Tj ET
+0.95 0.96 0.99 rg 50 194 220 24 re f
+0.55 G 0.75 w 50 194 220 24 re S
+BT /F2 7.5 Tf 0.2 g 280 221 Td (Signature) Tj ET
+0.95 0.96 0.99 rg 280 194 200 24 re f
+0.55 G 0.75 w 280 194 200 24 re S
+BT /F2 7.5 Tf 0.2 g 490 221 Td (Date) Tj ET
+0.95 0.96 0.99 rg 490 194 72 24 re f
+0.55 G 0.75 w 490 194 72 24 re S
+BT /F2 7.5 Tf 0.2 g 50 175 Td (Reviewed By - Change Manager \(Name / Rank\)) Tj ET
+0.95 0.96 0.99 rg 50 148 220 24 re f
+0.55 G 0.75 w 50 148 220 24 re S
+BT /F2 7.5 Tf 0.2 g 280 175 Td (Signature) Tj ET
+0.95 0.96 0.99 rg 280 148 200 24 re f
+0.55 G 0.75 w 280 148 200 24 re S
+BT /F2 7.5 Tf 0.2 g 490 175 Td (Date) Tj ET
+0.95 0.96 0.99 rg 490 148 72 24 re f
+0.55 G 0.75 w 490 148 72 24 re S
+BT /F2 7.5 Tf 0.2 g 50 129 Td (Approved By - Change Authority \(Name / Rank\)) Tj ET
+0.95 0.96 0.99 rg 50 102 220 24 re f
+0.55 G 0.75 w 50 102 220 24 re S
+BT /F2 7.5 Tf 0.2 g 280 129 Td (Signature) Tj ET
+0.95 0.96 0.99 rg 280 102 200 24 re f
+0.55 G 0.75 w 280 102 200 24 re S
+BT /F2 7.5 Tf 0.2 g 490 129 Td (Date) Tj ET
+0.95 0.96 0.99 rg 490 102 72 24 re f
+0.55 G 0.75 w 490 102 72 24 re S
+0.7 G 0.5 w 50 40 m 562 40 l S
+BT /F1 7.5 Tf 0.4 g 50 28 Td (Form CR-RB-01  |  Rollback Plan  |  Attach to Change Request) Tj ET
+BT /F1 7.5 Tf 0.4 g 520 28 Td (Page 2 of 2) Tj ET
+
+endstream
+endobj
+75 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 74 0 R /Annots [31 0 R 32 0 R 33 0 R 34 0 R 35 0 R 36 0 R 37 0 R 38 0 R 39 0 R 40 0 R 41 0 R 42 0 R 43 0 R 44 0 R 45 0 R 46 0 R 47 0 R 48 0 R 49 0 R 50 0 R 51 0 R 52 0 R 53 0 R 54 0 R 55 0 R 56 0 R 57 0 R 58 0 R 59 0 R 60 0 R 61 0 R 62 0 R 63 0 R 64 0 R 65 0 R 66 0 R 67 0 R 68 0 R 69 0 R 70 0 R 71 0 R] >>
+endobj
+76 0 obj
+<< /Title (Rollback Plan - Change Request) /Subject (Form CR-RB-01) /Creator (Change Request Portal) >>
+endobj
+xref
+0 77
+0000000000 65535 f 
+0000000009 00000 n 
+0000000121 00000 n 
+0000000186 00000 n 
+0000000746 00000 n 
+0000000843 00000 n 
+0000000945 00000 n 
+0000001018 00000 n 
+0000001197 00000 n 
+0000001294 00000 n 
+0000001458 00000 n 
+0000001614 00000 n 
+0000001765 00000 n 
+0000001921 00000 n 
+0000002060 00000 n 
+0000002203 00000 n 
+0000002366 00000 n 
+0000002524 00000 n 
+0000002681 00000 n 
+0000002884 00000 n 
+0000003059 00000 n 
+0000003240 00000 n 
+0000003416 00000 n 
+0000003583 00000 n 
+0000003822 00000 n 
+0000004083 00000 n 
+0000004324 00000 n 
+0000004575 00000 n 
+0000004813 00000 n 
+0000005064 00000 n 
+0000005256 00000 n 
+0000005459 00000 n 
+0000005616 00000 n 
+0000005784 00000 n 
+0000005943 00000 n 
+0000006100 00000 n 
+0000006268 00000 n 
+0000006427 00000 n 
+0000006584 00000 n 
+0000006752 00000 n 
+0000006911 00000 n 
+0000007068 00000 n 
+0000007236 00000 n 
+0000007395 00000 n 
+0000007552 00000 n 
+0000007720 00000 n 
+0000007879 00000 n 
+0000008036 00000 n 
+0000008204 00000 n 
+0000008363 00000 n 
+0000008520 00000 n 
+0000008688 00000 n 
+0000008847 00000 n 
+0000009004 00000 n 
+0000009172 00000 n 
+0000009331 00000 n 
+0000009488 00000 n 
+0000009656 00000 n 
+0000009815 00000 n 
+0000009974 00000 n 
+0000010144 00000 n 
+0000010305 00000 n 
+0000010458 00000 n 
+0000010612 00000 n 
+0000010781 00000 n 
+0000010906 00000 n 
+0000011055 00000 n 
+0000011241 00000 n 
+0000011366 00000 n 
+0000011515 00000 n 
+0000011703 00000 n 
+0000011828 00000 n 
+0000011977 00000 n 
+0000016003 00000 n 
+0000016304 00000 n 
+0000021676 00000 n 
+0000022111 00000 n 
+trailer
+<< /Size 77 /Root 1 0 R /Info 76 0 R >>
+startxref
+22231
+%%EOF

@@ -1,0 +1,4 @@
+Django~=5.2
+# PostgreSQL driver for the container image. Local work on Windows uses SQLite,
+# and there is no prebuilt driver for Windows on ARM.
+psycopg[binary]~=3.2; sys_platform == "linux"

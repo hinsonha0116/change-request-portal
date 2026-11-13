@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Schedule{% endblock %}
+{% block main_class %}full{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Forward schedule of change</h1>
+  <div class="month-nav">
+    <a class="button" href="?month={{ previous_month|date:'Y-m' }}" aria-label="Previous month">‹</a>
+    <strong>{{ month|date:"F Y" }}</strong>
+    <a class="button" href="?month={{ next_month|date:'Y-m' }}" aria-label="Next month">›</a>
+    <a class="button" href="{% url 'schedule' %}">Today</a>
+  </div>
+</div>
+
+<div class="schedule">
+  <div class="calendar">
+    {% for name in weekdays %}<div class="weekday">{{ name }}</div>{% endfor %}
+    {% for cell in cells %}
+    <div class="day{% if not cell.in_month %} outside{% endif %}{% if cell.is_selected %} selected{% endif %}">
+      <a class="daynum{% if cell.is_today %} today{% endif %}"
+         href="?month={{ month|date:'Y-m' }}&amp;day={{ cell.day|date:'Y-m-d' }}"
+         aria-label="{{ cell.day|date:'l j F' }}">{{ cell.day.day }}</a>
+      {% for entry in cell.chips %}
+      <a class="chip stage-{{ entry.cr.stage }}{% if entry.has_conflict %} clash{% endif %}"
+         href="{% url 'detail' entry.cr.pk %}?from=schedule" title="{{ entry.cr.title }}">{{ entry.cr.cr_number }} {{ entry.cr.a6_program }}</a>
+      {% endfor %}
+      {% if cell.more %}<span class="more">+{{ cell.more }} more</span>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <aside class="daypanel">
+    <h2>{{ selected|date:"l j F Y" }}</h2>
+    {% for entry in selected_entries %}
+    <a class="daycard stage-edge-{{ entry.cr.stage }}{% if entry.has_conflict %} clash{% endif %}" href="{% url 'detail' entry.cr.pk %}?from=schedule">
+      <span class="muted">{{ entry.start|date:"j M H:i" }} → {{ entry.end|date:"j M H:i" }}</span>
+      <strong>{{ entry.cr.cr_number }} {{ entry.cr.title }}</strong>
+      <span>{% if entry.cr.a6_program %}{{ entry.cr.a6_program }} · {% endif %}{{ entry.cr.location }}</span>
+      <span class="flags">
+        {{ entry.cr.get_stage_display }}
+        {% if entry.cr.outage_expected %}<span class="outage">· ⚠ Outage {{ entry.cr.outage_duration }}</span>{% endif %}
+        {% if entry.has_conflict %}<span class="clash-text">· ⛔ Possible clash</span>{% endif %}
+      </span>
+    </a>
+    {% empty %}
+    <p class="muted">No changes scheduled.</p>
+    {% endfor %}
+    <p class="hint">Chip colour = stage · red outline = possible clash (same location or A6 program, overlapping times)</p>
+  </aside>
+</div>
+{% endblock %}

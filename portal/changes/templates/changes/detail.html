@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}{{ cr.cr_number }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  {% if from_schedule %}<a class="button" href="{% url 'schedule' %}">← Schedule</a>
+  {% else %}<a class="button" href="{% url 'board' %}">← Board</a>{% endif %}
+  <h1>{{ cr.cr_number }} — {{ cr.title }}</h1>
+  {% if cr.stage == "implementation" and cr.implementation_complete %}<span class="complete">✔ Complete</span>{% endif %}
+</div>
+
+<ol class="tracker">
+  {% for step in tracker %}
+  <li class="{{ step.state }}"{% if step.state == "current" %} aria-current="step"{% endif %}>
+    <span class="dot">{% if step.state == "done" %}✓{% else %}{{ step.number }}{% endif %}</span>
+    <span>{{ step.label }}</span>
+  </li>
+  {% endfor %}
+</ol>
+
+<div class="detail">
+  <form method="post" class="detail-main">
+    {% csrf_token %}
+    <input type="hidden" name="stage" value="{{ cr.stage }}">
+    {% if form %}{% for error in form.non_field_errors %}<p class="error">{{ error }}</p>{% endfor %}{% endif %}
+
+    {% for section in sections %}
+    <section class="panel">
+      <h2>{{ section.title }}</h2>
+      <div class="grid">
+        {% for row in section.rows %}
+          {% if row.field %}
+            {% include "changes/_field.html" with field=row.field wide=row.wide %}
+          {% else %}
+            <div class="field readonly{% if row.wide %} wide{% endif %}">
+              <span class="label">{{ row.label }}</span>
+              <span class="value">{{ row.value|linebreaksbr }}</span>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+
+    <section class="panel actionbar">
+      <label for="comment">Comment</label>
+      <textarea id="comment" name="comment" rows="2" placeholder="Goes into the history. Required for Reject and Needs changes."></textarea>
+      <div class="actions">
+        {% if can_send_back %}<button class="button" name="action" value="back">← Send back</button>{% endif %}
+        {% if can_reject %}<button class="button danger" name="action" value="reject">Reject</button>{% endif %}
+        {% if can_needs_changes %}<button class="button warn" name="action" value="needschanges">Needs changes</button>{% endif %}
+        {% if can_complete %}<button class="button success" name="action" value="complete">✔ Completed</button>{% endif %}
+        <button class="button" name="action" value="comment">Add comment</button>
+        {% if form %}<button class="button" name="action" value="save">Save</button>{% endif %}
+        {% if advance_label %}<button class="button primary" name="action" value="advance">{{ advance_label }}</button>{% endif %}
+      </div>
+    </section>
+  </form>
+
+  <aside class="detail-side">
+    <section class="panel">
+      <h2>Attachments</h2>
+      <ul class="files">
+        {% for file in attachments %}
+        <li><a href="{% url 'download_attachment' file.pk %}">{{ file.filename }}</a> <span class="muted">{{ file.size|filesizeformat }}</span></li>
+        {% empty %}
+        <li class="muted">No files attached.</li>
+        {% endfor %}
+      </ul>
+      {% if upload_form %}
+      <form method="post" enctype="multipart/form-data" class="stack"
+            action="{% url 'upload_attachment' cr.pk %}{% if from_schedule %}?from=schedule{% endif %}">
+        {% csrf_token %}
+        <label for="{{ upload_form.files.id_for_label }}">Add files</label>
+        {{ upload_form.files }}
+        <div><button class="button">Upload</button></div>
+      </form>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <h2>History</h2>
+      <ol class="history">
+        {% for entry in history %}
+        <li>
+          <strong>{{ entry.summary }}</strong>
+          <span class="muted">{{ entry.created_at|date:"j M Y H:i" }} · {{ entry.actor.get_full_name|default:entry.actor.username }}</span>
+          {% if entry.comment %}<p>{{ entry.comment|linebreaksbr }}</p>{% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+  </aside>
+</div>
+{% endblock %}

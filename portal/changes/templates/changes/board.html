@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Board{% endblock %}
+{% block main_class %}full{% endblock %}
+{% block content %}
+<form method="get" class="filters">
+  <input type="search" name="q" value="{{ search }}" placeholder="Search title or CR number" aria-label="Search title or CR number">
+  <select name="category" aria-label="Category">
+    <option value="">All categories</option>
+    {% for value, label in categories %}<option value="{{ value }}"{% if value == category %} selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <select name="type" aria-label="Change type">
+    <option value="">All types</option>
+    {% for value, label in change_types %}<option value="{{ value }}"{% if value == change_type %} selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  {% if sees_all %}
+  <label class="check"><input type="checkbox" name="mine" value="1"{% if mine_only %} checked{% endif %}> Only my requests</label>
+  {% endif %}
+  <button class="button">Filter</button>
+  <a class="button plain" href="{% url 'board' %}">Clear</a>
+</form>
+
+<div class="board">
+  {% for column in columns %}
+  <section class="column">
+    <h2 class="stage-{{ column.stage }}">
+      {{ column.number }}. {{ column.label }} <span class="count">({{ column.cards|length }})</span>
+    </h2>
+    {% if column.stage == "close" %}<p class="hint">Closed in the last {{ close_days }} days</p>{% endif %}
+    {% for cr in column.cards %}
+    <a class="card priority-{{ cr.priority }}" href="{% url 'detail' cr.pk %}">
+      <span class="card-id">{{ cr.cr_number }}{% if cr.stage == "implementation" and cr.implementation_complete %} <span class="complete">✔ Complete</span>{% endif %}</span>
+      <span class="card-title">{{ cr.title }}</span>
+      <span class="card-meta">{{ cr.get_priority_display|slice:"4:" }} · {{ cr.get_category_display }} · {{ cr.get_change_type_display }}</span>
+      <span class="card-meta">Risk {{ cr.get_risk_display|slice:"4:" }} · Impact {{ cr.get_impact_display|slice:"4:" }}</span>
+      <span class="card-meta muted">{{ cr.requested_by }}{% if cr.a6_program %} · {{ cr.a6_program }}{% endif %} · {{ cr.created_at|date:"j M Y" }}</span>
+    </a>
+    {% empty %}
+    <p class="empty">Nothing here</p>
+    {% endfor %}
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}New request{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Request a new change</h1>
+  <a class="button" href="{% static 'changes/Rollback-Plan-Template.pdf' %}" download>Download the Rollback Plan template</a>
+</div>
+<form method="post" enctype="multipart/form-data" class="panel">
+  {% csrf_token %}
+  {% for error in form.non_field_errors %}<p class="error">{{ error }}</p>{% endfor %}
+  <div class="grid">
+    {% for field in form %}
+      {% if field.name in wide_fields %}
+        {% include "changes/_field.html" with field=field wide=True %}
+      {% else %}
+        {% include "changes/_field.html" with field=field wide=False %}
+      {% endif %}
+    {% endfor %}
+  </div>
+  <div class="actions">
+    <a class="button" href="{% url 'board' %}">Cancel</a>
+    <button class="button primary">Submit request</button>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Change Requests{% endblock %} · A6 Change Management</title>
+  <link rel="stylesheet" href="{% static 'changes/portal.css' %}">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="{% url 'board' %}">A6 Change Management</a>
+  {% if user.is_authenticated %}
+  <nav>
+    <a href="{% url 'board' %}">Board</a>
+    <a href="{% url 'schedule' %}">Schedule</a>
+    <a class="button light" href="{% url 'new_request' %}">+ Request a new change</a>
+  </nav>
+  <div class="who">
+    <span>{{ user.get_full_name|default:user.username }}</span>
+    {% if user.is_staff %}<a href="{% url 'admin:index' %}">Admin</a>{% endif %}
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link">Sign out</button></form>
+  </div>
+  {% endif %}
+</header>
+{% if messages %}
+<ul class="messages">
+  {% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}
+</ul>
+{% endif %}
+<main class="{% block main_class %}{% endblock %}">
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>
