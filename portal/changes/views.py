@@ -222,6 +222,7 @@ ACTIONS = {"save", "advance", "back", "reject", "needschanges", "complete", "com
 def detail(request, pk):
     cr = _get_visible(request, pk)
     if request.method != "POST":
+        cr.notifications.filter(user=request.user, read_at__isnull=True).update(read_at=timezone.now())
         return _render_detail(request, cr, detail_form(cr, request.user))
 
     action = request.POST.get("action", "")
@@ -319,3 +320,13 @@ def schedule(request):
         "selected_entries": fsc.entries_on(entries, selected),
         "weekdays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     })
+
+
+# ---------------------------------------------------------------- notifications
+
+@login_required
+def notifications(request):
+    """The 100 most recent notifications. Opening the list marks them all as read."""
+    items = list(request.user.notifications.select_related("request")[:100])
+    request.user.notifications.filter(read_at__isnull=True).update(read_at=timezone.now())
+    return render(request, "changes/notifications.html", {"items": items, "unread_count": 0})

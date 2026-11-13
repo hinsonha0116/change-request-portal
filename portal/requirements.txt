@@ -1,4 +1,6 @@
 Django~=5.2
+# Single sign-on through any OpenID Connect provider. Only used when OIDC_RP_CLIENT_ID is set.
+mozilla-django-oidc~=4.0
 # PostgreSQL driver for the container image. Local work on Windows uses SQLite,
 # and there is no prebuilt driver for Windows on ARM.
 psycopg[binary]~=3.2; sys_platform == "linux"

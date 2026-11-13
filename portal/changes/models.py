@@ -187,6 +187,23 @@ class HistoryEntry(models.Model):
         return f"{self.get_from_stage_display()} → {self.get_to_stage_display()}"
 
 
+class Notification(models.Model):
+    """Something a user should know about a request. Shown in the app; also emailed when email is set up."""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
+    request = models.ForeignKey(ChangeRequest, on_delete=models.CASCADE, related_name="notifications")
+    subject = models.CharField(max_length=400)
+    created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+        indexes = [models.Index(fields=["user", "read_at"])]
+
+    def __str__(self):
+        return self.subject
+
+
 class Attachment(models.Model):
     """Rollback plan and other uploads. Stored in the database so one backup covers everything."""
 

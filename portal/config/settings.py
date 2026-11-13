@@ -61,6 +61,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "changes.context.portal",
             ],
         },
     },
@@ -104,6 +105,63 @@ USE_TZ = True
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "board"
 LOGOUT_REDIRECT_URL = "login"
+
+
+def required_env(name):
+    value = os.environ.get(name, "")
+    if not value:
+        raise ImproperlyConfigured(f"Single sign-on is on (OIDC_RP_CLIENT_ID is set), so {name} must be set too.")
+    return value
+
+
+# --- Sign-in -----------------------------------------------------------------
+# Single sign-on (OpenID Connect) switches on when OIDC_RP_CLIENT_ID is set.
+# It works with any provider that speaks OIDC (Keycloak, Dex, GitLab, ...).
+OIDC_RP_CLIENT_ID = os.environ.get("OIDC_RP_CLIENT_ID", "")
+PORTAL_SSO_ENABLED = bool(OIDC_RP_CLIENT_ID)
+# Local user names and passwords. Always on when there is no single sign-on.
+PORTAL_LOCAL_LOGIN = env_bool("PORTAL_LOCAL_LOGIN", True) or not PORTAL_SSO_ENABLED
+
+AUTHENTICATION_BACKENDS = []
+if PORTAL_SSO_ENABLED:
+    INSTALLED_APPS.append("mozilla_django_oidc")
+    AUTHENTICATION_BACKENDS.append("accounts.oidc.PortalOIDCBackend")
+    OIDC_RP_CLIENT_SECRET = required_env("OIDC_RP_CLIENT_SECRET")
+    OIDC_OP_AUTHORIZATION_ENDPOINT = required_env("OIDC_OP_AUTHORIZATION_ENDPOINT")
+    OIDC_OP_TOKEN_ENDPOINT = required_env("OIDC_OP_TOKEN_ENDPOINT")
+    OIDC_OP_USER_ENDPOINT = required_env("OIDC_OP_USER_ENDPOINT")
+    OIDC_OP_JWKS_ENDPOINT = required_env("OIDC_OP_JWKS_ENDPOINT")
+    OIDC_RP_SIGN_ALGO = os.environ.get("OIDC_RP_SIGN_ALGO", "RS256")
+    OIDC_RP_SCOPES = os.environ.get("OIDC_RP_SCOPES", "openid email profile")
+    OIDC_USE_PKCE = True
+    OIDC_TIMEOUT = 10
+if PORTAL_LOCAL_LOGIN:
+    AUTHENTICATION_BACKENDS.append("django.contrib.auth.backends.ModelBackend")
+
+# Which claim holds the user name, and which holds the user's groups.
+PORTAL_OIDC_USERNAME_CLAIM = os.environ.get("PORTAL_OIDC_USERNAME_CLAIM", "preferred_username")
+PORTAL_OIDC_GROUPS_CLAIM = os.environ.get("PORTAL_OIDC_GROUPS_CLAIM", "groups")
+# Optional: take roles from the provider's groups, e.g. "cm=change-managers,trb=trb-members".
+# A role listed here is set from the group at every sign-in. Roles not listed stay as set on the People screen.
+PORTAL_OIDC_ROLE_GROUPS = dict(
+    pair.strip().split("=", 1)
+    for pair in os.environ.get("PORTAL_OIDC_ROLE_GROUPS", "").split(",")
+    if "=" in pair
+)
+
+# --- Notifications and email ---------------------------------------------------
+# Every notification shows in the app. Email is sent as well once EMAIL_HOST is set.
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+PORTAL_EMAIL_ENABLED = bool(EMAIL_HOST)
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "25"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
+EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", False)
+EMAIL_TIMEOUT = 10
+DEFAULT_FROM_EMAIL = os.environ.get("PORTAL_EMAIL_FROM", "change-management@localhost")
+# The address people use to reach the portal, e.g. https://changes.example. Used for links in emails.
+PORTAL_BASE_URL = os.environ.get("PORTAL_BASE_URL", "").rstrip("/")
 
 # Largest single attachment, in megabytes. Attachments are stored in the database.
 PORTAL_MAX_UPLOAD_MB = int(os.environ.get("PORTAL_MAX_UPLOAD_MB", "25"))

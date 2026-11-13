@@ -3,12 +3,20 @@
 {% block main_class %}narrow{% endblock %}
 {% block content %}
 <h1>Sign in</h1>
+{% if sso_enabled %}
+<div class="panel stack">
+  <a class="button primary" href="{% url 'oidc_authentication_init' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Sign in with single sign-on</a>
+</div>
+{% endif %}
+{% if local_login %}
 <form method="post" class="panel stack">
   {% csrf_token %}
+  {% if sso_enabled %}<p class="muted">Or use a portal user name and password:</p>{% endif %}
   {% if form.errors %}<p class="error">That user name and password don't match. Try again.</p>{% endif %}
-  <div class="field">{{ form.username.label_tag }}{{ form.username }}</div>
-  <div class="field">{{ form.password.label_tag }}{{ form.password }}</div>
+  <div class="field"><label for="{{ form.username.id_for_label }}">User name</label>{{ form.username }}</div>
+  <div class="field"><label for="{{ form.password.id_for_label }}">Password</label>{{ form.password }}</div>
   <input type="hidden" name="next" value="{{ next }}">
   <div><button class="button primary">Sign in</button></div>
 </form>
+{% endif %}
 {% endblock %}

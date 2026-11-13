@@ -2,6 +2,7 @@
 from django.db import transaction
 from django.utils import timezone
 
+from . import notify
 from .models import ChangeRequest, CRCounter, HistoryEntry, Stage
 
 
@@ -29,4 +30,5 @@ def submit_request(user, today=None, **fields):
     HistoryEntry.objects.create(
         request=cr, kind=HistoryEntry.Kind.CREATED, to_stage=Stage.REQUESTED, actor=user
     )
+    notify.new_request(cr)
     return cr

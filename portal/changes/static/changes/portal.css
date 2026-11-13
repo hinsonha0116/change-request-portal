@@ -38,6 +38,8 @@ a { color: var(--navy); }
 .who form { margin: 0; }
 button.link { background: none; border: 0; padding: 0; color: #fff; font: inherit; cursor: pointer; text-decoration: underline; }
 
+.badge { display: inline-block; min-width: 1.3rem; padding: 0 .35rem; border-radius: 999px; background: #fff; color: var(--navy); font-size: .78rem; font-weight: 700; text-align: center; }
+
 /* Messages */
 .messages { list-style: none; margin: 0; padding: .75rem 1rem 0; position: sticky; top: 0; z-index: 5; }
 .messages li { padding: .6rem .9rem; border-radius: 6px; margin-bottom: .4rem; background: #e6eef9; border: 1px solid #b6c9e8; }
@@ -137,6 +139,19 @@ label.check { display: flex; align-items: center; gap: .45rem; font-weight: 600;
 .history li:first-child { border-top: 0; padding-top: 0; }
 .history span { display: block; font-size: .8rem; }
 .history p { margin: .25rem 0 0; overflow-wrap: anywhere; }
+
+/* Notifications and people */
+.notices { list-style: none; margin: 0; padding: 0; }
+.notices li { padding: .6rem 0; border-top: 1px solid var(--line); }
+.notices li:first-child { border-top: 0; }
+.notices .unread a { font-weight: 700; }
+.notices span { display: block; font-size: .8rem; }
+.table-wrap { overflow-x: auto; }
+table.roles { border-collapse: collapse; width: 100%; }
+table.roles th, table.roles td { padding: .5rem .6rem; border-bottom: 1px solid var(--line); text-align: center; font-size: .9rem; }
+table.roles th[scope=row], table.roles thead th:first-child { text-align: left; }
+table.roles th[scope=row] span { display: block; font-weight: 400; font-size: .8rem; }
+table.roles input { width: 1.1rem; height: 1.1rem; }
 
 /* Schedule */
 .month-nav { display: flex; align-items: center; gap: .6rem; }

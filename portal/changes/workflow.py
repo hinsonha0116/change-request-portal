@@ -17,8 +17,10 @@ from django.utils import timezone
 
 from accounts.models import Role
 
+from . import notify
 from .models import (
     Attachment,
+    Category,
     ChangeRequest,
     ChangeType,
     Decision,
@@ -81,6 +83,8 @@ BOARDS = {
 }
 
 SEE_ALL_ROLES = (Role.CM, Role.TRB, Role.CAB, Role.AUTHORITY)
+# SW and HW managers are told about new requests in their category, so they can open those too.
+MANAGER_CATEGORIES = {Role.SW_MANAGER: Category.SOFTWARE, Role.HW_MANAGER: Category.HARDWARE}
 
 REQUEST_FIELDS = frozenset({
     "title", "a6_program", "dsn", "requested_by", "requester_email", "category",
@@ -105,7 +109,13 @@ def can_view(cr, user):
     """Board members and the CM team see everything; everyone else sees their own requests."""
     if not user.is_active:
         return False
-    return is_requester(cr, user) or cr.assignee_id == user.pk or user.has_any_role(*SEE_ALL_ROLES)
+    if is_requester(cr, user) or cr.assignee_id == user.pk or user.has_any_role(*SEE_ALL_ROLES):
+        return True
+    return cr.category in managed_categories(user)
+
+
+def managed_categories(user):
+    return [category for role, category in MANAGER_CATEGORIES.items() if user.has_role(role)]
 
 
 def own_requests(user):
@@ -122,7 +132,7 @@ def visible_to(user):
         return ChangeRequest.objects.none()
     if user.has_any_role(*SEE_ALL_ROLES):
         return ChangeRequest.objects.all()
-    return own_requests(user)
+    return own_requests(user) | ChangeRequest.objects.filter(category__in=managed_categories(user))
 
 
 def editable_fields(cr, user):
@@ -156,10 +166,11 @@ def _require(allowed, message):
 
 
 def _log(cr, user, kind, from_stage, to_stage, comment):
-    HistoryEntry.objects.create(
+    entry = HistoryEntry.objects.create(
         request=cr, kind=kind, from_stage=from_stage, to_stage=to_stage,
         comment=comment.strip(), actor=user,
     )
+    notify.stage_event(entry)
 
 
 def _append_note(existing, label, comment):

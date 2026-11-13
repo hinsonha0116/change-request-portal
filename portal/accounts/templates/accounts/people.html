@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}People and roles{% endblock %}
+{% block content %}
+<div class="page-head"><h1>People and roles</h1></div>
+<p class="muted">Tick the roles each person holds. People with no role can still submit and follow their own requests.
+  {% if sso_enabled %}New people appear here after their first sign-in.{% else %}Add new people in the Admin site.{% endif %}</p>
+<form method="post" class="panel">
+  {% csrf_token %}
+  <div class="table-wrap">
+    <table class="roles">
+      <thead>
+        <tr><th scope="col">Person</th>{% for role, label in roles %}<th scope="col">{{ label }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <th scope="row">{{ row.user.get_full_name|default:row.user.username }}
+            <span class="muted">{{ row.user.email|default:row.user.username }}</span></th>
+          {% for cell in row.cells %}
+          <td><input type="checkbox" name="role-{{ row.user.pk }}-{{ cell.role }}"{% if cell.held %} checked{% endif %}
+                     aria-label="{{ row.user.username }}: {{ cell.label }}"></td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="actions"><button class="button primary">Save roles</button></div>
+</form>
+{% endblock %}

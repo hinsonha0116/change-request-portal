@@ -13,10 +13,13 @@
   <nav>
     <a href="{% url 'board' %}">Board</a>
     <a href="{% url 'schedule' %}">Schedule</a>
+    <a href="{% url 'notifications' %}">Notifications{% if unread_count %} <span class="badge">{{ unread_count }}</span>{% endif %}</a>
+    {% if can_manage_people %}<a href="{% url 'people' %}">People</a>{% endif %}
     <a class="button light" href="{% url 'new_request' %}">+ Request a new change</a>
   </nav>
   <div class="who">
     <span>{{ user.get_full_name|default:user.username }}</span>
+    {% if user.has_usable_password and local_login %}<a href="{% url 'password_change' %}">Password</a>{% endif %}
     {% if user.is_staff %}<a href="{% url 'admin:index' %}">Admin</a>{% endif %}
     <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link">Sign out</button></form>
   </div>

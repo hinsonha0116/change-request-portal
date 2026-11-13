@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Notifications</h1></div>
+<section class="panel">
+  <ul class="notices">
+    {% for item in items %}
+    <li{% if not item.read_at %} class="unread"{% endif %}>
+      <a href="{% url 'detail' item.request_id %}">{{ item.subject }}</a>
+      <span class="muted">{{ item.created_at|date:"j M Y H:i" }}{% if not item.read_at %} · New{% endif %}</span>
+    </li>
+    {% empty %}
+    <li class="muted">Nothing yet. You'll be told here when a request needs you or one of yours moves.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}
