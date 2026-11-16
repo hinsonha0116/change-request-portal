@@ -282,3 +282,25 @@ On each of those drop-downs, also set:
 - **A control that should be inside a card or gallery** must be indented under it in the Tree view. To move one there: **Ctrl+X**, select the card or gallery, then **Ctrl+V**.
 - **Hidden form cards** belong at the **bottom** of **Edit fields**. Hidden cards in between visible ones can break the column layout (Issue 3).
 - **A drop-down shows *Item 1, 2, 3*:** the card-generated combo box isn't reading the choices. Refresh the data source first. If that doesn't help, use a classic **Drop down** with a list in App.Formulas (Issues 1 and 4). The lists are in **Reference — every choice list**.
+
+---
+
+## Issue 5 — The A6 program is blank in the flows (16 Nov 2026)
+
+**Symptom:** the archive flow filed every change under **No program**, and the PDF showed **—** for the A6 program. The new-request email's *A6 program* row was empty too. The app showed the programs normally.
+
+**Cause:** the column's **internal name** is `A6Program_x002c__x0020_DSN_x002c`, not `A6Program`. When it was first created, its name was typed as something like *"A6Program, DSN,"*. SharePoint fixes the internal name when a column is created (`_x002c_` is a comma, `_x0020_` a space), and renaming the column later only changed the display name.
+- **Power Apps** uses the display name, so `A6Program` works in the app.
+- **Power Automate** uses the internal name, so `['A6Program']` finds nothing.
+
+**Found by:** opening the run's **Get item › Show raw outputs** and searching for `Program`:
+```
+"A6Program_x002c__x0020_DSN_x002c": "C2C",
+```
+
+**Fix:** in every flow, read the program as `body('Get_item')?['A6Program_x002c__x0020_DSN_x002c']` (or `triggerOutputs()?['body/A6Program_x002c__x0020_DSN_x002c']` from a trigger). The archive guide and Step 8a of the build guide now use this name. Internal names can't be changed.
+
+**Keep in mind:**
+- A production list built with **From existing list** keeps this internal name.
+- A list built with **Provision-ChangeRequestLists.ps1** names it plain `A6Program`, and the flows must use that instead.
+- **To check any column's internal name:** in **List settings**, click the column and look at `Field=…` at the end of the address, or look in a flow run's raw outputs.

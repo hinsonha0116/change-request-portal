@@ -99,15 +99,23 @@ Add these **Compose** actions. Rename each, and paste each input with **fx / Exp
 
 **`SafeProgram`** and **`SafeTitle`** remove characters SharePoint doesn't allow in folder names. For example, *HERTR/GWRTR* becomes *HERTR-GWRTR*. The title is also cut to 80 characters to stay well inside SharePoint's path length limit.
 
+> **The A6 program column's internal name is `A6Program_x002c__x0020_DSN_x002c`.** When the column was first created, its name was typed as something like *"A6Program, DSN,"*. SharePoint fixes a column's internal name when it's created, so renaming it later only changed the display name. Power Apps uses the display name, so the app is unaffected. Power Automate uses the internal name, so the expressions below use it.
+>
+> - **Production lists built with *From existing list*** copy this name, so the expressions work as written.
+> - **Lists built with the provisioning script** name the column plain `A6Program`. Change the expressions to `['A6Program']` there.
+> - **To check any list:** run the flow once, open **Get item › Show raw outputs**, and search for `Program`.
+
 `SafeProgram`:
 ```
-trim(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(if(empty(body('Get_item')?['A6Program']), 'No program', body('Get_item')?['A6Program']), '"', ''), '*', ''), ':', ' -'), '<', ''), '>', ''), '?', ''), '/', '-'), '\', '-'), '|', '-'), '#', ''))
+trim(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(if(empty(body('Get_item')?['A6Program_x002c__x0020_DSN_x002c']), 'No program', body('Get_item')?['A6Program_x002c__x0020_DSN_x002c']), decodeUriComponent('%22'), ''), '*', ''), ':', ' -'), '<', ''), '>', ''), '?', ''), '/', '-'), decodeUriComponent('%5C'), '-'), '|', '-'), '#', ''))
 ```
 
 `SafeTitle`:
 ```
-trim(take(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(coalesce(body('Get_item')?['Title'], 'Untitled'), '"', ''), '*', ''), ':', ' -'), '<', ''), '>', ''), '?', ''), '/', '-'), '\', '-'), '|', '-'), '#', ''), '%', ''), 80))
+trim(take(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(coalesce(body('Get_item')?['Title'], 'Untitled'), decodeUriComponent('%22'), ''), '*', ''), ':', ' -'), '<', ''), '>', ''), '?', ''), '/', '-'), decodeUriComponent('%5C'), '-'), '|', '-'), '#', ''), '%', ''), 80))
 ```
+
+`decodeUriComponent('%22')` is a double quote and `decodeUriComponent('%5C')` a backslash. Writing them this way avoids typing those two characters into the expression, which the designer sometimes stores differently from how they were typed.
 
 ---
 
@@ -129,9 +137,11 @@ With no assignee it gives an empty list; with several it uses the list as it is;
 
 **Typed, not picked:** in **Get history**, type the column names in **Filter Query** (`RequestID eq `, then the `outputs('RequestID')` expression) and **Order By** (`Created asc`) as plain text. Picking *Created* or *RequestID* from dynamic content inserts a value instead of the column name, and the action fails.
 
-**`History rows` › Map.** One table row per History entry, with the same wording as the app:
+**`History rows` › From** must be exactly `body('Get_history')?['value']`, the rows **Get history** returned. With anything else, the rows have no dates and the step fails.
+
+**`History rows` › Map.** One table row per History entry, with the same wording as the app. An empty date shows **—** instead of stopping the flow:
 ```
-concat('<tr><td>', convertFromUtc(item()?['Created'], 'W. Europe Standard Time', 'dd MMM yyyy HH:mm'), '</td><td>', coalesce(item()?['Author']?['DisplayName'], ''), '</td><td>', if(empty(item()?['FromStage']), 'Created', if(startsWith(coalesce(item()?['Comment'], ''), '✎'), concat('Changes (', item()?['ToStage'], ')'), if(equals(item()?['FromStage'], item()?['ToStage']), concat('Comment (', item()?['ToStage'], ')'), concat(item()?['FromStage'], ' → ', item()?['ToStage'])))), '</td><td>', coalesce(item()?['Comment'], ''), '</td></tr>')
+concat('<tr><td>', if(empty(item()?['Created']), '—', convertFromUtc(item()?['Created'], 'W. Europe Standard Time', 'dd MMM yyyy HH:mm')), '</td><td>', coalesce(item()?['Author']?['DisplayName'], ''), '</td><td>', if(empty(item()?['FromStage']), 'Created', if(startsWith(coalesce(item()?['Comment'], ''), '✎'), concat('Changes (', item()?['ToStage'], ')'), if(equals(item()?['FromStage'], item()?['ToStage']), concat('Comment (', item()?['ToStage'], ')'), concat(item()?['FromStage'], ' → ', item()?['ToStage'])))), '</td><td>', coalesce(item()?['Comment'], ''), '</td></tr>')
 ```
 
 ### 3b. Every field, ready to print
@@ -145,7 +155,7 @@ Add a **Compose**, rename it `Fields`, and paste the block below into **Inputs**
   "Closed": "@{convertFromUtc(outputs('ClosedAt'), 'W. Europe Standard Time', 'dd MMM yyyy HH:mm')}",
   "Submitted": "@{convertFromUtc(body('Get_item')?['Created'], 'W. Europe Standard Time', 'dd MMM yyyy HH:mm')}",
   "SubmittedBy": "@{if(empty(body('Get_item')?['SubmittedBy']), '—', body('Get_item')?['SubmittedBy'])}",
-  "A6Program": "@{if(empty(body('Get_item')?['A6Program']), '—', body('Get_item')?['A6Program'])}",
+  "A6Program": "@{if(empty(body('Get_item')?['A6Program_x002c__x0020_DSN_x002c']), '—', body('Get_item')?['A6Program_x002c__x0020_DSN_x002c'])}",
   "RequestedBy": "@{if(empty(body('Get_item')?['RequestedBy']), '—', body('Get_item')?['RequestedBy'])}",
   "RequesterEmail": "@{if(empty(body('Get_item')?['RequesterEmail']), '—', body('Get_item')?['RequesterEmail'])}",
   "DSN": "@{if(empty(body('Get_item')?['DSN']), '—', body('Get_item')?['DSN'])}",
@@ -386,4 +396,6 @@ Do these with **TEST –** requests, and delete them and their archive folders a
 | The PDF shows `@{...}` text | The expression was stored as plain text | Rebuild those parts with **Expression** (note under 3c) |
 | **Assignee names** fails: *'from' … is of type 'Object'. The value must be an array* | An older **From** formula, and Assignee allows only one person | Use the **From** in 3a, which handles one or several |
 | **Get history** fails: *The expression "2026-… asc" is not valid* | **Order By** holds the dynamic *Created* date instead of the text | Clear it and type `Created asc` |
+| Every change is filed under **No program**, and the PDF's A6 program shows **—** | The flow reads `A6Program`, but the column's internal name differs | Use the internal name from **Get item › Show raw outputs** (here `A6Program_x002c__x0020_DSN_x002c`), as in Step 2c |
+| **History rows** fails: *'convertFromUtc' expects … a string … The provided value is of type 'Null'* | **History rows › From** isn't the History rows | Set **From** to `body('Get_history')?['value']` |
 | Dates are an hour or a day off | Time zone | Use the same time zone name in every expression |

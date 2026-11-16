@@ -1267,7 +1267,7 @@ Two flows send the emails. Build them signed in as the account that should own t
    <tr><td><b>CR number</b></td><td>@{outputs('CRNumber')}</td></tr>
    <tr><td><b>Title</b></td><td>@{triggerOutputs()?['body/Title']}</td></tr>
    <tr><td><b>Requested by</b></td><td>@{triggerOutputs()?['body/RequestedBy']} (@{triggerOutputs()?['body/RequesterEmail']})</td></tr>
-   <tr><td><b>A6 program</b></td><td>@{triggerOutputs()?['body/A6Program']}</td></tr>
+   <tr><td><b>A6 program</b></td><td>@{triggerOutputs()?['body/A6Program_x002c__x0020_DSN_x002c']}</td></tr>
    <tr><td><b>Category / type</b></td><td>@{triggerOutputs()?['body/Category/Value']} / @{triggerOutputs()?['body/ChangeType/Value']}</td></tr>
    <tr><td><b>Priority</b></td><td>@{triggerOutputs()?['body/Priority/Value']}</td></tr>
    <tr><td><b>Risk / Impact</b></td><td>@{triggerOutputs()?['body/Risk/Value']} / @{triggerOutputs()?['body/Impact/Value']}</td></tr>
@@ -1282,6 +1282,8 @@ Two flows send the emails. Build them signed in as the account that should own t
    <p><a href="YOUR-WEB-LINK&crid=@{triggerOutputs()?['body/ID']}">Open @{outputs('CRNumber')} in the Change Request Portal</a></p>
    ```
    > If the `@{...}` parts stay as plain text in the email, rebuild each one by hand: delete it, then insert the matching item from **Dynamic content** or the Compose output.
+   >
+   > **A6 program:** this list's A6 program column has the internal name `A6Program_x002c__x0020_DSN_x002c` (it was first created as *"A6Program, DSN,"*), so the flow reads that name. On a list built by the provisioning script, it's plain `A6Program`. Check under the trigger's **Show raw outputs** if in doubt.
 
 5. **Email the CM team.** Add **Send an email (V2)** (Office 365 Outlook):
    - **To** = `variables('CMTeamEmails')` *(expression)*
