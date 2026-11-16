@@ -118,11 +118,16 @@ Add two **Select** actions (under *Data Operation*). For each, click the **Map**
 
 | Rename to | From (expression) | Map (expression) |
 |---|---|---|
-| `Assignee names` | `if(empty(body('Get_item')?['Assignee']), json('[]'), body('Get_item')?['Assignee'])` | `item()?['DisplayName']` |
+| `Assignee names` | see below | `item()?['DisplayName']` |
 | `History rows` | `body('Get_history')?['value']` | see below |
 
-> If **Assignee** still allows only one person (Part 3 of the current updates not done yet), use this **From** instead:
-> `if(empty(body('Get_item')?['Assignee']), json('[]'), createArray(body('Get_item')?['Assignee']))`
+**`Assignee names` › From.** Works whether **Assignee** allows one person or several:
+```
+if(empty(body('Get_item')?['Assignee']), json('[]'), if(startsWith(string(body('Get_item')?['Assignee']), '['), body('Get_item')?['Assignee'], createArray(body('Get_item')?['Assignee'])))
+```
+With no assignee it gives an empty list; with several it uses the list as it is; with one person it wraps them in a list, because **Select** only accepts a list.
+
+**Typed, not picked:** in **Get history**, type the column names in **Filter Query** (`RequestID eq `, then the `outputs('RequestID')` expression) and **Order By** (`Created asc`) as plain text. Picking *Created* or *RequestID* from dynamic content inserts a value instead of the column name, and the action fails.
 
 **`History rows` › Map.** One table row per History entry, with the same wording as the app:
 ```
@@ -379,5 +384,6 @@ Do these with **TEST –** requests, and delete them and their archive folders a
 | **Save archive link** fails | A required field wasn't passed, or the column name differs | Pass **Title** and **Stage**; check the column's internal name is `ArchiveLink` |
 | **Open archive** doesn't show | The flow hadn't finished when the request was opened, or the app didn't refresh the data source | Reopen the request a few minutes later; refresh **Change Requests** in **Data** and republish |
 | The PDF shows `@{...}` text | The expression was stored as plain text | Rebuild those parts with **Expression** (note under 3c) |
-| Assignees fail with an error about an array | Assignee still allows only one person | Use the alternative **From** in 3a |
+| **Assignee names** fails: *'from' … is of type 'Object'. The value must be an array* | An older **From** formula, and Assignee allows only one person | Use the **From** in 3a, which handles one or several |
+| **Get history** fails: *The expression "2026-… asc" is not valid* | **Order By** holds the dynamic *Created* date instead of the text | Clear it and type `Created asc` |
 | Dates are an hour or a day off | Time zone | Use the same time zone name in every expression |
