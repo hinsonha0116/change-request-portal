@@ -1,0 +1,107 @@
+# Change Request Portal. Settings an install normally changes are marked CHANGE.
+
+image:
+  # CHANGE: where the cluster pulls the portal image from.
+  repository: change-request-portal
+  tag: ""            # defaults to the chart's appVersion
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+
+# CHANGE: the host name people use to reach the portal.
+host: changes.example
+
+# The portal expects HTTPS to end at the Ingress. Set false only to try it over plain HTTP.
+https: true
+
+replicas: 2
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  #  nginx.ingress.kubernetes.io/proxy-body-size: 30m   # attachments can be 25 MB
+  # Name of the TLS secret for the host. Leave empty if the Ingress controller supplies the certificate.
+  tlsSecretName: ""
+
+# Passwords and keys. Leave existingSecret empty and the chart creates a Secret,
+# generating the secret key and the database password on first install and
+# keeping them on upgrades. To manage the Secret yourself, name it here; it needs
+# the keys django-secret-key and postgres-password, plus oidc-client-secret and
+# email-password when those features are used.
+secrets:
+  existingSecret: ""
+  djangoSecretKey: ""
+  postgresPassword: ""
+  oidcClientSecret: ""
+  emailPassword: ""
+
+# Single sign-on through any OpenID Connect provider. On when clientId is set.
+oidc:
+  clientId: ""
+  authorizationEndpoint: ""
+  tokenEndpoint: ""
+  userEndpoint: ""
+  jwksEndpoint: ""
+  signAlgo: RS256
+  scopes: openid email profile
+  usernameClaim: preferred_username
+  groupsClaim: groups
+  # Roles from provider groups, e.g. "cm=change-managers,trb=trb-members".
+  roleGroups: ""
+  # Set false to hide user-name-and-password sign-in once single sign-on works.
+  localLogin: true
+
+# Email. On when host is set.
+email:
+  host: ""
+  port: 25
+  user: ""
+  useTls: false
+  useSsl: false
+  from: change-management@localhost
+
+timeZone: UTC
+maxUploadMb: 25
+logLevel: INFO
+
+# Extra environment variables for the portal, as name: value.
+extraEnv: {}
+
+resources:
+  requests: {cpu: 100m, memory: 256Mi}
+  limits: {memory: 512Mi}
+
+# The database. With enabled: true the chart runs one PostgreSQL pod with its own volume.
+# With enabled: false, fill in externalDatabase (for example a database run by an operator).
+postgresql:
+  enabled: true
+  image: postgres:17
+  storageSize: 10Gi
+  storageClassName: ""   # empty uses the cluster's default
+  resources:
+    requests: {cpu: 100m, memory: 256Mi}
+    limits: {memory: 1Gi}
+
+externalDatabase:
+  host: ""
+  port: 5432
+
+database:
+  name: portal
+  user: portal
+
+# A scheduled pg_dump of the whole database (requests, history, attachments, users).
+backup:
+  enabled: true
+  schedule: "15 1 * * *"
+  keepDays: 14
+  # Must match the database's major version when using an external database.
+  image: postgres:17
+  storageSize: 10Gi
+  # CHANGE: ideally a storage class on different hardware from the database volume.
+  storageClassName: ""
+  # Use a volume claim that already exists instead of creating one.
+  existingClaim: ""
+
+nodeSelector: {}
+tolerations: []

@@ -1,4 +1,7 @@
 Django~=5.2
+# Serves the app in the container image, and its static files.
+gunicorn~=23.0
+whitenoise~=6.9
 # Single sign-on through any OpenID Connect provider. Only used when OIDC_RP_CLIENT_ID is set.
 mozilla-django-oidc~=4.0
 # PostgreSQL driver for the container image. Local work on Windows uses SQLite,

@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "portal.name" . }}
+  labels: {{ include "portal.labels" . | nindent 4 }}
+data:
+  DJANGO_ALLOWED_HOSTS: {{ required "Set host to the portal's host name" .Values.host | quote }}
+  PORTAL_BASE_URL: "{{ ternary "https" "http" .Values.https }}://{{ .Values.host }}"
+  PORTAL_HTTPS: {{ ternary "1" "0" .Values.https | quote }}
+  PORTAL_TIME_ZONE: {{ .Values.timeZone | quote }}
+  PORTAL_MAX_UPLOAD_MB: {{ .Values.maxUploadMb | quote }}
+  PORTAL_LOG_LEVEL: {{ .Values.logLevel | quote }}
+  POSTGRES_HOST: {{ include "portal.dbHost" . | quote }}
+  POSTGRES_PORT: {{ include "portal.dbPort" . | quote }}
+  POSTGRES_DB: {{ .Values.database.name | quote }}
+  POSTGRES_USER: {{ .Values.database.user | quote }}
+  {{- with .Values.oidc }}
+  {{- if .clientId }}
+  OIDC_RP_CLIENT_ID: {{ .clientId | quote }}
+  OIDC_OP_AUTHORIZATION_ENDPOINT: {{ required "oidc.authorizationEndpoint is needed with oidc.clientId" .authorizationEndpoint | quote }}
+  OIDC_OP_TOKEN_ENDPOINT: {{ required "oidc.tokenEndpoint is needed with oidc.clientId" .tokenEndpoint | quote }}
+  OIDC_OP_USER_ENDPOINT: {{ required "oidc.userEndpoint is needed with oidc.clientId" .userEndpoint | quote }}
+  OIDC_OP_JWKS_ENDPOINT: {{ required "oidc.jwksEndpoint is needed with oidc.clientId" .jwksEndpoint | quote }}
+  OIDC_RP_SIGN_ALGO: {{ .signAlgo | quote }}
+  OIDC_RP_SCOPES: {{ .scopes | quote }}
+  PORTAL_OIDC_USERNAME_CLAIM: {{ .usernameClaim | quote }}
+  PORTAL_OIDC_GROUPS_CLAIM: {{ .groupsClaim | quote }}
+  PORTAL_OIDC_ROLE_GROUPS: {{ .roleGroups | quote }}
+  PORTAL_LOCAL_LOGIN: {{ ternary "1" "0" .localLogin | quote }}
+  {{- end }}
+  {{- end }}
+  {{- with .Values.email }}
+  {{- if .host }}
+  EMAIL_HOST: {{ .host | quote }}
+  EMAIL_PORT: {{ .port | quote }}
+  EMAIL_HOST_USER: {{ .user | quote }}
+  EMAIL_USE_TLS: {{ ternary "1" "0" .useTls | quote }}
+  EMAIL_USE_SSL: {{ ternary "1" "0" .useSsl | quote }}
+  PORTAL_EMAIL_FROM: {{ .from | quote }}
+  {{- end }}
+  {{- end }}
+  {{- range $name, $value := .Values.extraEnv }}
+  {{ $name }}: {{ $value | quote }}
+  {{- end }}

@@ -39,7 +39,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # First, so the cluster's health probes are answered before any host or HTTPS check.
+    "config.health.HealthMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -168,3 +171,50 @@ PORTAL_MAX_UPLOAD_MB = int(os.environ.get("PORTAL_MAX_UPLOAD_MB", "25"))
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# WhiteNoise serves the static files from the app itself, so no separate web server is needed.
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+        if DEBUG
+        else "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    },
+}
+
+# --- HTTPS ---------------------------------------------------------------------
+# The portal expects to sit behind an Ingress that ends HTTPS and passes
+# X-Forwarded-Proto. PORTAL_HTTPS=0 is only for trying the image without HTTPS.
+PORTAL_HTTPS = env_bool("PORTAL_HTTPS", not DEBUG)
+if PORTAL_HTTPS:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = int(os.environ.get("PORTAL_HSTS_SECONDS", str(60 * 60 * 24 * 365)))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("PORTAL_HSTS_INCLUDE_SUBDOMAINS", False)
+    SECURE_HSTS_PRELOAD = False
+if PORTAL_BASE_URL:
+    CSRF_TRUSTED_ORIGINS = [PORTAL_BASE_URL]
+SESSION_COOKIE_HTTPONLY = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+
+# Keep database connections open between requests, and check each one before use.
+if DATABASES["default"]["ENGINE"].endswith("postgresql"):
+    DATABASES["default"]["CONN_MAX_AGE"] = 60
+    DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
+
+# Everything is logged to the console, where the cluster collects it.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {"plain": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s"}},
+    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "plain"}},
+    "root": {"handlers": ["console"], "level": os.environ.get("PORTAL_LOG_LEVEL", "INFO")},
+    "loggers": {
+        "django": {"handlers": ["console"], "level": "INFO", "propagate": False},
+    },
+}
+
+# An internal portal is never submitted to the browsers' public HSTS preload list.
+SILENCED_SYSTEM_CHECKS = ["security.W021"]

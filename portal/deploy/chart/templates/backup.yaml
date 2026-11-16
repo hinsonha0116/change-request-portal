@@ -1,0 +1,81 @@
+{{- if .Values.backup.enabled }}
+{{- if not .Values.backup.existingClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "portal.name" . }}-backup
+  labels: {{ include "portal.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  accessModes: [ReadWriteOnce]
+  {{- with .Values.backup.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.backup.storageSize }}
+---
+{{- end }}
+# One file per run, portal-<date>-<time>.dump, restorable with pg_restore.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "portal.name" . }}-backup
+  labels: {{ include "portal.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.backup.schedule | quote }}
+  timeZone: {{ .Values.timeZone | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            {{- include "portal.labels" . | nindent 12 }}
+            app.kubernetes.io/component: backup
+        spec:
+          restartPolicy: OnFailure
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
+            runAsGroup: 999
+            fsGroup: 999
+            seccompProfile: {type: RuntimeDefault}
+          {{- include "portal.scheduling" . | nindent 10 }}
+          containers:
+            - name: backup
+              image: {{ .Values.backup.image }}
+              command:
+                - /bin/sh
+                - -ec
+                - |
+                  file="/backups/portal-$(date +%Y%m%d-%H%M%S).dump"
+                  # Written under a temporary name, so a failed run never leaves a file that looks complete.
+                  pg_dump --format=custom --file="$file.partial"
+                  mv "$file.partial" "$file"
+                  echo "Wrote $file ($(du -h "$file" | cut -f1))"
+                  find /backups -name 'portal-*.dump' -mtime +{{ .Values.backup.keepDays }} -print -delete
+                  rm -f /backups/*.partial
+              env:
+                - {name: PGHOST, value: {{ include "portal.dbHost" . | quote }}}
+                - {name: PGPORT, value: {{ include "portal.dbPort" . | quote }}}
+                - {name: PGDATABASE, value: {{ .Values.database.name | quote }}}
+                - {name: PGUSER, value: {{ .Values.database.user | quote }}}
+                - name: PGPASSWORD
+                  valueFrom: {secretKeyRef: {name: {{ include "portal.secretName" . }}, key: postgres-password}}
+              resources:
+                requests: {cpu: 50m, memory: 128Mi}
+                limits: {memory: 512Mi}
+              {{- include "portal.containerSecurity" . | nindent 14 }}
+              volumeMounts:
+                - {name: backups, mountPath: /backups}
+          volumes:
+            - name: backups
+              persistentVolumeClaim:
+                claimName: {{ .Values.backup.existingClaim | default (printf "%s-backup" (include "portal.name" .)) }}
+{{- end }}

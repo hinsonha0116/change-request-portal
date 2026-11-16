@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "portal.name" . }}
+  labels: {{ include "portal.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "portal.selector" . | nindent 6 }}
+      app.kubernetes.io/component: web
+  strategy:
+    rollingUpdate: {maxUnavailable: 0, maxSurge: 1}
+  template:
+    metadata:
+      labels:
+        {{- include "portal.labels" . | nindent 8 }}
+        app.kubernetes.io/component: web
+      annotations:
+        # Restart the pods when the settings change.
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      {{- include "portal.scheduling" . | nindent 6 }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              {{- include "portal.selector" . | nindent 14 }}
+              app.kubernetes.io/component: web
+      containers:
+        - name: web
+          image: {{ include "portal.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- include "portal.env" . | nindent 10 }}
+          ports:
+            - {name: http, containerPort: 8000}
+          # Not ready until the database answers and the migration Job has finished.
+          startupProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            httpGet: {path: /readyz, port: http}
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 20
+            timeoutSeconds: 5
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+          {{- include "portal.containerSecurity" . | nindent 10 }}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        # Scratch space for uploads while they are being received.
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "portal.name" . }}
+  labels: {{ include "portal.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "portal.selector" . | nindent 4 }}
+    app.kubernetes.io/component: web
+  ports:
+    - {name: http, port: 80, targetPort: http}
+{{- if gt (int .Values.replicas) 1 }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "portal.name" . }}
+  labels: {{ include "portal.labels" . | nindent 4 }}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      {{- include "portal.selector" . | nindent 6 }}
+      app.kubernetes.io/component: web
+{{- end }}

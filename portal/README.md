@@ -2,7 +2,7 @@
 
 A Django rebuild of the Power Apps portal, meant to run in a Kubernetes cluster with no Microsoft 365 services. The guides in the parent folder are the specification.
 
-**Status:** steps 1 to 4 of 6 are done: the data model, the stage rules, the screens, sign-in and roles, and notifications with email. Still to come: the container image and Helm chart, then a full run in a local cluster.
+**Status:** steps 1 to 5 of 6 are done: the data model, the stage rules, the screens, sign-in and roles, notifications with email, and the container image with its Helm chart. Still to come: a full run in a real Kubernetes cluster. See [Run it in the cluster](#run-it-in-the-cluster) for what has and has not been checked.
 
 ## What's here
 
@@ -17,7 +17,9 @@ A Django rebuild of the Power Apps portal, meant to run in a Kubernetes cluster 
 | `changes/views.py`, `forms.py`, `templates/`, `static/` | The screens: board, list, New Request, detail, schedule and notifications |
 | `changes/management/commands/seed_demo.py` | Demo users and requests for local work |
 | `changes/tests/` | Tests for every route, rule, permission and screen |
-| `config/` | Settings, read from environment variables. `settings_dev.py` is for local work only |
+| `config/` | Settings, read from environment variables. `settings_dev.py` is for local work only. `health.py` answers the cluster's health probes |
+| `Dockerfile` | The container image |
+| `deploy/chart/` | The Helm chart: portal, database, migration Job and backups |
 
 ## Run it locally
 
@@ -56,6 +58,67 @@ Start the app, then open http://localhost:8000:
 The demo users are `pat` and `sam` (requesters), `cm`, `trb`, `cab` and `authority`. `cm` holds every role and is a superuser, so that one account can approve and move a request through every step. Their shared password is `DEMO_PASSWORD` in `changes/management/commands/seed_demo.py`. `cm` can also open the admin site at `/admin/` to add users and roles.
 
 `config.settings_dev` turns debug on and uses a local SQLite file. The PostgreSQL driver is only installed on Linux (the container image).
+
+## Run it in the cluster
+
+Needs Docker to build the image, and Helm 3 with access to the cluster.
+
+Build the image and push it to a registry the cluster can pull from:
+
+```bash
+docker build -t <registry>/change-request-portal:0.1.0 .
+```
+
+```bash
+docker push <registry>/change-request-portal:0.1.0
+```
+
+Install it. `host` is the name people will type to reach the portal:
+
+```bash
+helm install portal deploy/chart --namespace change-portal --create-namespace --set image.repository=<registry>/change-request-portal --set host=changes.example --set ingress.enabled=true
+```
+
+Create the first account, which can then add everyone else on the People screen:
+
+```bash
+kubectl -n change-portal exec -it deploy/portal -- python manage.py createsuperuser
+```
+
+Every other setting is described in `deploy/chart/values.yaml`. Upgrade with `helm upgrade` and the same settings.
+
+What the chart sets up:
+
+- **The portal**: two pods behind a Service, and an Ingress if `ingress.enabled` is set. The pods run as an unprivileged user with a read-only file system.
+- **The database**: one PostgreSQL pod with its own volume. To use a database run elsewhere, set `postgresql.enabled=false` and `externalDatabase.host`.
+- **Migrations**: a Job brings the tables up to date on every install and upgrade. Portal pods take no traffic until it has finished.
+- **Backups**: a nightly `pg_dump` to a second volume, kept for 14 days. One file holds everything: requests, history, attachments and users.
+- **Passwords**: the secret key and database password are generated on first install and kept in a Secret. To supply your own Secret, set `secrets.existingSecret`.
+
+The portal expects HTTPS to end at the Ingress. It redirects plain HTTP, marks its cookies secure, and sends the HSTS header. Attachments can be 25 MB, so the Ingress must allow request bodies that large; `values.yaml` shows the annotation for ingress-nginx.
+
+Restore a backup into an empty database with:
+
+```bash
+pg_restore --no-owner -d portal /backups/portal-<date>-<time>.dump
+```
+
+### What has been checked
+
+Checked with Docker and PostgreSQL 17, each container run the way the chart runs it (unprivileged user, read-only file system, no added privileges):
+
+- The image builds, and all 119 tests pass against PostgreSQL.
+- 24 requests submitted at the same moment get 24 different CR numbers, including the first request of a year. This is the row lock, which SQLite cannot test.
+- The portal reports not-ready before the migration and ready after it.
+- Plain HTTP is redirected, and cookies and headers are correct behind an HTTPS proxy.
+- A backup made by the chart's script restores into an empty database.
+- The chart passes `helm lint` and renders with every option on.
+
+Not checked yet:
+
+- **The chart has never been installed in a cluster.** Its templates render, but no Kubernetes has run them.
+- The Ingress, with a real controller and certificate.
+- Single sign-on against a real provider, and email through a real relay.
 
 ## Sign-in and roles
 
@@ -99,4 +162,7 @@ The person who did the action is not notified about it. Comments notify nobody.
 | `PORTAL_EMAIL_FROM` | The From address on emails |
 | `PORTAL_BASE_URL` | The portal's address, e.g. `https://changes.example`, for links in emails |
 | `PORTAL_MAX_UPLOAD_MB` | Largest single attachment. Default `25` |
+| `PORTAL_HTTPS` | `0` turns off the HTTPS redirect and secure cookies, to try the image over plain HTTP. Default `1` unless `DJANGO_DEBUG=1` |
+| `PORTAL_HSTS_SECONDS`, `PORTAL_HSTS_INCLUDE_SUBDOMAINS` | The HSTS header. Defaults: one year, this host only |
+| `PORTAL_LOG_LEVEL` | Default `INFO`. Logs go to the console |
 | `PORTAL_TIME_ZONE` | Time zone for dates and the yearly CR number reset. Default `UTC` |

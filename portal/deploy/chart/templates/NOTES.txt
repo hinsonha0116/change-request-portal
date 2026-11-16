@@ -1,0 +1,16 @@
+The Change Request Portal is installing. Watch it come up:
+
+  kubectl -n {{ .Release.Namespace }} get pods -l app.kubernetes.io/instance={{ .Release.Name }}
+
+Create the first account (it can then add everyone else on the People screen):
+
+  kubectl -n {{ .Release.Namespace }} exec -it deploy/{{ include "portal.name" . }} -- python manage.py createsuperuser
+
+{{- if .Values.ingress.enabled }}
+
+Then open {{ ternary "https" "http" .Values.https }}://{{ .Values.host }}
+{{- else }}
+
+No Ingress was created (ingress.enabled is false). To reach the portal, point your own
+Ingress or gateway at the Service "{{ include "portal.name" . }}" on port 80.
+{{- end }}

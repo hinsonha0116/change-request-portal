@@ -1,0 +1,6 @@
+apiVersion: v2
+name: change-request-portal
+description: The Change Request Portal with its PostgreSQL database, migrations and backups
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

@@ -1,0 +1,33 @@
+# Brings the database tables up to date. A new Job runs with every install and
+# upgrade; the web pods report not-ready until it has finished.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "portal.name" . }}-migrate-{{ .Release.Revision }}
+  labels: {{ include "portal.labels" . | nindent 4 }}
+spec:
+  # Retries cover the database still starting on a first install.
+  backoffLimit: 10
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        {{- include "portal.labels" . | nindent 8 }}
+        app.kubernetes.io/component: migrate
+    spec:
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      {{- include "portal.scheduling" . | nindent 6 }}
+      containers:
+        - name: migrate
+          image: {{ include "portal.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: [python, manage.py, migrate, --noinput]
+          {{- include "portal.env" . | nindent 10 }}
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+          {{- include "portal.containerSecurity" . | nindent 10 }}

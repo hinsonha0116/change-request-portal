@@ -1,7 +1,10 @@
 import datetime
+import threading
+import unittest
 
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.db import connection
+from django.test import TestCase, TransactionTestCase
 
 from changes.models import ChangeRequest, HistoryEntry, Stage
 
@@ -56,3 +59,33 @@ class NumberingTests(TestCase):
                 planned_start=datetime.datetime(2026, 12, 2, tzinfo=datetime.timezone.utc),
                 planned_end=datetime.datetime(2026, 12, 1, tzinfo=datetime.timezone.utc),
             )
+
+
+@unittest.skipUnless(connection.vendor == "postgresql", "Row locks need PostgreSQL; SQLite has none.")
+class ConcurrentNumberingTests(TransactionTestCase):
+    """Many people submitting at the same moment, including the first request of a year."""
+
+    def test_simultaneous_submissions_get_different_numbers(self):
+        user = make_user("pat")
+        day = datetime.date(2026, 11, 13)
+        count = 24
+        start = threading.Barrier(count)
+        numbers, errors = [], []
+
+        def submit():
+            try:
+                start.wait()
+                numbers.append(make_request(user, today=day).cr_number)
+            except Exception as error:  # noqa: BLE001
+                errors.append(error)
+            finally:
+                connection.close()
+
+        threads = [threading.Thread(target=submit) for _ in range(count)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+
+        self.assertEqual(errors, [])
+        self.assertEqual(sorted(numbers), [f"CR-2026-{n:03d}" for n in range(1, count + 1)])
