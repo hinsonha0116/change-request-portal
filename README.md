@@ -23,6 +23,7 @@ Standard changes go straight from Requested to Implementation, then Close. Emerg
 | [Build-RollbackPdf.ps1](Build-RollbackPdf.ps1) | Regenerates the Rollback Plan PDF: `./Build-RollbackPdf.ps1 -OutFile .\Rollback-Plan-Template.pdf` |
 | [Migration-Guide.md](Migration-Guide.md) | Step-by-step move from the test SharePoint site to production: lists, template, app copy, permissions, testing, go-live, and the email flows and roles to build afterwards |
 | [DetailScreen-Fixes.md](DetailScreen-Fixes.md) | App updates not yet in the build guide: change-type help, "Other" A6 program, several assignees, the Emergency CAB route, and a History line for every field change |
+| [Change-Archive-Guide.md](Change-Archive-Guide.md) | Archive flow: when a change closes, a PDF of the whole record plus its attachments is filed in a SharePoint library by program, year, month and CR |
 | [Forward-Schedule-of-Change.md](Forward-Schedule-of-Change.md) | Step-by-step build of the Schedule screen: a month calendar of planned changes with clash warnings and a day panel |
 | [SharePoint-Intro.md](SharePoint-Intro.md) | Intro text for the Change Management SharePoint page: how to submit a request, the routes for each change type, and the schedule |
 | [TODO.md](TODO.md) | Everything left to implement, in order: test-site build, migration, and production follow-ups |

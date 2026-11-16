@@ -11,6 +11,13 @@
 - [ ] **Part 5:** a History line listing every field change on save
 - [ ] Once done, fold these into the build guide and clear the updates doc.
 
+## Change archive ([Change-Archive-Guide.md](Change-Archive-Guide.md))
+
+- [ ] Check OneDrive's **Convert file** action is available in your cloud (otherwise use the HTML fallback).
+- [ ] Create the **Change Archive** library (read-only for members) and the `ArchiveLink` column.
+- [ ] Build the **Archive on close** flow and the **Open archive** button.
+- [ ] Optional: archive changes that closed earlier with the manual copy of the flow.
+
 ## Phase 1: build on the test site (before migration)
 
 **Updates document ([DetailScreen-Fixes.md](DetailScreen-Fixes.md)), all parts except the email ones:**

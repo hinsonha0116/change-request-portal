@@ -1443,6 +1443,7 @@ Work through this list in the **published** app. You'll need your own account (C
 
 ## Optional extras
 
+- **Change archive:** when a change closes, file a PDF of the whole record and its attachments in a SharePoint library, by program, year, month and CR. See **[Change-Archive-Guide.md](Change-Archive-Guide.md)**.
 - **Manage roles without republishing (App Roles list):** create a SharePoint list **App Roles** with `Email` (text, lower case) and `Role` (choice: CM, TRB, CAB, Authority, SW Manager, HW Manager), and add it as a data source. Replace the role lines in App.Formulas with, for example, `IsCM = !IsBlank(LookUp('App Roles', Email = Lower(User().Email) && Role.Value = "CM"));`, and have the flows read their recipients from the same list. Limit who can edit it.
 - **Block duplicate CR numbers:** once every request has a CRNumber, set **CRNumber › Enforce unique values: Yes** in List settings. If two submits ever collide, the second fails and the requester clicks Submit again to get the next number.
 - **CR numbers on older requests:** requests from before CR numbers by year show `CR-000NN`. To renumber them, use **Edit in grid view**, sort by **Created** (show the column via **+ Add column › Show or hide columns**), and type `CR-2026-001`, `CR-2026-002` and so on in order, before anyone submits a new request.
