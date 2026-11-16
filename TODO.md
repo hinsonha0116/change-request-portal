@@ -16,6 +16,7 @@
 - [ ] Check OneDrive's **Convert file** action is available in your cloud (otherwise use the HTML fallback).
 - [ ] Create the **Change Archive** library (read-only for members) and the `ArchiveLink` column.
 - [ ] Build the **Archive on close** flow and the **Open archive** button.
+- [ ] Apply the fixes in [Archive-Flow-Fixes.md](Archive-Flow-Fixes.md) to the original archive flow, and the A6 program fix to the new-request email.
 - [ ] Optional: archive changes that closed earlier with the manual copy of the flow.
 
 ## Phase 1: build on the test site (before migration)
