@@ -29,6 +29,7 @@ Connect-PnPOnline -Url $SiteUrl -ClientId $ClientId -Interactive
 $Stages = @(
     'Requested',
     'Technical Review Board',
+    'Emergency CAB',             # Emergency changes only
     'Change Advisory Board',
     'Change Authority',
     'Implementation',
@@ -107,7 +108,7 @@ Add-FieldIfMissing $cr 'FormResponseId'     Number
 # Rollback plan PDF and other uploads are stored as list-item attachments (enabled by default).
 Add-FieldIfMissing $cr 'PlannedStart'       DateTime
 Add-FieldIfMissing $cr 'PlannedEnd'         DateTime
-Add-FieldIfMissing $cr 'Assignee'           User
+Add-FieldIfMissing $cr 'Assignee'           UserMulti   # one or more implementers
 
 # Request details added on the New Request screen
 Add-FieldIfMissing $cr 'ImpactDetails'      Note
@@ -123,6 +124,10 @@ Add-FieldIfMissing $cr 'TRBNotes'           Note
 Add-FieldIfMissing $cr 'TRBRollbackReviewed' Boolean -Default '0'
 Add-FieldIfMissing $cr 'TRBTested'          Boolean  -Default '0'
 Add-FieldIfMissing $cr 'TRBSecurityReviewed' Boolean -Default '0'
+
+# Emergency CAB stage (Emergency changes only; CAB members decide)
+Add-FieldIfMissing $cr 'ECABDecision'       Choice   -Choices 'Pending','Approved','Rejected' -Default 'Pending'
+Add-FieldIfMissing $cr 'ECABNotes'          Note
 
 # Change Advisory Board stage
 Add-FieldIfMissing $cr 'CABDecision'        Choice   -Choices 'Pending','Approved','Rejected' -Default 'Pending'

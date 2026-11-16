@@ -18,7 +18,7 @@ The test site and test app are left untouched, so you can keep using them to try
 
 **What's no longer part of the migration:**
 - **The Microsoft Form and its flow.** Requests are now submitted inside the app.
-- **The email flows** (updates document Parts 4, 5 and 7). These get built **directly in production after go-live**, together with the App Roles list. See Step 8.
+- **The email flows** (build guide, Step 8). These get built **directly in production after go-live**, together with the App Roles list. See Step 8.
 
 **How it works.** Power Apps can't simply "move" to another site. Instead you:
 1. build the lists on the production site,
@@ -251,7 +251,7 @@ Work through this list in the **published** production app. Use your own account
 ### Making changes after go-live
 - **Try changes in the TEST app first,** against the test site.
 - **Then make the same change in the production app,** and publish it. Don't **Save as** from test again: that creates a new production app with a new link, and you'd have to repeat Steps 4 and 5.
-- **Keep the updates document and [TODO.md](TODO.md) up to date** with each change.
+- **Keep the [build guide](Change-Request-PowerApp-Guide.md) and [TODO.md](TODO.md) up to date** with each change.
 
 ---
 
@@ -263,12 +263,12 @@ Build these directly in production, in this order.
    - switch `IsCM`, `IsTRB`, `IsCAB` and `IsAuthority` in App.Formulas to read from the list.
 
    *Claude will write the App Roles guide when you're ready.*
-2. **New-request emails:** updates document **Part 4**. CM on every request; SW or HW managers by category.
-3. **Stage emails:** updates document **Part 7**. TRB, CAB and Authority at their stages, the requester when a request is sent back, needs changes or is closed, CM on *Completed* and PIR. Point both flows at the **production** site and lists.
-4. **Email link:** updates document **Part 5**. Use the **production** app's web link.
+2. **New-request emails:** build guide **Step 8a**. CM on every request; SW or HW managers by category.
+3. **Stage emails:** build guide **Step 8b**. TRB, CAB and Authority at their stages, the requester when a request is sent back, needs changes or is closed, CM on *Completed* and PIR. Point both flows at the **production** site and lists.
+4. **Email link:** build guide **Step 8c**. Use the **production** app's web link.
 5. **Test the emails** with a couple of **TEST –** requests, then delete them and their History rows.
 
-Until App Roles exists, the flows can use the typed email variables shown in Parts 4 and 7. Switch them to App Roles afterwards.
+Until App Roles exists, the flows can use the typed email variables shown in Step 8. Switch them to App Roles afterwards.
 
 ---
 

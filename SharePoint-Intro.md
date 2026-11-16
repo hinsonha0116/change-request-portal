@@ -5,7 +5,7 @@ Intro text for the Change Management SharePoint page, above the embedded app. Pa
 **Before you publish:**
 - **"When to use it":** these are general definitions. Swap in A6's own wording if your change policy defines the types differently.
 - **Lead times or a CAB meeting schedule:** if you have them, add a line under *Submitting a change request*, for example "Submit Normal changes at least *[X]* working days before the planned date".
-- **Emails:** once the notification flows (Parts 4 and 7 of the updates doc) are live, add a line saying people get emails when their request is submitted and when it moves stage.
+- **Emails:** once the notification flows (Step 8 of the build guide) are live, add a line saying people get emails when their request is submitted and when it moves stage.
 
 ---
 
@@ -30,9 +30,10 @@ You can track your request on the board at any time. You'll only see requests yo
 |---|---|---|
 | **Standard** | Routine, low-risk, pre-approved changes | Requested → Implementation → Close |
 | **Normal** | Most changes | Requested → Technical Review Board → Change Advisory Board → Change Authority → Implementation → Post-Implementation Review → Close |
-| **Emergency** | Urgent fixes that can't wait for the normal schedule | Requested → Change Advisory Board → Change Authority → Implementation → Post-Implementation Review → Close |
+| **Emergency** | Urgent fixes that can't wait for the normal schedule | Requested → Emergency CAB → Implementation → Post-Implementation Review → Close |
 
 - **Technical Review Board (TRB):** checks the technical plan, testing and rollback plan. If something needs fixing, the request comes back to you with comments.
+- **Emergency CAB (ECAB):** the CAB reviews and approves emergency changes quickly, in place of the full CAB and Change Authority review.
 - **Change Advisory Board (CAB):** reviews the risk, impact and timing.
 - **Change Authority:** gives final approval.
 - **Implementation:** the change is carried out. The implementer marks it **Completed** when done.

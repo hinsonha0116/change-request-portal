@@ -13,7 +13,7 @@ A new **Schedule** screen shows every change with planned dates on a month calen
 - **Navigation:** **‹ ›** move between months and **Today** jumps back to now. **Schedule** on the board opens the calendar, and **← Schedule** on the detail screen comes back to it.
 - **Who sees what:** the same rule as the board. CM, CAB and Authority see every change, and everyone else sees only their own.
 
-**Before you start:** do **Parts 1–3 and 6** of the current updates document ([DetailScreen-Fixes.md](DetailScreen-Fixes.md)) first. This screen uses:
+**Before you start:** build Steps 1–5 of the [build guide](Change-Request-PowerApp-Guide.md) first. This screen uses:
 - the **Location** and **Outage** fields,
 - the gap kept in the board header for the Schedule button.
 
@@ -204,7 +204,7 @@ Click the first chip slot until the pencil ✎ shows, then insert:
 | 1 | Rectangle | `rectChip` | X `0` · Y `0` · Width `Parent.TemplateWidth` · Height `Parent.TemplateHeight` · Fill: `LookUp(Stages, Name = ThisItem.Stage.Value).Color` · BorderColor: `If(ThisItem.HasConflict, Color.Red, Color.Transparent)` · BorderThickness `2` |
 | 2 | Text label | `lblChip` | Text: `Coalesce(ThisItem.CRNumber, "CR-" & Text(ThisItem.ID, "00000")) & " " & ThisItem.A6Program` · Tooltip: `ThisItem.Title` · X `4` · Y `0` · Width `Parent.TemplateWidth - 6` · Height `Parent.TemplateHeight` · Size `8` · Color: `Color.White` · PaddingTop/Bottom/Left/Right `0` |
 
-Each chip shows just the **CR number and A6 program**, so it fits in a day cell. Hover over it to see the title, or click the day to see the full details in the day panel (section 5). Requests submitted before CR numbers by year (Part 12 of the updates doc) show their old `CR-000NN` number.
+Each chip shows just the **CR number and A6 program**, so it fits in a day cell. Hover over it to see the title, or click the day to see the full details in the day panel (section 5). Requests submitted before CR numbers by year show their old `CR-000NN` number.
 
 Clicking a **chip** opens that request. Clicking **empty space** in a day selects the day for the panel in section 5.
 
@@ -258,7 +258,7 @@ If(ThisItem.HasConflict, "  ·  ⛔ Possible clash", "")
 ## 6 — Open the calendar from the board, and come back to it
 
 ### 6a. Schedule button on the board
-On **BoardScreen**, insert a **Button** in the gap kept in the header (Part 6b of the updates document). Rename it `btnSchedule` and set:
+On **BoardScreen**, insert a **Button** in the gap kept in the header (build guide, Step 3.2). Rename it `btnSchedule` and set:
 
 | Property | Value |
 |---|---|

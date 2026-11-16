@@ -16,13 +16,13 @@ Standard changes go straight from Requested to Implementation, then Close. Emerg
 
 | File | Purpose |
 |---|---|
-| [Change-Request-PowerApp-Guide.md](Change-Request-PowerApp-Guide.md) | Step-by-step build of the canvas app (board, detail screen, stage rules, Power Fx formulas) |
-| [Change-Request-Form-Setup.md](Change-Request-Form-Setup.md) | Microsoft Form questions and the Power Automate flow that turns each response into a ticket |
+| [Change-Request-PowerApp-Guide.md](Change-Request-PowerApp-Guide.md) | Step-by-step build of the whole app: SharePoint lists, board, New Request screen, detail screen, stage rules and routes, publishing, email flows, tests and troubleshooting |
+| [Change-Request-Form-Setup.md](Change-Request-Form-Setup.md) | *Retired.* The Microsoft Form and flow used before requests were submitted in the app |
 | [Provision-ChangeRequestLists.ps1](Provision-ChangeRequestLists.ps1) | Creates the SharePoint lists and uploads the rollback template (PnP.PowerShell) |
 | [Rollback-Plan-Template.pdf](Rollback-Plan-Template.pdf) | Fillable Rollback Plan form that requesters attach to every change |
 | [Build-RollbackPdf.ps1](Build-RollbackPdf.ps1) | Regenerates the Rollback Plan PDF: `./Build-RollbackPdf.ps1 -OutFile .\Rollback-Plan-Template.pdf` |
 | [Migration-Guide.md](Migration-Guide.md) | Step-by-step move from the test SharePoint site to production: lists, template, app copy, permissions, testing, go-live, and the email flows and roles to build afterwards |
-| [DetailScreen-Fixes.md](DetailScreen-Fixes.md) | Latest app update, not yet in the guide: new request fields (Impact details, Justification, Location, Affected systems, Outage), New Request clean-up, board filters, and email notifications for new requests and stage changes |
+| [DetailScreen-Fixes.md](DetailScreen-Fixes.md) | App updates not yet in the build guide: change-type help, "Other" A6 program, several assignees, the Emergency CAB route, and a History line for every field change |
 | [Forward-Schedule-of-Change.md](Forward-Schedule-of-Change.md) | Step-by-step build of the Schedule screen: a month calendar of planned changes with clash warnings and a day panel |
 | [SharePoint-Intro.md](SharePoint-Intro.md) | Intro text for the Change Management SharePoint page: how to submit a request, the routes for each change type, and the schedule |
 | [TODO.md](TODO.md) | Everything left to implement, in order: test-site build, migration, and production follow-ups |
@@ -31,6 +31,6 @@ Standard changes go straight from Requested to Implementation, then Close. Emerg
 
 ## Setup order
 
-1. Run `Provision-ChangeRequestLists.ps1` against your SharePoint site.
-2. Build the form and the flow by following `Change-Request-Form-Setup.md`.
-3. Build the app by following `Change-Request-PowerApp-Guide.md`, then paste the form link and the template link into `App.Formulas`.
+1. Run `Provision-ChangeRequestLists.ps1` against your SharePoint site, or create the lists by hand (build guide, Step 1).
+2. Build the app and the email flows by following `Change-Request-PowerApp-Guide.md`, including the Schedule screen from `Forward-Schedule-of-Change.md`.
+3. To move from a test site to production, follow `Migration-Guide.md`.

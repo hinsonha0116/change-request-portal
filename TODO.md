@@ -1,6 +1,15 @@
 # Change Request Portal: to-do list
 
-*Created 4 Nov 2026, updated 5 Nov 2026. Tick items off (`- [x]`) as they're done.*
+*Created 4 Nov 2026, updated 16 Nov 2026. The Part numbers refer to the old updates document, now folded into the build guide. Tick items off (`- [x]`) as they're done.*
+
+## Current updates ([DetailScreen-Fixes.md](DetailScreen-Fixes.md))
+
+- [ ] **Part 1:** hover text explaining the change types on New Request
+- [ ] **Part 2:** "Other" in the A6 program list, with a free-text box
+- [ ] **Part 3:** several assignees (SharePoint *Allow multiple selections*, then the Assignee card)
+- [ ] **Part 4:** Emergency CAB route (Requested → ECAB → Implementation → PIR → Close). *Finish any Emergency requests at CAB or Change Authority first.*
+- [ ] **Part 5:** a History line listing every field change on save
+- [ ] Once done, fold these into the build guide and clear the updates doc.
 
 ## Phase 1: build on the test site (before migration)
 
@@ -20,7 +29,7 @@
 - [ ] **Run the test checklists** in Parts 1–3, 6, 8 and 9, and in the calendar guide.
 
 **Documents (ask Claude when ready):**
-- [ ] Fold every update into the **main guide** ([Change-Request-PowerApp-Guide.md](Change-Request-PowerApp-Guide.md)).
+- [x] Fold every update into the **main guide** ([Change-Request-PowerApp-Guide.md](Change-Request-PowerApp-Guide.md)).
 - [x] Update the **migration guide**: skip the form and flow steps, add Office 365 Users, add the TRB and PIR SharePoint changes.
 - [ ] Redraw the guide's **board and detail-screen diagrams** (`docs/Build-Mockups.ps1`).
 
@@ -38,13 +47,13 @@ Using [Migration-Guide.md](Migration-Guide.md) (updated 5 Nov 2026 for the curre
 
 ## Phase 3: in production, after go-live
 
-- [ ] **Part 12:** CR numbers by year (`CR-2026-001`): new `CRNumber` column, hidden card on New Request, new number on the board, detail, calendar and emails.
+- [x] **Part 12:** CR numbers by year (`CR-2026-001`): new `CRNumber` column, hidden card on New Request, new number on the board, detail, calendar and emails.
 
 - [ ] **App Roles** list: one list holding the CM, TRB, CAB, Authority and SW/HW manager emails. *Guide still to be written by Claude.*
 - [ ] Switch App.Formulas (`IsCM`, `IsTRB`, `IsCAB`, `IsAuthority`) to read from App Roles.
-- [ ] **Part 4 flow:** new-request emails (CM always, SW/HW managers by category), reading recipients from App Roles.
-- [ ] **Part 7 flow:** stage emails, including TRB, Needs changes, Completed and PIR.
-- [ ] **Part 5:** the email link that opens the request, using the production app's web link.
+- [x] **Part 4 flow:** new-request emails (CM always, SW/HW managers by category), reading recipients from App Roles.
+- [x] **Part 7 flow:** stage emails, including TRB, Needs changes, Completed and PIR.
+- [x] **Part 5:** the email link that opens the request, using the production app's web link.
 - [ ] Test the emails with a couple of "TEST – ignore" requests, then delete them and their History rows.
 
 ## Later / optional
