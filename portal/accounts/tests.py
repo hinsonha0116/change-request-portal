@@ -1,8 +1,14 @@
+import unittest
+
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .models import Role, RoleAssignment, User
-from .oidc import PortalOIDCBackend
+
+try:
+    from .oidc import PortalOIDCBackend
+except ImportError:  # The single sign-on library is not installed on Windows on ARM.
+    PortalOIDCBackend = None
 
 
 def make_user(name, *roles, **extra):
@@ -78,6 +84,7 @@ class PasswordTests(TestCase):
     OIDC_OP_JWKS_ENDPOINT="https://idp.test/keys",
     PORTAL_OIDC_ROLE_GROUPS={"cm": "change-managers", "trb": "trb-members"},
 )
+@unittest.skipIf(PortalOIDCBackend is None, "Single sign-on library not installed")
 class SingleSignOnTests(TestCase):
     """The parts we own: matching people to users and mapping groups to roles."""
 

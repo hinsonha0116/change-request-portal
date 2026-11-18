@@ -127,6 +127,12 @@ PORTAL_LOCAL_LOGIN = env_bool("PORTAL_LOCAL_LOGIN", True) or not PORTAL_SSO_ENAB
 
 AUTHENTICATION_BACKENDS = []
 if PORTAL_SSO_ENABLED:
+    try:
+        import mozilla_django_oidc  # noqa: F401
+    except ImportError as error:
+        raise ImproperlyConfigured(
+            "Single sign-on is on (OIDC_RP_CLIENT_ID is set) but mozilla-django-oidc is not installed."
+        ) from error
     INSTALLED_APPS.append("mozilla_django_oidc")
     AUTHENTICATION_BACKENDS.append("accounts.oidc.PortalOIDCBackend")
     OIDC_RP_CLIENT_SECRET = required_env("OIDC_RP_CLIENT_SECRET")

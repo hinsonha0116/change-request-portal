@@ -3,7 +3,9 @@ Django~=5.2
 gunicorn~=23.0
 whitenoise~=6.9
 # Single sign-on through any OpenID Connect provider. Only used when OIDC_RP_CLIENT_ID is set.
-mozilla-django-oidc~=4.0
+# Skipped on Windows on ARM, where its cryptography dependency has no prebuilt package
+# and will not install without a compiler. Local work never uses single sign-on.
+mozilla-django-oidc~=4.0; platform_machine != "ARM64"
 # PostgreSQL driver for the container image. Local work on Windows uses SQLite,
 # and there is no prebuilt driver for Windows on ARM.
 psycopg[binary]~=3.2; sys_platform == "linux"
