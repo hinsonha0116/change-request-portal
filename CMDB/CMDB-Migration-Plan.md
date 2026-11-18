@@ -399,7 +399,7 @@ Every virtual machine shows as *Orphaned VM* in the workbook, so there are no de
    - Total acquisition cost (**Portfolio Value** on `Pivot_Worker`).
    - Expired warranty count. Expect Dataverse to be **much higher**, because the workbook never applied the registry dates (bug B).
 5. **Cut over.** Remove the macro buttons, protect every sheet, and save the workbook as `…_ARCHIVE_<date>.xlsx` without macros. Store it with the CUI marking in the restricted library.
-6. Update [TODO.md](TODO.md) and the portal guides once the Change Affected CI link is added.
+6. Update [TODO.md](../TODO.md) and the portal guides once the Change Affected CI link is added.
 
 ---
 
