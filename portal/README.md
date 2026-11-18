@@ -2,7 +2,7 @@
 
 A Django rebuild of the Power Apps portal, meant to run in a Kubernetes cluster with no Microsoft 365 services. The guides in the parent folder are the specification.
 
-**Status:** steps 1 to 5 of 6 are done: the data model, the stage rules, the screens, sign-in and roles, notifications with email, and the container image with its Helm chart. Still to come: a full run in a real Kubernetes cluster. See [Run it in the cluster](#run-it-in-the-cluster) for what has and has not been checked.
+**Status:** all 6 steps are done: the data model, the stage rules, the screens, sign-in and roles, notifications with email, the container image with its Helm chart, and a full run in a local Kubernetes cluster. What is left needs the real cluster's services: the Ingress, single sign-on and the mail relay. See [What has been checked](#what-has-been-checked).
 
 ## What's here
 
@@ -105,19 +105,20 @@ pg_restore --no-owner -d portal /backups/portal-<date>-<time>.dump
 
 ### What has been checked
 
-Checked with Docker and PostgreSQL 17, each container run the way the chart runs it (unprivileged user, read-only file system, no added privileges):
+The chart was installed in a local Kubernetes 1.34 cluster (kind), with the chart's default settings: two portal pods, the bundled PostgreSQL 17, and backups on.
 
-- The image builds, and all 119 tests pass against PostgreSQL.
-- 24 requests submitted at the same moment get 24 different CR numbers, including the first request of a year. This is the row lock, which SQLite cannot test.
-- The portal reports not-ready before the migration and ready after it.
-- Plain HTTP is redirected, and cookies and headers are correct behind an HTTPS proxy.
-- A backup made by the chart's script restores into an empty database.
-- The chart passes `helm lint` and renders with every option on.
+- `helm install --wait` finishes in under 30 seconds. The migration Job retries until the database is up, and the portal pods take no traffic until it has finished.
+- 30 people submitting at the same moment through the Service, spread over both portal pods, got CR-2026-001 to CR-2026-030, with no repeats and no gaps.
+- The backup CronJob writes a dump, and that dump restores into an empty database with every request in it.
+- Deleting the database pod loses nothing.
+- `helm upgrade` runs a new migration Job, scales the portal, and keeps the generated secret key and database password.
+- `helm uninstall` keeps the Secret, the database volume and the backup volume, so installing again brings back all the data.
+- The portal pods run as an unprivileged user and cannot write to their file system.
+- All 119 tests pass against PostgreSQL, and `manage.py check --deploy` passes.
 
-Not checked yet:
+Not checked yet. These need the real cluster's services:
 
-- **The chart has never been installed in a cluster.** Its templates render, but no Kubernetes has run them.
-- The Ingress, with a real controller and certificate.
+- **The Ingress.** The template renders, but no Ingress controller has served the portal yet. The test cluster could not download one. Check that HTTPS works and that a 25 MB attachment uploads.
 - Single sign-on against a real provider, and email through a real relay.
 
 ## Sign-in and roles

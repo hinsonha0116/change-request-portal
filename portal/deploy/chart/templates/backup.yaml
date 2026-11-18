@@ -6,6 +6,10 @@ metadata:
   name: {{ include "portal.name" . }}-backup
   labels: {{ include "portal.labels" . | nindent 4 }}
   annotations:
+    # Created as a hook so `helm install --wait` does not hang: many storage classes
+    # only make the volume once the first backup runs. Helm never deletes it.
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: before-hook-creation
     helm.sh/resource-policy: keep
 spec:
   accessModes: [ReadWriteOnce]
