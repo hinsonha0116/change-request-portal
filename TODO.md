@@ -9,6 +9,7 @@
 - [ ] **Part 3:** several assignees (SharePoint *Allow multiple selections*, then the Assignee card)
 - [ ] **Part 4:** Emergency CAB route (Requested → ECAB → Implementation → PIR → Close). *Finish any Emergency requests at CAB or Change Authority first.*
 - [ ] **Part 5:** a History line listing every field change on save
+- [ ] **Part 6:** software and hardware details on each request, the CMDB tasker email to the HW or SW asset manager, and the required *CMDB updated* check
 - [ ] Once done, fold these into the build guide and clear the updates doc.
 
 ## Change archive ([Change-Archive-Guide.md](Change-Archive-Guide.md))

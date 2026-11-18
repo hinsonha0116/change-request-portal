@@ -118,6 +118,16 @@ Add-FieldIfMissing $cr 'AffectedSystems'    Text
 Add-FieldIfMissing $cr 'OutageExpected'     Boolean  -Default '0'   # Yes/No, defaults to No
 Add-FieldIfMissing $cr 'OutageDuration'     Text
 
+# Configuration items, by category (Software or Hardware), for the CMDB tasker
+Add-FieldIfMissing $cr 'SoftwareName'       Text
+Add-FieldIfMissing $cr 'CurrentVersion'     Text
+Add-FieldIfMissing $cr 'NewVersion'         Text
+Add-FieldIfMissing $cr 'HardwareMake'       Text
+Add-FieldIfMissing $cr 'HardwareModel'      Text
+Add-FieldIfMissing $cr 'SerialNumbers'      Note       # one per line
+Add-FieldIfMissing $cr 'NewSerialNumbers'   Note       # replacements, one per line
+Add-FieldIfMissing $cr 'CMDBUpdated'        Boolean  -Default '0'   # ticked once the asset manager has updated the CMDB
+
 # Technical Review Board stage (Normal changes only)
 Add-FieldIfMissing $cr 'TRBDecision'        Choice   -Choices 'Pending','Approved','Needs changes','Rejected' -Default 'Pending'
 Add-FieldIfMissing $cr 'TRBNotes'           Note

@@ -1,4 +1,4 @@
-# App updates: change-type help, "Other" A6 program, several assignees, Emergency CAB, and a log of field changes
+# App updates: change-type help, "Other" A6 program, several assignees, Emergency CAB, a log of field changes, and the CMDB tasker
 
 These changes build on the app as described in the [build guide](Change-Request-PowerApp-Guide.md). Section numbers like *4.5* or *5.7* refer to that guide.
 
@@ -8,10 +8,11 @@ These changes build on the app as described in the [build guide](Change-Request-
 3. **Several assignees:** the **Assignee** field on the detail screen takes more than one person.
 4. **Emergency CAB (ECAB):** Emergency changes follow their own route, **Requested → ECAB → Implementation → PIR → Close**. The ECAB replaces the CAB and Change Authority for emergencies. The CAB members record the ECAB decision.
 5. **A History line for every change:** when someone saves a request and any field has changed, the History shows what changed, e.g. *Priority: 3 - Moderate → 2 - High*. This covers the CM changing the priority or change type in *Requested*.
+6. **Software and hardware details, and the CMDB tasker:** software name and versions, or hardware make, model and serials, on each request; an email tasking the HW or SW asset manager to update the CMDB once a change is implemented; and a required *CMDB updated* check before closing.
 
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. Unlock form cards first if needed: **Properties › Advanced › 🔒 Unlock to change properties**.
 
-**Time:** about 3 hours. Do the parts in order: Part 5 uses the fields from Parts 3 and 4.
+**Time:** about 5½ hours. Do the parts in order: Part 5 uses the fields from Parts 3 and 4, and Part 6 adds to Part 5.
 
 ---
 
@@ -409,3 +410,281 @@ Leave the rest of OnSuccess as it is, starting with `Set(varCR, Self.LastSubmit)
 - **The change line never appears:** the formula in 5a must be **before** `Set(varCR, Self.LastSubmit);`, otherwise it compares the new values with themselves.
 - **A field name in 5a is red:** that column doesn't exist under that name. Check its internal name in **List settings**, or delete that line.
 - **Anything else:** open the **App checker** (the stethoscope icon) and send me the exact text of any red error banner.
+
+---
+
+## Part 6 — Software and hardware details, and the CMDB tasker
+
+**What changes:**
+- **Category-specific fields** on every request, shown only for their category:
+
+  | Category | Fields |
+  |---|---|
+  | **Software** | Software name · Current version · New version *(if applicable)* |
+  | **Hardware** | Make · Model · Serial number(s) · New serial number(s) *(if replaced)* |
+  | **Network** | *(none: Affected systems describes it)* |
+
+  **Affected systems** stays on every request. It's required for Network changes and optional for Software and Hardware.
+- **A CMDB tasker email** goes to the asset manager when a change has been implemented:
+
+  | Category | To | CC |
+  |---|---|---|
+  | Hardware | HW asset manager | CM team |
+  | Software | SW asset manager | CM team |
+  | Network | HW **and** SW asset managers | CM team |
+
+  - **Normal and Emergency:** sent when the CM team moves the request from **Implementation to PIR**.
+  - **Standard** (no PIR): sent when the implementer clicks **✔ Completed**.
+  - **Rejected changes** never get one.
+- **A required "CMDB updated" check:** a Yes/No field that the CM team or an asset manager ticks once the CMDB is updated.
+  - Normal and Emergency changes can't leave **PIR** until it's ticked.
+  - Standard changes can't leave **Implementation** until it's ticked.
+
+**Time:** about 2½ hours. Do Parts 1–5 first: 6f adds lines to the Part 5 formula.
+
+> **Requests already at PIR** (or Standard requests already at Implementation) when you turn this on will need **CMDB updated** ticked before they can close.
+
+### 6a. SharePoint (Change Requests list)
+Add these columns. Type each name exactly as shown, with no spaces.
+
+| Name | Type | Settings |
+|---|---|---|
+| `SoftwareName` | Single line of text | |
+| `CurrentVersion` | Single line of text | |
+| `NewVersion` | Single line of text | |
+| `HardwareMake` | Single line of text | |
+| `HardwareModel` | Single line of text | |
+| `SerialNumbers` | Multiple lines of text | More options › *Use enhanced rich text* **off** |
+| `NewSerialNumbers` | Multiple lines of text | More options › *Use enhanced rich text* **off** |
+| `CMDBUpdated` | Yes/No | Default **No** |
+
+Then, in Power Apps Studio, go to **Data**, click **⋯** next to **Change Requests**, then **Refresh**.
+
+> **Check the internal names.** Type each name in one go, exactly as above. If a name is mistyped and then renamed, the flows have to use the original internal name, as happened with A6 program (Troubleshooting-Notes, Issue 5).
+
+### 6b. App.Formulas
+Add to the **end**:
+```powerfx
+// Asset managers: receive the CMDB tasker and can tick "CMDB updated". Use lower-case emails.
+HWAssetManagers = ["hw.asset.manager@us.af.mil"];
+SWAssetManagers = ["sw.asset.manager@us.af.mil"];
+IsAssetManager  = Lower(User().Email) in HWAssetManagers || Lower(User().Email) in SWAssetManagers;
+```
+
+Then change `CanSeeAll`, so asset managers can find any request on the board:
+```powerfx
+CanSeeAll = IsCM || IsTRB || IsCAB || IsAuthority || IsAssetManager;
+```
+
+### 6c. New Request screen (`frmNew`)
+1. Click **Edit fields › + Add field**, tick the seven new detail fields (not CMDBUpdated), and click **Add**.
+2. **Placement:** drag them to just after **Location**, in this order:
+
+   > … Location · **SoftwareName · CurrentVersion · NewVersion · HardwareMake · HardwareModel · SerialNumbers · NewSerialNumbers** · AffectedSystems · Description …
+
+   The Software fields make one row of three, and Hardware makes one row of three plus New serial number(s) on its own row. Because each category fills whole rows, hiding the other category's fields shouldn't upset the 3-column layout. Check it in test 2.
+3. **Unlock** each new card and apply the sizes from guide 4.3.
+4. Set on each **card**:
+
+   | Card | Label Text | Visible | Required |
+   |---|---|---|---|
+   | SoftwareName | `"Software name"` | `drpCategory.Selected.Value = "Software"` | same as Visible |
+   | CurrentVersion | `"Current version"` | `drpCategory.Selected.Value = "Software"` | same as Visible |
+   | NewVersion | `"New version (if applicable)"` | `drpCategory.Selected.Value = "Software"` | `false` |
+   | HardwareMake | `"Make"` | `drpCategory.Selected.Value = "Hardware"` | same as Visible |
+   | HardwareModel | `"Model"` | `drpCategory.Selected.Value = "Hardware"` | same as Visible |
+   | SerialNumbers | `"Serial number(s)"` | `drpCategory.Selected.Value = "Hardware"` | same as Visible |
+   | NewSerialNumbers | `"New serial number(s) (if replaced)"` | `drpCategory.Selected.Value = "Hardware"` | `false` |
+
+5. **Update on each card:** save the value only for the chosen category, so switching category after typing doesn't leave stray values. Use the card's own text box name, and `"Hardware"` on the four hardware cards:
+   ```powerfx
+   If(drpCategory.Selected.Value = "Software", DataCardValueN.Text, Blank())
+   ```
+6. **Serial number boxes** (SerialNumbers and NewSerialNumbers): set the text box's **Mode** = `TextMode.MultiLine`, **Height** = `60` and **HintText** = `"One per line"`.
+7. **Hints** on the other boxes: Software name `"e.g. Adobe Acrobat Pro"`, Current version `"e.g. 23.1"`, New version `"e.g. 24.2"`, Make `"e.g. Dell"`, Model `"e.g. OptiPlex 7090"`.
+8. **AffectedSystems card › Required:** `drpCategory.Selected.Value = "Network"`.
+
+### 6d. Detail screen (`frmDetail`)
+1. **Edit fields › + Add field**: tick the seven detail fields and **CMDBUpdated**, then click **Add**.
+2. **Placement:** the seven detail fields go just after **Location**, in the same order as 6c. **CMDBUpdated** goes just after **ReviewOutcome**.
+3. **Unlock** each card, apply the sizes from guide 4.3, and use the same labels as 6c. CMDBUpdated's label is `"CMDB updated"`.
+4. **The seven detail cards:**
+   - **Visible**, with that card's category (`"Software"` or `"Hardware"`):
+     ```powerfx
+     Coalesce(drpCategoryDetail.Selected.Value, ThisItem.Category.Value) = "Software"
+     ```
+     For **NewVersion** and **NewSerialNumbers**, also hide them once read-only and empty (use that card's own column):
+     ```powerfx
+     Coalesce(drpCategoryDetail.Selected.Value, ThisItem.Category.Value) = "Software" &&
+     (!IsBlank(ThisItem.NewVersion) || Parent.DisplayMode = DisplayMode.Edit)
+     ```
+   - **DisplayMode:** editable while the request is in *Requested*, and again in *Implementation*, so the implementer can correct versions or serials to what was actually installed:
+     ```powerfx
+     If(varCR.Stage.Value in ["Requested", "Implementation"], DisplayMode.Edit, DisplayMode.View)
+     ```
+   - **Update:**
+     ```powerfx
+     If(Coalesce(drpCategoryDetail.Selected.Value, ThisItem.Category.Value) = "Software", DataCardValueN.Text, Blank())
+     ```
+   - **Serial number boxes:** **Mode** `TextMode.MultiLine`, **Height** `60`.
+5. **AffectedSystems:** keep the guide's Visible rule. It already shows the field while in *Requested* and hides it later when empty.
+6. **CMDBUpdated card:**
+   - **Visible:** from Implementation for Standard changes, from PIR for the others:
+     ```powerfx
+     With({cur: LookUp(Stages, Name = varCR.Stage.Value).Order},
+         If(Coalesce(varCR.ChangeType.Value, "Normal") = "Standard",
+            cur >= LookUp(Stages, Name = "Implementation").Order,
+            cur >= LookUp(Stages, Name = "PIR").Order))
+     ```
+   - **DisplayMode:** editable at the stage where it's checked, for the CM team and asset managers:
+     ```powerfx
+     If((varCR.Stage.Value = "PIR" ||
+         (varCR.Stage.Value = "Implementation" && Coalesce(varCR.ChangeType.Value, "Normal") = "Standard")) &&
+        (IsCM || IsAssetManager),
+        DisplayMode.Edit, DisplayMode.View)
+     ```
+   - Inside it, set the toggle's **TrueText** = `"Yes"` and **FalseText** = `"No"`.
+
+### 6e. The closing rule (`frmDetail` › OnSuccess)
+In the `"advance"` section, add these two rules just **after** the `cur.Name = "PIR" && IsBlank(varCR.ReviewOutcome.Value)` rule, before the `Set(varCR, Patch(…))` line:
+```powerfx
+                cur.Name = "PIR" && !varCR.CMDBUpdated,
+                    Notify("Confirm the CMDB has been updated (set CMDB updated to Yes) before closing.", NotificationType.Error),
+                cur.Name = "Implementation" && type = "Standard" && !varCR.CMDBUpdated,
+                    Notify("Confirm the CMDB has been updated (set CMDB updated to Yes) before closing.", NotificationType.Error),
+```
+
+Because Move saves first, a CM can set **CMDB updated** to Yes and click **Move** in one step. An asset manager who isn't on the CM team ticks it and clicks **Save changes**, and CM moves the request on afterwards.
+
+### 6f. Change log (Part 5)
+In the Part 5 formula at the start of **`frmDetail` › OnSuccess**, add these lines to the `Table(…)`, just after the **Affected systems** line. Serial numbers are listed on one line, separated by commas.
+```powerfx
+                    {f: "Software name",          a: o.SoftwareName,                       b: n.SoftwareName,                       big: false},
+                    {f: "Current version",        a: o.CurrentVersion,                     b: n.CurrentVersion,                     big: false},
+                    {f: "New version",            a: o.NewVersion,                         b: n.NewVersion,                         big: false},
+                    {f: "Make",                   a: o.HardwareMake,                       b: n.HardwareMake,                       big: false},
+                    {f: "Model",                  a: o.HardwareModel,                      b: n.HardwareModel,                      big: false},
+                    {f: "Serial numbers",         a: Substitute(o.SerialNumbers, Char(10), ", "),    b: Substitute(n.SerialNumbers, Char(10), ", "),    big: false},
+                    {f: "New serial numbers",     a: Substitute(o.NewSerialNumbers, Char(10), ", "), b: Substitute(n.NewSerialNumbers, Char(10), ", "), big: false},
+                    {f: "CMDB updated",           a: If(o.CMDBUpdated, "Yes", "No"),       b: If(n.CMDBUpdated, "Yes", "No"),       big: false},
+```
+The History then shows who ticked **CMDB updated** and when, e.g. *✎ CMDB updated: No → Yes*.
+
+### 6g. The CMDB tasker email (stage-change flow)
+Open **Change Request – Stage notifications** (guide 8b) in **Edit**.
+
+1. **Recipients.** Next to the other **Initialize variable** actions, add two (String):
+
+   | Name | Value |
+   |---|---|
+   | `HWAssetManagerEmails` | `hw.asset.manager@us.af.mil` |
+   | `SWAssetManagerEmails` | `sw.asset.manager@us.af.mil` |
+
+2. **After the Switch** (not inside it), add a **Condition** and rename it `Needs CMDB tasker`. In its first row, put this on the left as an **expression**, choose **is equal to**, and type `true` on the right:
+   ```
+   or(equals(triggerOutputs()?['body/ToStage'], 'PIR'), and(equals(triggerOutputs()?['body/ToStage'], 'Implementation complete'), equals(body('Get_item')?['ChangeType']?['Value'], 'Standard')))
+   ```
+   It's true when a Normal or Emergency change reaches PIR, or a Standard change is marked complete.
+
+3. **In the "True" branch**, add these actions. Rename each as shown.
+
+   | # | Action | Rename to | Settings |
+   |---|---|---|---|
+   | 1 | **Compose** | `AssetManagerEmails` | expression below |
+   | 2 | **Select** *(Map in text mode)* | `Tasker assignees` | **From:** expression below · **Map:** `item()?['DisplayName']` |
+   | 3 | **Compose** | `CIDetails` | expression below |
+   | 4 | **Compose** | `TaskerBody` | the HTML below |
+   | 5 | **Send an email (V2)** *(or from a shared mailbox, guide 8d)* | `Send CMDB tasker` | To: `outputs('AssetManagerEmails')` · CC: `variables('CMTeamEmails')` · Subject: `concat('CMDB update required: ', outputs('CRNumber'), ' – ', body('Get_item')?['Title'])` · Body: **Code view**, then the **Outputs** of `TaskerBody` · Importance: `if(equals(body('Get_item')?['ChangeType']?['Value'], 'Emergency'), 'High', 'Normal')` |
+
+   **`AssetManagerEmails`:**
+   ```
+   if(equals(body('Get_item')?['Category']?['Value'], 'Hardware'), variables('HWAssetManagerEmails'), if(equals(body('Get_item')?['Category']?['Value'], 'Software'), variables('SWAssetManagerEmails'), concat(variables('HWAssetManagerEmails'), ';', variables('SWAssetManagerEmails'))))
+   ```
+
+   **`Tasker assignees` › From** (works with one assignee or several):
+   ```
+   if(empty(body('Get_item')?['Assignee']), json('[]'), if(startsWith(string(body('Get_item')?['Assignee']), '['), body('Get_item')?['Assignee'], createArray(body('Get_item')?['Assignee'])))
+   ```
+
+   **`CIDetails`.** Builds the Software or Hardware rows, with serial numbers one per line:
+   ```
+   if(equals(body('Get_item')?['Category']?['Value'], 'Software'), concat('<tr><td><b>Software</b></td><td>', coalesce(body('Get_item')?['SoftwareName'], '—'), '</td></tr><tr><td><b>Current version</b></td><td>', coalesce(body('Get_item')?['CurrentVersion'], '—'), '</td></tr><tr><td><b>New version</b></td><td>', coalesce(body('Get_item')?['NewVersion'], '—'), '</td></tr>'), if(equals(body('Get_item')?['Category']?['Value'], 'Hardware'), concat('<tr><td><b>Make / model</b></td><td>', coalesce(body('Get_item')?['HardwareMake'], '—'), ' ', coalesce(body('Get_item')?['HardwareModel'], ''), '</td></tr><tr><td valign="top"><b>Serial number(s)</b></td><td>', replace(coalesce(body('Get_item')?['SerialNumbers'], '—'), decodeUriComponent('%0A'), '<br>'), '</td></tr><tr><td valign="top"><b>New serial number(s)</b></td><td>', replace(coalesce(body('Get_item')?['NewSerialNumbers'], '—'), decodeUriComponent('%0A'), '<br>'), '</td></tr>'), ''))
+   ```
+
+   **`TaskerBody`.** Paste as plain text, and replace `YOUR-WEB-LINK` as in guide 8c. The A6 program uses the column's internal name (Troubleshooting-Notes, Issue 5).
+   ```html
+   <p><b>CMDB update required</b></p>
+   <p>Change <b>@{outputs('CRNumber')} – @{body('Get_item')?['Title']}</b> has been implemented. Please update the CMDB to reflect it <b>within 5 working days</b>.</p>
+   <table cellpadding="6" style="border-collapse:collapse;font-family:Segoe UI,Arial,sans-serif;font-size:14px">
+   <tr><td><b>CR number</b></td><td>@{outputs('CRNumber')}</td></tr>
+   <tr><td><b>A6 program</b></td><td>@{body('Get_item')?['A6Program_x002c__x0020_DSN_x002c']}</td></tr>
+   <tr><td><b>Category / type</b></td><td>@{body('Get_item')?['Category']?['Value']} / @{body('Get_item')?['ChangeType']?['Value']}</td></tr>
+   @{outputs('CIDetails')}
+   <tr><td><b>Affected systems</b></td><td>@{body('Get_item')?['AffectedSystems']}</td></tr>
+   <tr><td><b>Location</b></td><td>@{body('Get_item')?['Location']}</td></tr>
+   <tr><td><b>Implemented by</b></td><td>@{join(body('Tasker_assignees'), ', ')}</td></tr>
+   <tr><td><b>Implemented</b></td><td>@{if(empty(body('Get_item')?['ActualStart']), '—', convertFromUtc(body('Get_item')?['ActualStart'], 'W. Europe Standard Time', 'dd MMM yyyy HH:mm'))} → @{if(empty(body('Get_item')?['ActualEnd']), '—', convertFromUtc(body('Get_item')?['ActualEnd'], 'W. Europe Standard Time', 'dd MMM yyyy HH:mm'))}</td></tr>
+   <tr><td valign="top"><b>What was done</b></td><td style="white-space:pre-wrap">@{body('Get_item')?['ImplementationNotes']}</td></tr>
+   </table>
+   <p><b>Please:</b></p>
+   <ol>
+   <li>Update the configuration items above in the CMDB: add, change or retire records, versions, serial numbers or locations as applicable.</li>
+   <li>Open the request and set <b>CMDB updated</b> to <b>Yes</b>, then click <b>Save changes</b>. Add a comment with the CI IDs you changed. The change can't be closed until this is done.</li>
+   </ol>
+   <p>If the change was rolled back, or doesn't match what's in the CMDB, contact the CM team before updating.</p>
+   <p><a href="YOUR-WEB-LINK&crid=@{triggerOutputs()?['body/RequestID']}">Open @{outputs('CRNumber')} in the Change Request Portal</a></p>
+   ```
+   Change **5 working days** to the deadline your organization sets.
+
+4. **Save** the flow.
+
+> **Sent again after a send-back:** if CM sends a request back from PIR and it reaches PIR again, the asset manager gets a second tasker. That's useful when what was implemented changed. If it's not wanted, combine the condition with `equals(body('Get_item')?['CMDBUpdated'], false)` inside `and(…)`.
+
+### 6h. Archive PDF (recommended)
+In the **Change Request – Archive on close** flow and the manual copy, add the new fields so the record keeps them:
+
+1. **`Fields`:** add these lines before the `"Generated"` line:
+   ```json
+     "SoftwareName": "@{if(empty(body('Get_item')?['SoftwareName']), '—', body('Get_item')?['SoftwareName'])}",
+     "CurrentVersion": "@{if(empty(body('Get_item')?['CurrentVersion']), '—', body('Get_item')?['CurrentVersion'])}",
+     "NewVersion": "@{if(empty(body('Get_item')?['NewVersion']), '—', body('Get_item')?['NewVersion'])}",
+     "HardwareMake": "@{if(empty(body('Get_item')?['HardwareMake']), '—', body('Get_item')?['HardwareMake'])}",
+     "HardwareModel": "@{if(empty(body('Get_item')?['HardwareModel']), '—', body('Get_item')?['HardwareModel'])}",
+     "SerialNumbers": "@{if(empty(body('Get_item')?['SerialNumbers']), '—', body('Get_item')?['SerialNumbers'])}",
+     "NewSerialNumbers": "@{if(empty(body('Get_item')?['NewSerialNumbers']), '—', body('Get_item')?['NewSerialNumbers'])}",
+     "CMDBUpdated": "@{if(equals(body('Get_item')?['CMDBUpdated'], true), 'Yes', 'No')}",
+   ```
+2. **`Report HTML`:** add this section just **before** `<h2>Technical Review Board</h2>`:
+   ```html
+   <h2>Configuration items</h2>
+   <table>
+   <tr><td class="l">Software</td><td class="v">@{outputs('Fields')?['SoftwareName']}</td><td class="l">Version</td><td class="v">@{outputs('Fields')?['CurrentVersion']} → @{outputs('Fields')?['NewVersion']}</td></tr>
+   <tr><td class="l">Make / model</td><td class="v">@{outputs('Fields')?['HardwareMake']} @{outputs('Fields')?['HardwareModel']}</td><td class="l">CMDB updated</td><td class="v">@{outputs('Fields')?['CMDBUpdated']}</td></tr>
+   <tr><td class="l">Serial number(s)</td><td class="v">@{outputs('Fields')?['SerialNumbers']}</td><td class="l">New serial number(s)</td><td class="v">@{outputs('Fields')?['NewSerialNumbers']}</td></tr>
+   </table>
+   ```
+
+### Part 6 tests
+
+| # | Do this | Expect |
+|---|---|---|
+| 1 | On New Request, choose **Software** | Software name, Current version and New version appear as one row; the hardware fields are hidden |
+| 2 | Switch to **Hardware** | Make, Model, Serial number(s) and New serial number(s) appear; the software fields are hidden; no gaps in the layout |
+| 3 | Choose **Network** | No category fields; Affected systems shows a red star |
+| 4 | Submit a Hardware request without a serial number | Error: *Fill in every field marked with a red star* |
+| 5 | Type software details, switch to Hardware, fill that in and submit | Only the hardware values are saved in SharePoint |
+| 6 | Take a **Normal Hardware** request to **PIR** | The HW asset manager gets *"CMDB update required: CR-…"*, CC the CM team, with make, model and serials one per line |
+| 7 | At PIR, set a PIR outcome and click **Move** without ticking CMDB updated | Error: *Confirm the CMDB has been updated* |
+| 8 | As the asset manager, open the request from the email link, set **CMDB updated** to Yes and **Save changes** | Saved; History shows *✎ CMDB updated: No → Yes* with their name |
+| 9 | CM clicks **Move** | It closes |
+| 10 | Take a **Standard Software** request to Implementation and click **✔ Completed** | The SW asset manager gets the tasker; **Move** to Close is blocked until CMDB updated is Yes |
+| 11 | Take a **Network** request to PIR | Both asset managers get the tasker |
+| 12 | Reject a request at CAB | No tasker is sent |
+| 13 | Close a request and open its archive PDF *(if you did 6h)* | The *Configuration items* section shows the details and *CMDB updated: Yes* |
+
+**If something goes wrong:**
+- **Both categories' fields show, or neither:** check each card's **Visible** uses `drpCategory` (New Request) or `drpCategoryDetail` (detail screen), and the exact text `"Software"` or `"Hardware"`.
+- **Fields leave gaps when hidden:** check the order in **Edit fields** matches 6c, so each category fills whole rows, and that the hidden system cards are still at the bottom.
+- **No tasker email:** check the **Condition** is after the Switch, not inside a case, and that its right-hand side is `true`. For Standard changes, the tasker comes from **Completed**, not from Move.
+- **The tasker's details are blank:** check the new columns' internal names in **Get item › Show raw outputs** (see the note in 6a).
+- **CMDB updated can't be ticked:** the person isn't in `CMTeam`, `HWAssetManagers` or `SWAssetManagers`, or the request isn't at PIR (or at Implementation, for Standard).

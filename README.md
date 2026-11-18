@@ -22,7 +22,7 @@ Standard changes go straight from Requested to Implementation, then Close. Emerg
 | [Rollback-Plan-Template.pdf](Rollback-Plan-Template.pdf) | Fillable Rollback Plan form that requesters attach to every change |
 | [Build-RollbackPdf.ps1](Build-RollbackPdf.ps1) | Regenerates the Rollback Plan PDF: `./Build-RollbackPdf.ps1 -OutFile .\Rollback-Plan-Template.pdf` |
 | [Migration-Guide.md](Migration-Guide.md) | Step-by-step move from the test SharePoint site to production: lists, template, app copy, permissions, testing, go-live, and the email flows and roles to build afterwards |
-| [DetailScreen-Fixes.md](DetailScreen-Fixes.md) | App updates not yet in the build guide: change-type help, "Other" A6 program, several assignees, the Emergency CAB route, and a History line for every field change |
+| [DetailScreen-Fixes.md](DetailScreen-Fixes.md) | App updates not yet in the build guide: change-type help, "Other" A6 program, several assignees, the Emergency CAB route, a History line for every field change, and software/hardware details with the CMDB tasker |
 | [Change-Archive-Guide.md](Change-Archive-Guide.md) | Archive flow: when a change closes, a PDF of the whole record plus its attachments is filed in a SharePoint library by program, year, month and CR |
 | [Archive-Flow-Fixes.md](Archive-Flow-Fixes.md) | Checklist of fixes for the original archive flow, found while testing the manual copy |
 | [Forward-Schedule-of-Change.md](Forward-Schedule-of-Change.md) | Step-by-step build of the Schedule screen: a month calendar of planned changes with clash warnings and a day panel |
