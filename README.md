@@ -26,6 +26,7 @@ Standard changes go straight from Requested to Implementation, then Close. Emerg
 | [Change-Archive-Guide.md](Change-Archive-Guide.md) | Archive flow: when a change closes, a PDF of the whole record plus its attachments is filed in a SharePoint library by program, year, month and CR |
 | [Archive-Flow-Fixes.md](Archive-Flow-Fixes.md) | Checklist of fixes for the original archive flow, found while testing the manual copy |
 | [Forward-Schedule-of-Change.md](Forward-Schedule-of-Change.md) | Step-by-step build of the Schedule screen: a month calendar of planned changes with clash warnings and a day panel |
+| [User-Guide-Change-Manager.md](User-Guide-Change-Manager.md) | User guide for the CM team: every screen and button, and a change from submission to closure and archive. Also as [PDF](User-Guide-Change-Manager.pdf) |
 | [SharePoint-Intro.md](SharePoint-Intro.md) | Intro text for the Change Management SharePoint page: how to submit a request, the routes for each change type, and the schedule |
 | [hardware-cmdb](https://github.com/hinsonha0116/hardware-cmdb) (separate repository) | Plan for moving the hardware CMDB from the Excel/Power Query/macro workbook to Dataverse: tables, Dataflow, cleanup, app, flows, reports, cutover and timeline |
 | [TODO.md](TODO.md) | Everything left to implement, in order: test-site build, migration, and production follow-ups |
