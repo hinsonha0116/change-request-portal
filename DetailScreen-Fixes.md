@@ -214,10 +214,36 @@ The provisioning script now creates **Assignee** as a person column that allows 
 
 A request only ever shows the tabs on its own route (at most six), so `galNoteTabs` › **TemplateSize** stays `Self.Width / 6`.
 
-### 4c. The board: eight columns
-**`galStages` › TemplateSize:** `Self.Width / 8 - 9`.
+### 4c. The board: an ECAB column only while it's in use
+The ECAB column shows only while an emergency the user can see is at the ECAB. The rest of the time, the board keeps its seven columns.
 
-Columns are now about 160 pixels wide, so titles wrap sooner. The column headers already use the short names (*3. ECAB*).
+1. **App.Formulas:** add to the end:
+   ```powerfx
+   // Board columns: the ECAB column shows only while a request this user can see is in it.
+   ECABActive  = !IsEmpty(Filter('Change Requests', Stage.Value = "Emergency CAB",
+                     CanSeeAll || SubmittedBy = User().Email || RequesterEmail = User().Email));
+   BoardStages = Filter(Stages, Name <> "Emergency CAB" || ECABActive);
+   ```
+2. **BoardScreen › `galStages`:**
+
+   | Property | Value |
+   |---|---|
+   | Items | `BoardStages` |
+   | TemplateSize | `Self.Width / CountRows(BoardStages) - 9` |
+
+3. **`lblHeader` › Text:** number the columns by position, so they don't skip a number while ECAB is hidden:
+   ```powerfx
+   CountRows(Filter(BoardStages, Order <= ThisItem.Order)) & ". " & ThisItem.Short & "  (" & CountRows(galCards.AllItems) & ")"
+   ```
+
+**How it behaves:**
+- **No emergency at the ECAB:** seven columns, as before.
+- **An emergency reaches the ECAB:** the column appears at the board's next refresh: automatically every minute, with ⟳, or on returning to the board. It disappears again once the request moves on.
+- **Visibility:** the check uses the board's own visibility rule, so regular users don't see an empty ECAB column for someone else's emergency. CM, TRB, CAB and Authority members see it whenever any emergency is at the ECAB.
+- **Filters:** the Category and Type filters don't hide it. Like any column, it shows **(0)** while the filters hide its cards, so the board doesn't jump around as people filter.
+- **Unchanged:** the detail screen's progress tracker and the Schedule still use the full `Stages` list.
+
+With eight columns, each is about 160 pixels wide, so titles wrap sooner.
 
 ### 4d. ECAB fields on the detail form
 1. Select `frmDetail`, click **Edit fields › + Add field**, tick **ECABDecision** and **ECABNotes**, and click **Add**.
@@ -397,7 +423,7 @@ Leave the rest of OnSuccess as it is, starting with `Set(varCR, Self.LastSubmit)
 | 5 | Type a name and submit | The card, the detail screen and SharePoint show the typed name |
 | 6 | Open that request in *Requested* | The drop-down shows **Other**, with the name in the box; change the name, save, and it's kept |
 | 7 | Open a request at **Implementation** and pick **two** assignees, then **Save changes** | Both saved; read-only, they show as *First Last, First Last* |
-| 8 | Open the board | There are eight columns, with **3. ECAB** |
+| 8 | Open the board with no emergency at the ECAB, then move an Emergency request to the ECAB and refresh | First seven columns numbered 1–7; then **3. ECAB** appears and the columns renumber 1–8. Once it moves on, ECAB disappears again |
 | 9 | Submit an **Emergency** request and open it | The tracker shows Requested · Emergency CAB · Implementation · Post Implementation Review · Close; Move says **Move to Emergency CAB →** |
 | 10 | As CM, move it to the ECAB, then click **Move** again | Error: *ECAB decision must be Approved* |
 | 11 | As a **CAB member**, set the ECAB decision to **Approved**; CM clicks **Move** | Moves to **Implementation**; the CAB members got *"… needs EMERGENCY CAB review"* when it reached the ECAB |
