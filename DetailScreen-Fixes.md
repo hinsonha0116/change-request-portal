@@ -147,7 +147,7 @@ The existing card was built for one person, and refreshing the data doesn't chan
 8. Add the read-only label in 3c.
 
 ### 3c. The read-only names
-Select **`lblAssigneeView`** and replace its **Text** with this, which lists everyone in the short *First Last* style:
+The old `lblAssigneeView` went with the old card. Select the new **card**, insert a **Text label** inside it, rename it `lblAssigneeView`, and give it the read-only label settings from guide 5.4: **Visible** `Parent.DisplayMode = DisplayMode.View`, **X** / **PaddingLeft** from `DataCardKeyN`, **Y** = the combo box's Y, **Height** `FormValueHeight`, **Size** `FormLabelSize`. Set its **Text** to this, which lists everyone in the short *First Last* style:
 ```powerfx
 Coalesce(
     Concat(ThisItem.Assignee As a,
