@@ -7,7 +7,6 @@
 - [ ] **Part 1:** hover text explaining the change types on New Request
 - [ ] **Part 2:** "Other" in the A6 program list, with a free-text box
 - [ ] **Part 3:** several assignees (SharePoint *Allow multiple selections*, then the Assignee card)
-    - [ ] Rebuild the Assignee card with [Assignee-Card-Rebuild.md](Assignee-Card-Rebuild.md) (temporary; delete it when done)
 - [ ] **Part 4:** Emergency CAB route (Requested → ECAB → Implementation → PIR → Close). *Finish any Emergency requests at CAB or Change Authority first.*
 - [ ] **Part 5:** a History line listing every field change on save
 - [ ] **Part 6:** software and hardware details on each request, the CMDB tasker email to the HW or SW asset manager, and the required *CMDB updated* check

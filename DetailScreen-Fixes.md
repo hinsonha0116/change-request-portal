@@ -125,19 +125,26 @@ The read-only label (`lblA6ProgramView`, `Coalesce(ThisItem.A6Program, "—")`) 
 2. Set **Allow multiple selections** to **Yes** and click **OK**. Existing assignees are kept.
 3. In Power Apps Studio, go to **Data**, click **⋯** next to **Change Requests**, then **Refresh**.
 
-### 3b. The Assignee card (detail screen)
-In `frmDetail`, expand **`Assignee_DataCard…`**.
+### 3b. Rebuild the Assignee card (detail screen)
+The existing card was built for one person, and refreshing the data doesn't change that: its **Default** shows *"Expected record value… the rule produces table values"*. So the card has to be removed and added again, **after** Studio has picked up the column change.
 
-1. Select the **combo box** (`DataCardValueN`) and set:
+1. In `frmDetail`, click **Edit fields**, hover **Assignee**, and click **⋯ › Remove**. Use **Remove** in Edit fields, not **Delete** in the Tree view, which leaves the field behind. If an `Assignee_DataCard…` is still in the Tree view afterwards, delete that too.
+2. **Save** (Ctrl+S), refresh **Change Requests** under **Data**, then **close Studio completely** (the browser tab) and reopen the app from **Apps › ⋯ › Edit**. Without the close and reopen, Studio keeps its old copy of the column, and the new card is built for one person again.
+3. **Check:** a temporary label with **Text** `CountRows(varCR.Assignee)` should show a number, not an error. Remove the label afterwards.
+4. **+ Add field › Assignee**, drag it to just after **AuthorityDecision**, and **Unlock** the new card.
+5. Set the **card**: **Visible** = the stage pattern with `"Implementation"` (guide 5.3), **DisplayMode** = `If(varCR.Stage.Value = "Implementation", DisplayMode.Edit, DisplayMode.View)`, **WidthFit** = `false`, **Update** = `DataCardValueN.SelectedItems` (the combo box's name). Leave **Default** as `ThisItem.Assignee`.
+6. Set the **title label** (`DataCardKeyN`): **Text** `"Assignees"`, **Size** `FormLabelSize`, **Height** `FormLabelHeight`.
+7. Set the **combo box** (`DataCardValueN`):
 
    | Property | Value |
    |---|---|
    | SelectMultiple | `true` |
    | DefaultSelectedItems | `Parent.Default` |
    | DisplayFields / SearchFields | `["DisplayName"]` / `["DisplayName", "Email"]` |
+   | Visible | `Parent.DisplayMode = DisplayMode.Edit` |
+   | Size / Height | `FormLabelSize` / `FormValueHeight` |
 
-2. Select the **card** and set **Update** = `DataCardValueN.SelectedItems` (the combo box's own name).
-3. **If the card shows errors after the change** (it was built for a single person): remove **Assignee** in **Edit fields** and add it again, then put it back after **AuthorityDecision** and redo its settings from guide 5.3 and 5.4.
+8. Add the read-only label in 3c.
 
 ### 3c. The read-only names
 Select **`lblAssigneeView`** and replace its **Text** with this, which lists everyone in the short *First Last* style:
