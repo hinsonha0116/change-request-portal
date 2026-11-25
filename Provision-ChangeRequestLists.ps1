@@ -126,7 +126,7 @@ Add-FieldIfMissing $cr 'HardwareMake'       Text
 Add-FieldIfMissing $cr 'HardwareModel'      Text
 Add-FieldIfMissing $cr 'SerialNumbers'      Note       # one per line
 Add-FieldIfMissing $cr 'NewSerialNumbers'   Note       # replacements, one per line
-Add-FieldIfMissing $cr 'CMDBUpdated'        Boolean  -Default '0'   # ticked once the asset manager has updated the CMDB
+Add-FieldIfMissing $cr 'CMDBUpdated'        Boolean  -Default '0'   # ticked once the HW or SW managers have updated the CMDB
 
 # Technical Review Board stage (Normal changes only)
 Add-FieldIfMissing $cr 'TRBDecision'        Choice   -Choices 'Pending','Approved','Needs changes','Rejected' -Default 'Pending'

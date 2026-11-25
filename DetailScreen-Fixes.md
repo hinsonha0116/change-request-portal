@@ -8,7 +8,7 @@ These changes build on the app as described in the [build guide](Change-Request-
 3. **Several assignees:** the **Assignee** field on the detail screen takes more than one person.
 4. **Emergency CAB (ECAB):** Emergency changes follow their own route, **Requested → ECAB → Implementation → PIR → Close**. The ECAB replaces the CAB and Change Authority for emergencies. The CAB members record the ECAB decision.
 5. **A History line for every change:** when someone saves a request and any field has changed, the History shows what changed, e.g. *Priority: 3 - Moderate → 2 - High*. This covers the CM changing the priority or change type in *Requested*.
-6. **Software and hardware details, and the CMDB tasker:** software name and versions, or hardware make, model and serials, on each request; an email tasking the HW or SW asset manager to update the CMDB when the implementer clicks Completed; and a required *CMDB updated* check before a change can leave Implementation.
+6. **Software and hardware details, and the CMDB tasker:** software name and versions, or hardware make, model and serials, on each request; an email tasking the HW or SW managers to update the CMDB when the implementer clicks Completed; and a required *CMDB updated* check before a change can leave Implementation.
 
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. Unlock form cards first if needed: **Properties › Advanced › 🔒 Unlock to change properties**.
 
@@ -458,23 +458,23 @@ Leave the rest of OnSuccess as it is, starting with `Set(varCR, Self.LastSubmit)
   | **Network** | *(none: Affected systems describes it)* |
 
   **Affected systems** stays on every request. It's required for Network changes and optional for Software and Hardware.
-- **A CMDB tasker email** goes to the asset manager when a change has been implemented:
+- **A CMDB tasker email** goes to the **HW or SW managers**, the same people who already get the new-request emails, when a change has been implemented:
 
   | Category | To | CC |
   |---|---|---|
-  | Hardware | HW asset manager | CM team |
-  | Software | SW asset manager | CM team |
-  | Network | HW **and** SW asset managers | CM team |
+  | Hardware | HW managers | CM team |
+  | Software | SW managers | CM team |
+  | Network | HW **and** SW managers | CM team |
 
   - **When:** for every change type, as soon as the implementer clicks **✔ Completed** in Implementation.
   - **Rejected changes** never get one.
-- **A required "CMDB updated" check:** a Yes/No field that the CM team or an asset manager ticks once the CMDB is updated.
+- **A required "CMDB updated" check:** a Yes/No field that the CM team or an HW or SW manager ticks once the CMDB is updated.
   - It shows from **Implementation** onward, and can only be changed **during Implementation**.
   - **No change can leave Implementation** until it's ticked.
 
 **Time:** about 2½ hours. Do Parts 1–5 first: 6f adds lines to the Part 5 formula.
 
-> **Requests already in Implementation** when you turn this on need **CMDB updated** ticked before they can move on. If the implementer had already clicked Completed, no tasker was sent, so contact the asset manager directly. Requests already past Implementation aren't affected.
+> **Requests already in Implementation** when you turn this on need **CMDB updated** ticked before they can move on. If the implementer had already clicked Completed, no tasker was sent, so contact the HW or SW managers directly. Requests already past Implementation aren't affected.
 
 ### 6a. SharePoint (Change Requests list)
 Add these columns. Type each name exactly as shown, with no spaces.
@@ -497,15 +497,15 @@ Then, in Power Apps Studio, go to **Data**, click **⋯** next to **Change Reque
 ### 6b. App.Formulas
 Add to the **end**:
 ```powerfx
-// Asset managers: receive the CMDB tasker and can tick "CMDB updated". Use lower-case emails.
-HWAssetManagers = ["hw.asset.manager@us.af.mil"];
-SWAssetManagers = ["sw.asset.manager@us.af.mil"];
-IsAssetManager  = Lower(User().Email) in HWAssetManagers || Lower(User().Email) in SWAssetManagers;
+// HW and SW managers (the same people who get the new-request emails): they receive the CMDB tasker and can tick "CMDB updated". Use lower-case emails.
+HWManagers = ["hw.manager1@us.af.mil", "hw.manager2@us.af.mil"];
+SWManagers = ["sw.manager1@us.af.mil", "sw.manager2@us.af.mil"];
+IsHWSWManager  = Lower(User().Email) in HWManagers || Lower(User().Email) in SWManagers;
 ```
 
-Then change `CanSeeAll`, so asset managers can find any request on the board:
+Then change `CanSeeAll`, so the HW and SW managers can find any request on the board:
 ```powerfx
-CanSeeAll = IsCM || IsTRB || IsCAB || IsAuthority || IsAssetManager;
+CanSeeAll = IsCM || IsTRB || IsCAB || IsAuthority || IsHWSWManager;
 ```
 
 ### 6c. New Request screen (`frmNew`)
@@ -565,9 +565,9 @@ CanSeeAll = IsCM || IsTRB || IsCAB || IsAuthority || IsAssetManager;
      ```powerfx
      LookUp(Stages, Name = varCR.Stage.Value).Order >= LookUp(Stages, Name = "Implementation").Order
      ```
-   - **DisplayMode:** editable only during Implementation, for the CM team and asset managers:
+   - **DisplayMode:** editable only during Implementation, for the CM team and the HW and SW managers:
      ```powerfx
-     If(varCR.Stage.Value = "Implementation" && (IsCM || IsAssetManager), DisplayMode.Edit, DisplayMode.View)
+     If(varCR.Stage.Value = "Implementation" && (IsCM || IsHWSWManager), DisplayMode.Edit, DisplayMode.View)
      ```
    - Inside it, set the toggle's **TrueText** = `"Yes"` and **FalseText** = `"No"`.
 
@@ -580,7 +580,7 @@ In the `"advance"` section, add this rule just **after** the `cur.Name = "Implem
 
 It applies to every change type, whether the next stage is PIR (Normal, Emergency) or Close (Standard). **Completed** isn't blocked: the implementer clicks it, which sends the tasker, and the request then waits in Implementation until the CMDB is updated.
 
-Because Move saves first, a CM can set **CMDB updated** to Yes and click **Move** in one step. An asset manager who isn't on the CM team ticks it and clicks **Save changes**, and CM moves the request on afterwards.
+Because Move saves first, a CM can set **CMDB updated** to Yes and click **Move** in one step. An HW or SW manager who isn't on the CM team ticks it and clicks **Save changes**, and CM moves the request on afterwards.
 
 ### 6f. Change log (Part 5)
 In the Part 5 formula at the start of **`frmDetail` › OnSuccess**, add these lines to the `Table(…)`, just after the **Affected systems** line. Serial numbers are listed on one line, separated by commas.
@@ -599,12 +599,12 @@ The History then shows who ticked **CMDB updated** and when, e.g. *✎ CMDB upda
 ### 6g. The CMDB tasker email (stage-change flow)
 Open **Change Request – Stage notifications** (guide 8b) in **Edit**.
 
-1. **Recipients.** Next to the other **Initialize variable** actions, add two (String):
+1. **Recipients.** Next to the other **Initialize variable** actions, add two (String) holding the **same addresses** as the new-request flow (guide 8a). A flow can only read its own variables, so the addresses are copied here:
 
    | Name | Value |
    |---|---|
-   | `HWAssetManagerEmails` | `hw.asset.manager@us.af.mil` |
-   | `SWAssetManagerEmails` | `sw.asset.manager@us.af.mil` |
+   | `HWManagerEmails` | `hw.manager1@us.af.mil;hw.manager2@us.af.mil` (same as the new-request flow) |
+   | `SWManagerEmails` | `sw.manager1@us.af.mil;sw.manager2@us.af.mil` (same as the new-request flow) |
 
 2. **After the Switch** (not inside it), add a **Condition** and rename it `Needs CMDB tasker`. In its first row, put this on the left as an **expression**, choose **is equal to**, and type `true` on the right:
    ```
@@ -616,15 +616,15 @@ Open **Change Request – Stage notifications** (guide 8b) in **Edit**.
 
    | # | Action | Rename to | Settings |
    |---|---|---|---|
-   | 1 | **Compose** | `AssetManagerEmails` | expression below |
+   | 1 | **Compose** | `TaskerEmails` | expression below |
    | 2 | **Select** *(Map in text mode)* | `Tasker assignees` | **From:** expression below · **Map:** `item()?['DisplayName']` |
    | 3 | **Compose** | `CIDetails` | expression below |
    | 4 | **Compose** | `TaskerBody` | the HTML below |
-   | 5 | **Send an email (V2)** *(or from a shared mailbox, guide 8d)* | `Send CMDB tasker` | To: `outputs('AssetManagerEmails')` · CC: `variables('CMTeamEmails')` · Subject: `concat('CMDB update required: ', outputs('CRNumber'), ' – ', body('Get_item')?['Title'])` · Body: **Code view**, then the **Outputs** of `TaskerBody` · Importance: `if(equals(body('Get_item')?['ChangeType']?['Value'], 'Emergency'), 'High', 'Normal')` |
+   | 5 | **Send an email (V2)** *(or from a shared mailbox, guide 8d)* | `Send CMDB tasker` | To: `outputs('TaskerEmails')` · CC: `variables('CMTeamEmails')` · Subject: `concat('CMDB update required: ', outputs('CRNumber'), ' – ', body('Get_item')?['Title'])` · Body: **Code view**, then the **Outputs** of `TaskerBody` · Importance: `if(equals(body('Get_item')?['ChangeType']?['Value'], 'Emergency'), 'High', 'Normal')` |
 
-   **`AssetManagerEmails`:**
+   **`TaskerEmails`:**
    ```
-   if(equals(body('Get_item')?['Category']?['Value'], 'Hardware'), variables('HWAssetManagerEmails'), if(equals(body('Get_item')?['Category']?['Value'], 'Software'), variables('SWAssetManagerEmails'), concat(variables('HWAssetManagerEmails'), ';', variables('SWAssetManagerEmails'))))
+   if(equals(body('Get_item')?['Category']?['Value'], 'Hardware'), variables('HWManagerEmails'), if(equals(body('Get_item')?['Category']?['Value'], 'Software'), variables('SWManagerEmails'), concat(variables('HWManagerEmails'), ';', variables('SWManagerEmails'))))
    ```
 
    **`Tasker assignees` › From** (works with one assignee or several):
@@ -664,7 +664,7 @@ Open **Change Request – Stage notifications** (guide 8b) in **Edit**.
 
 4. **Save** the flow.
 
-> **Sent again after a send-back:** Send back clears *Completed*, so if a request is sent back to Implementation and the implementer clicks Completed again, the asset manager gets a second tasker. That's useful when what was implemented changed. If it's not wanted, use `and(equals(triggerOutputs()?['body/ToStage'], 'Implementation complete'), equals(body('Get_item')?['CMDBUpdated'], false))` as the condition instead.
+> **Sent again after a send-back:** Send back clears *Completed*, so if a request is sent back to Implementation and the implementer clicks Completed again, the managers get a second tasker. That's useful when what was implemented changed. If it's not wanted, use `and(equals(triggerOutputs()?['body/ToStage'], 'Implementation complete'), equals(body('Get_item')?['CMDBUpdated'], false))` as the condition instead.
 
 ### 6h. Archive PDF (recommended)
 In the **Change Request – Archive on close** flow and the manual copy, add the new fields so the record keeps them:
@@ -699,13 +699,13 @@ In the **Change Request – Archive on close** flow and the manual copy, add the
 | 3 | Choose **Network** | No category fields; Affected systems shows a red star |
 | 4 | Submit a Hardware request without a serial number | Error: *Fill in every field marked with a red star* |
 | 5 | Type software details, switch to Hardware, fill that in and submit | Only the hardware values are saved in SharePoint |
-| 6 | Take a **Normal Hardware** request to Implementation | **CMDB updated** shows (No); CM and asset managers can change it, others see it read-only |
-| 7 | The implementer adds notes and clicks **✔ Completed** | The HW asset manager gets *"CMDB update required: CR-…"*, CC the CM team, with make, model and serials one per line |
+| 6 | Take a **Normal Hardware** request to Implementation | **CMDB updated** shows (No); CM and the HW and SW managers can change it, others see it read-only |
+| 7 | The implementer adds notes and clicks **✔ Completed** | The HW managers get *"CMDB update required: CR-…"*, CC the CM team, with make, model and serials one per line |
 | 8 | CM clicks **Move to PIR** without CMDB updated ticked | Error: *Confirm the CMDB has been updated* |
-| 9 | As the asset manager, open the request from the email link, set **CMDB updated** to Yes and **Save changes** | Saved; History shows *✎ CMDB updated: No → Yes* with their name |
+| 9 | As an HW manager, open the request from the email link, set **CMDB updated** to Yes and **Save changes** | Saved; History shows *✎ CMDB updated: No → Yes* with their name |
 | 10 | CM clicks **Move** | Moves to PIR; CMDB updated shows *Yes*, read-only |
-| 11 | Take a **Standard Software** request to Implementation, click **✔ Completed**, then **Move** | The SW asset manager gets the tasker; Move to Close is blocked until CMDB updated is Yes |
-| 12 | Take a **Network** request to Implementation and click **✔ Completed** | Both asset managers get the tasker |
+| 11 | Take a **Standard Software** request to Implementation, click **✔ Completed**, then **Move** | The SW managers get the tasker; Move to Close is blocked until CMDB updated is Yes |
+| 12 | Take a **Network** request to Implementation and click **✔ Completed** | Both the HW and SW managers get the tasker |
 | 13 | Reject a request at CAB | No tasker is sent |
 | 14 | Close a request and open its archive PDF *(if you did 6h)* | The *Configuration items* section shows the details and *CMDB updated: Yes* |
 
@@ -714,4 +714,4 @@ In the **Change Request – Archive on close** flow and the manual copy, add the
 - **Fields leave gaps when hidden:** check the order in **Edit fields** matches 6c, so each category fills whole rows, and that the hidden system cards are still at the bottom.
 - **No tasker email:** check the **Condition** is after the Switch, not inside a case, and that its right-hand side is `true`. The tasker comes from **Completed**, not from Move.
 - **The tasker's details are blank:** check the new columns' internal names in **Get item › Show raw outputs** (see the note in 6a).
-- **CMDB updated can't be ticked:** the person isn't in `CMTeam`, `HWAssetManagers` or `SWAssetManagers`, or the request isn't in Implementation.
+- **CMDB updated can't be ticked:** the person isn't in `CMTeam`, `HWManagers` or `SWManagers`, or the request isn't in Implementation.
