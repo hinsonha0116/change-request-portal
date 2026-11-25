@@ -8,7 +8,7 @@ These changes build on the app as described in the [build guide](Change-Request-
 3. **Several assignees:** the **Assignee** field on the detail screen takes more than one person.
 4. **Emergency CAB (ECAB):** Emergency changes follow their own route, **Requested → ECAB → Implementation → PIR → Close**. The ECAB replaces the CAB and Change Authority for emergencies. The CAB members record the ECAB decision.
 5. **A History line for every change:** when someone saves a request and any field has changed, the History shows what changed, e.g. *Priority: 3 - Moderate → 2 - High*. This covers the CM changing the priority or change type in *Requested*.
-6. **Software and hardware details, and the CMDB tasker:** software name and versions, or hardware make, model and serials, on each request; an email tasking the HW or SW asset manager to update the CMDB once a change is implemented; and a required *CMDB updated* check before closing.
+6. **Software and hardware details, and the CMDB tasker:** software name and versions, or hardware make, model and serials, on each request; an email tasking the HW or SW asset manager to update the CMDB when the implementer clicks Completed; and a required *CMDB updated* check before a change can leave Implementation.
 
 > **How to set a property:** select the control in the **Tree view**, choose the property in the dropdown at the left of the formula bar, and paste the value into the formula bar. Unlock form cards first if needed: **Properties › Advanced › 🔒 Unlock to change properties**.
 
@@ -466,16 +466,15 @@ Leave the rest of OnSuccess as it is, starting with `Set(varCR, Self.LastSubmit)
   | Software | SW asset manager | CM team |
   | Network | HW **and** SW asset managers | CM team |
 
-  - **Normal and Emergency:** sent when the CM team moves the request from **Implementation to PIR**.
-  - **Standard** (no PIR): sent when the implementer clicks **✔ Completed**.
+  - **When:** for every change type, as soon as the implementer clicks **✔ Completed** in Implementation.
   - **Rejected changes** never get one.
 - **A required "CMDB updated" check:** a Yes/No field that the CM team or an asset manager ticks once the CMDB is updated.
-  - Normal and Emergency changes can't leave **PIR** until it's ticked.
-  - Standard changes can't leave **Implementation** until it's ticked.
+  - It shows from **Implementation** onward, and can only be changed **during Implementation**.
+  - **No change can leave Implementation** until it's ticked.
 
 **Time:** about 2½ hours. Do Parts 1–5 first: 6f adds lines to the Part 5 formula.
 
-> **Requests already at PIR** (or Standard requests already at Implementation) when you turn this on will need **CMDB updated** ticked before they can close.
+> **Requests already in Implementation** when you turn this on need **CMDB updated** ticked before they can move on. If the implementer had already clicked Completed, no tasker was sent, so contact the asset manager directly. Requests already past Implementation aren't affected.
 
 ### 6a. SharePoint (Change Requests list)
 Add these columns. Type each name exactly as shown, with no spaces.
@@ -562,30 +561,24 @@ CanSeeAll = IsCM || IsTRB || IsCAB || IsAuthority || IsAssetManager;
    - **Serial number boxes:** **Mode** `TextMode.MultiLine`, **Height** `60`.
 5. **AffectedSystems:** keep the guide's Visible rule. It already shows the field while in *Requested* and hides it later when empty.
 6. **CMDBUpdated card:**
-   - **Visible:** from Implementation for Standard changes, from PIR for the others:
+   - **Visible:** from Implementation onward, for every change type:
      ```powerfx
-     With({cur: LookUp(Stages, Name = varCR.Stage.Value).Order},
-         If(Coalesce(varCR.ChangeType.Value, "Normal") = "Standard",
-            cur >= LookUp(Stages, Name = "Implementation").Order,
-            cur >= LookUp(Stages, Name = "PIR").Order))
+     LookUp(Stages, Name = varCR.Stage.Value).Order >= LookUp(Stages, Name = "Implementation").Order
      ```
-   - **DisplayMode:** editable at the stage where it's checked, for the CM team and asset managers:
+   - **DisplayMode:** editable only during Implementation, for the CM team and asset managers:
      ```powerfx
-     If((varCR.Stage.Value = "PIR" ||
-         (varCR.Stage.Value = "Implementation" && Coalesce(varCR.ChangeType.Value, "Normal") = "Standard")) &&
-        (IsCM || IsAssetManager),
-        DisplayMode.Edit, DisplayMode.View)
+     If(varCR.Stage.Value = "Implementation" && (IsCM || IsAssetManager), DisplayMode.Edit, DisplayMode.View)
      ```
    - Inside it, set the toggle's **TrueText** = `"Yes"` and **FalseText** = `"No"`.
 
 ### 6e. The closing rule (`frmDetail` › OnSuccess)
-In the `"advance"` section, add these two rules just **after** the `cur.Name = "PIR" && IsBlank(varCR.ReviewOutcome.Value)` rule, before the `Set(varCR, Patch(…))` line:
+In the `"advance"` section, add this rule just **after** the `cur.Name = "Implementation" && IsBlank(varCR.ImplementationNotes)` rule:
 ```powerfx
-                cur.Name = "PIR" && !varCR.CMDBUpdated,
-                    Notify("Confirm the CMDB has been updated (set CMDB updated to Yes) before closing.", NotificationType.Error),
-                cur.Name = "Implementation" && type = "Standard" && !varCR.CMDBUpdated,
-                    Notify("Confirm the CMDB has been updated (set CMDB updated to Yes) before closing.", NotificationType.Error),
+                cur.Name = "Implementation" && !varCR.CMDBUpdated,
+                    Notify("Confirm the CMDB has been updated (set CMDB updated to Yes) before moving on.", NotificationType.Error),
 ```
+
+It applies to every change type, whether the next stage is PIR (Normal, Emergency) or Close (Standard). **Completed** isn't blocked: the implementer clicks it, which sends the tasker, and the request then waits in Implementation until the CMDB is updated.
 
 Because Move saves first, a CM can set **CMDB updated** to Yes and click **Move** in one step. An asset manager who isn't on the CM team ticks it and clicks **Save changes**, and CM moves the request on afterwards.
 
@@ -615,9 +608,9 @@ Open **Change Request – Stage notifications** (guide 8b) in **Edit**.
 
 2. **After the Switch** (not inside it), add a **Condition** and rename it `Needs CMDB tasker`. In its first row, put this on the left as an **expression**, choose **is equal to**, and type `true` on the right:
    ```
-   or(equals(triggerOutputs()?['body/ToStage'], 'PIR'), and(equals(triggerOutputs()?['body/ToStage'], 'Implementation complete'), equals(body('Get_item')?['ChangeType']?['Value'], 'Standard')))
+   equals(triggerOutputs()?['body/ToStage'], 'Implementation complete')
    ```
-   It's true when a Normal or Emergency change reaches PIR, or a Standard change is marked complete.
+   It's true when the implementer clicks **Completed**, for every change type.
 
 3. **In the "True" branch**, add these actions. Rename each as shown.
 
@@ -671,7 +664,7 @@ Open **Change Request – Stage notifications** (guide 8b) in **Edit**.
 
 4. **Save** the flow.
 
-> **Sent again after a send-back:** if CM sends a request back from PIR and it reaches PIR again, the asset manager gets a second tasker. That's useful when what was implemented changed. If it's not wanted, combine the condition with `equals(body('Get_item')?['CMDBUpdated'], false)` inside `and(…)`.
+> **Sent again after a send-back:** Send back clears *Completed*, so if a request is sent back to Implementation and the implementer clicks Completed again, the asset manager gets a second tasker. That's useful when what was implemented changed. If it's not wanted, use `and(equals(triggerOutputs()?['body/ToStage'], 'Implementation complete'), equals(body('Get_item')?['CMDBUpdated'], false))` as the condition instead.
 
 ### 6h. Archive PDF (recommended)
 In the **Change Request – Archive on close** flow and the manual copy, add the new fields so the record keeps them:
@@ -706,18 +699,19 @@ In the **Change Request – Archive on close** flow and the manual copy, add the
 | 3 | Choose **Network** | No category fields; Affected systems shows a red star |
 | 4 | Submit a Hardware request without a serial number | Error: *Fill in every field marked with a red star* |
 | 5 | Type software details, switch to Hardware, fill that in and submit | Only the hardware values are saved in SharePoint |
-| 6 | Take a **Normal Hardware** request to **PIR** | The HW asset manager gets *"CMDB update required: CR-…"*, CC the CM team, with make, model and serials one per line |
-| 7 | At PIR, set a PIR outcome and click **Move** without ticking CMDB updated | Error: *Confirm the CMDB has been updated* |
-| 8 | As the asset manager, open the request from the email link, set **CMDB updated** to Yes and **Save changes** | Saved; History shows *✎ CMDB updated: No → Yes* with their name |
-| 9 | CM clicks **Move** | It closes |
-| 10 | Take a **Standard Software** request to Implementation and click **✔ Completed** | The SW asset manager gets the tasker; **Move** to Close is blocked until CMDB updated is Yes |
-| 11 | Take a **Network** request to PIR | Both asset managers get the tasker |
-| 12 | Reject a request at CAB | No tasker is sent |
-| 13 | Close a request and open its archive PDF *(if you did 6h)* | The *Configuration items* section shows the details and *CMDB updated: Yes* |
+| 6 | Take a **Normal Hardware** request to Implementation | **CMDB updated** shows (No); CM and asset managers can change it, others see it read-only |
+| 7 | The implementer adds notes and clicks **✔ Completed** | The HW asset manager gets *"CMDB update required: CR-…"*, CC the CM team, with make, model and serials one per line |
+| 8 | CM clicks **Move to PIR** without CMDB updated ticked | Error: *Confirm the CMDB has been updated* |
+| 9 | As the asset manager, open the request from the email link, set **CMDB updated** to Yes and **Save changes** | Saved; History shows *✎ CMDB updated: No → Yes* with their name |
+| 10 | CM clicks **Move** | Moves to PIR; CMDB updated shows *Yes*, read-only |
+| 11 | Take a **Standard Software** request to Implementation, click **✔ Completed**, then **Move** | The SW asset manager gets the tasker; Move to Close is blocked until CMDB updated is Yes |
+| 12 | Take a **Network** request to Implementation and click **✔ Completed** | Both asset managers get the tasker |
+| 13 | Reject a request at CAB | No tasker is sent |
+| 14 | Close a request and open its archive PDF *(if you did 6h)* | The *Configuration items* section shows the details and *CMDB updated: Yes* |
 
 **If something goes wrong:**
 - **Both categories' fields show, or neither:** check each card's **Visible** uses `drpCategory` (New Request) or `drpCategoryDetail` (detail screen), and the exact text `"Software"` or `"Hardware"`.
 - **Fields leave gaps when hidden:** check the order in **Edit fields** matches 6c, so each category fills whole rows, and that the hidden system cards are still at the bottom.
-- **No tasker email:** check the **Condition** is after the Switch, not inside a case, and that its right-hand side is `true`. For Standard changes, the tasker comes from **Completed**, not from Move.
+- **No tasker email:** check the **Condition** is after the Switch, not inside a case, and that its right-hand side is `true`. The tasker comes from **Completed**, not from Move.
 - **The tasker's details are blank:** check the new columns' internal names in **Get item › Show raw outputs** (see the note in 6a).
-- **CMDB updated can't be ticked:** the person isn't in `CMTeam`, `HWAssetManagers` or `SWAssetManagers`, or the request isn't at PIR (or at Implementation, for Standard).
+- **CMDB updated can't be ticked:** the person isn't in `CMTeam`, `HWAssetManagers` or `SWAssetManagers`, or the request isn't in Implementation.

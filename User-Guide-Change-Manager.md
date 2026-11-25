@@ -456,4 +456,4 @@ These changes are in [DetailScreen-Fixes.md](DetailScreen-Fixes.md) and will be 
 | **Emergency CAB (ECAB)** | Emergency changes go **Requested → Emergency CAB → Implementation → PIR → Close**. The CAB members record the **ECAB decision**, and the board gets an **ECAB** column |
 | **History of every change** | When anyone saves a change to a field (e.g. you correct the priority in Requested), the History shows *✎ Changes: Priority: 3 - Moderate → 2 - High* |
 | **Software and hardware details** | Software requests record the software name and versions; hardware requests record make, model and serial numbers |
-| **CMDB tasker** | When a change is implemented, the HW or SW asset manager is emailed to update the CMDB. A **CMDB updated** check must be ticked (by CM or an asset manager) before the request can close: at **PIR** for Normal and Emergency, and at **Implementation** for Standard |
+| **CMDB tasker** | When the implementer clicks **Completed**, the HW or SW asset manager is emailed to update the CMDB. **CMDB updated** must then be ticked (by CM or an asset manager) during Implementation before any change can move on |
